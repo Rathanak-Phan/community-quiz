@@ -1,0 +1,46 @@
+##################################
+# Global
+##################################
+
+.DS_Store
+Thumbs.db
+.env
+.env.local
+.env.*.local
+*.log
+*.lock
+
+##################################
+# Frontend (Vue / React / Vite)
+##################################
+
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.cache/
+frontend/.env
+frontend/.env.*
+
+##################################
+# Backend (Laravel 10)
+##################################
+
+backend/vendor/
+backend/node_modules/
+backend/public/storage
+backend/storage/*.key
+backend/storage/app/*
+backend/storage/framework/*
+backend/storage/logs/*
+backend/bootstrap/cache/*
+backend/.env
+backend/.env.*
+backend/*.log
+
+##################################
+# IDE Files
+##################################
+
+.vscode/
+.idea/

@@ -1,0 +1,1 @@
+Kom lus tang 6
