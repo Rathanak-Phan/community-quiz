@@ -14,9 +14,11 @@ use App\Http\Controllers\Auth\AuthController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+//  Route::middleware('auth:sanctum')->get('/user', function (Request $request) {                                                                │
+// return $request->user(); 
+//  });
+Route::get('/user', function (Request $request) {
+    return \App\Models\User::all();
 });
 /*
 |--------------------------------------------------------------------------
