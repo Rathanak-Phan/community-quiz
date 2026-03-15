@@ -9,6 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @mixin \Laravel\Sanctum\HasApiTokens
+ *
  * 
  * @method \Laravel\Sanctum\NewAccessToken createToken(string $name, array $abilities = ['*'])
  *
@@ -21,7 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'password'
+        'role'
     ];
 
     protected $hidden = [
