@@ -11,16 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
 
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->foreignId('quiz_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
-            $table->string('password');
-            $table->rememberToken();
+            $table->enum('type', ['MCQ', 'TF', 'SHORT']);
+
+            $table->text('question_text');
+
+            $table->text('correct_answer')->nullable();
+
+            $table->string('image')->nullable();
+
 
             $table->timestamps();
         });
@@ -31,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('questions');
     }
 };
