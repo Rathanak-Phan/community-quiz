@@ -55,7 +55,7 @@ function Login() {
 
         {/* Title */}
         <h2 className="text-xl font-semibold text-center text-gray-900">
-          Quiz Community
+          Quiz Community Jingjo Test
         </h2>
 
         <p className="text-sm text-gray-500 text-center mt-2 mb-6">
