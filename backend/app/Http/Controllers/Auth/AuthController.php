@@ -19,6 +19,7 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
+
         $result = $this->authService->register($request->validated());
 
         return response()->json([
@@ -59,6 +60,12 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out successfully'
+        ]);
+    }
+
+    public function profile(Request $request){
+        return response()->json([
+            'user' => $request->user()
         ]);
     }
 }

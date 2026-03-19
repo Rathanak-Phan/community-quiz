@@ -1,18 +1,26 @@
 <?php
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class AuthService{
     public function register($data){
         /** @var \App\Models\User $user */
+        $role = Role::where('name', 'user')->first();
+
+        if (!$role) {
+            throw new \Exception('Role not found. Please run RoleSeeder.');
+        }
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role'=>'user'
+            'role_id' => $role->id,
         ]);
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
