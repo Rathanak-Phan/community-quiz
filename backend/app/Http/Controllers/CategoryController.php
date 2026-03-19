@@ -7,59 +7,84 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // GET ALL
+    public function index(Request $request)
     {
-        //
+        $user = $request->user();
+
+        // Admin → all categories
+        if ($user->role->name === 'admin') {
+            return response()->json(Category::all());
+        }
+
+        // Quiz Maker → own categories
+        return response()->json(
+            Category::where('user_id', $user->id)->get()
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    // Not needed for API
+    public function create() {}
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // CREATE
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $category = Category::create([
+            'name' => $request->name,
+            'user_id' => $request->user()->id
+        ]);
+
+        return response()->json($category, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // SHOW (FIXED)
     public function show(Category $category)
     {
-        //
+        return response()->json($category);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
+    // Not needed for API
+    public function edit() {}
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // UPDATE
     public function update(Request $request, Category $category)
     {
-        //
+        $user = $request->user();
+
+        // Authorization
+        if ($user->role->name !== 'admin' && $category->user_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $category->update([
+            'name' => $request->name
+        ]);
+
+        return response()->json($category);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
+    // DELETE
+    public function destroy(Request $request, Category $category)
     {
-        //
+        $user = $request->user();
+
+        // Authorization
+        if ($user->role->name !== 'admin' && $category->user_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $category->delete();
+
+        return response()->json([
+            'message' => 'Deleted successfully'
+        ]);
     }
 }
