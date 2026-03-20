@@ -3,6 +3,8 @@ import "./App.css";
 import Login from "./page/auth/Login";
 import Dashboard from "./page/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+import CategoryList from "./page/admin/categories/CategoryList";
 
 function App() {
   return (
@@ -16,6 +18,14 @@ function App() {
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categories"
+          element={
+            <AdminRoute>
+              <CategoryList />
+            </AdminRoute>
           }
         />
       </Routes>
