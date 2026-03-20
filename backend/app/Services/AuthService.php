@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Services;
 
 use App\Models\Role;
@@ -35,6 +35,7 @@ class AuthService{
         if(!$user || !Hash::check($data['password'], $user->password)){
             return null;
         }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [

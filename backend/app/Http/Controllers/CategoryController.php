@@ -41,9 +41,11 @@ class CategoryController extends Controller
         return response()->json($category, 201);
     }
 
-    // SHOW (FIXED)
+    // SHOW
     public function show(Category $category)
     {
+        $this->authorize('view', $category);
+
         return response()->json($category);
     }
 
@@ -53,12 +55,7 @@ class CategoryController extends Controller
     // UPDATE
     public function update(Request $request, Category $category)
     {
-        $user = $request->user();
-
-        // Authorization
-        if ($user->role->name !== 'admin' && $category->user_id !== $user->id) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+        $this->authorize('update', $category);
 
         $request->validate([
             'name' => 'required|string|max:255'
@@ -74,12 +71,7 @@ class CategoryController extends Controller
     // DELETE
     public function destroy(Request $request, Category $category)
     {
-        $user = $request->user();
-
-        // Authorization
-        if ($user->role->name !== 'admin' && $category->user_id !== $user->id) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+        $this->authorize('delete', $category);
 
         $category->delete();
 
