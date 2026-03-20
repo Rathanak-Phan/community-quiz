@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 /**
  * @mixin \Laravel\Sanctum\HasApiTokens
  * 
+ *
  * @method \Laravel\Sanctum\NewAccessToken createToken(string $name, array $abilities = ['*'])
  *
  * @property-read \Laravel\Sanctum\NewAccessToken $currentAccessToken
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id'
     ];
 
     protected $hidden = [
@@ -32,4 +34,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }
