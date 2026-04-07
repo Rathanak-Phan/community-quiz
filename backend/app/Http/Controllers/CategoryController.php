@@ -14,7 +14,9 @@ class CategoryController extends Controller
 
         // Admin → all categories
         if ($user->role->name === 'admin') {
-            return response()->json(Category::all());
+            return response()->json(
+                Category::with('user')->get()
+            );
         }
 
         // Quiz Maker → own categories
