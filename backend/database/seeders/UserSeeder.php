@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
     {
         $adminRole = Role::where('name', 'admin')->first();
         $makerRole = Role::where('name', 'quiz_maker')->first();
+        $userRole = Role::where('name', 'user')->first();
 
         User::create([
             'name' => 'Admin',
@@ -29,6 +30,13 @@ class UserSeeder extends Seeder
             'email' => 'maker@test.com',
             'password' => Hash::make('12345678'),
             'role_id' => $makerRole->id
+        ]);
+
+        User::create([
+            'name' => 'Test User',
+            'email' => 'user@test.com',
+            'password' => Hash::make('12345678'),
+            'role_id' => $userRole->id
         ]);
     }
 }

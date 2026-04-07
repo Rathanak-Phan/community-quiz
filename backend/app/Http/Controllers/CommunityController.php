@@ -12,7 +12,9 @@ class CommunityController extends Controller
      */
     public function index()
     {
-        //
+        $communities = Community::with('creator:id,name,email')->get();
+
+        return response()->json($communities);
     }
 
     /**
@@ -28,7 +30,34 @@ class CommunityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'visibility' => 'required|in:public,private',
+            'cover_image' => 'nullable|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $path = null;
+
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')
+                ->store('communities', 'public');
+        }
+
+        $community = Community::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'visibility' => $request->visibility,
+            'created_by' => auth()->id(),
+            'cover_image' => $path
+        ]);
+
+        // Attach owner (IMPORTANT)
+        $community->users()->attach(auth()->id(), [
+            'role' => 'owner',
+            'status' => 'approved'
+        ]);
+
+        return response()->json($community, 201);
     }
 
     /**
@@ -52,7 +81,33 @@ class CommunityController extends Controller
      */
     public function update(Request $request, Community $community)
     {
-        //
+        $this->authorize('update', $community);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'visibility' => 'required|in:public,private',
+            'cover_image' => 'nullable|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'description' => $request->description,
+            'visibility' => $request->visibility,
+        ];
+
+        // Handle image
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')
+                ->store('communities', 'public');
+        }
+
+        $community->update($data);
+
+        return response()->json([
+            'message' => 'Community updated successfully',
+            'data' => $community
+        ]);
     }
 
     /**
@@ -60,6 +115,12 @@ class CommunityController extends Controller
      */
     public function destroy(Community $community)
     {
-        //
+        $this->authorize('delete', $community);
+
+        $community->delete();
+
+        return response()->json([
+            'message' => 'Community deleted successfully'
+        ]);
     }
 }
