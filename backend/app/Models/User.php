@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @mixin \Laravel\Sanctum\HasApiTokens
  * 
  *
+ *
  * @method \Laravel\Sanctum\NewAccessToken createToken(string $name, array $abilities = ['*'])
  *
  * @property-read \Laravel\Sanctum\NewAccessToken $currentAccessToken
@@ -43,5 +44,12 @@ class User extends Authenticatable
     public function categories()
     {
         return $this->hasMany(Category::class);
+    }
+
+    public function communities()
+    {
+        return $this->belongsToMany(Community::class, 'community_user')
+            ->withPivot('status', 'role')
+            ->withTimestamps();
     }
 }

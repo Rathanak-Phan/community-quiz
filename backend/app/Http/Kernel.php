@@ -39,7 +39,8 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
@@ -63,9 +64,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        'admin' => \App\Http\Middleware\AdminMiddleware::class,
-        'quizmaker' => \App\Http\Middleware\QuizMakerMiddleware::class,
+        'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\Authenticate::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
 }

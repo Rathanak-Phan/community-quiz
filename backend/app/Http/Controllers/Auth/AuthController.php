@@ -7,6 +7,8 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -17,17 +19,23 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    // =============================
+    // REGISTER (SPA - COOKIE)
+    // =============================
     public function register(RegisterRequest $request)
     {
+        $user = $this->authService->register($request->validated());
 
-        $result = $this->authService->register($request->validated());
+        Auth::login($user);
 
         return response()->json([
-            'user' => $result['user'],
-            'token' => $result['token'],
+            'user' => $user
         ], 201);
     }
 
+    // =============================
+    // LOGIN (SPA - COOKIE)
+    // =============================
     public function login(Request $request)
     {
         $request->validate([
@@ -35,27 +43,55 @@ class AuthController extends Controller
             'password' => 'required|string|min:8'
         ]);
 
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            /** @var \App\Models\User $user */
-            $user = Auth::user();
-            $token = $user->createToken('api-token')->plainTextToken;
-
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
-                'user' => $user,
-                'token' => $token
-            ]);
+                'message' => 'Invalid credentials'
+            ], 401);
         }
 
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'user' => Auth::user()
+        ]);
     }
 
+    // =============================
+    // LOGIN TOKEN (POSTMAN)
+    // =============================
+    public function loginToken(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        $token = $user->createToken('postman-token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user' => $user
+        ]);
+    }
+
+    // =============================
+    // LOGOUT (SPA - COOKIE)
+    // =============================
     public function logout(Request $request)
     {
-        $user = $request->user();
-        if ($user) {
-            $user->currentAccessToken()->delete();
+        Auth::guard('web')->logout();
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
 
         return response()->json([
@@ -63,7 +99,23 @@ class AuthController extends Controller
         ]);
     }
 
-    public function profile(Request $request){
+    // =============================
+    // LOGOUT TOKEN (POSTMAN)
+    // =============================
+    public function logoutToken(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Token logged out'
+        ]);
+    }
+
+    // =============================
+    // PROFILE (BOTH WORK)
+    // =============================
+    public function profile(Request $request)
+    {
         return response()->json([
             'user' => $request->user()
         ]);

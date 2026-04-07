@@ -16,7 +16,7 @@ class Authenticate extends Middleware
         if ($request->expectsJson()) {
             return null;
         }
-        
+
         return route('login');
     }
 
@@ -31,8 +31,8 @@ class Authenticate extends Middleware
      */
     protected function unauthenticated($request, array $guards)
     {
-        abort(response()->json([
-            'message' => 'Unauthenticated.'
-        ], 401));
+        throw new \Illuminate\Auth\AuthenticationException(
+            'Unauthenticated.', $guards, null
+        );
     }
 }
