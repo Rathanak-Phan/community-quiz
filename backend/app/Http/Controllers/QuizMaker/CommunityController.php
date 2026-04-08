@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\QuizMaker;
 
+use App\Http\Controllers\Controller;
 use App\Models\Community;
+use App\Models\CommunityMember;
 use Illuminate\Http\Request;
 
 class CommunityController extends Controller
@@ -47,7 +49,7 @@ class CommunityController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'visibility' => $request->visibility,
-            'created_by' => auth()->id(),
+            'owner_id' => auth()->id(),
             'cover_image' => $path
         ]);
 
@@ -121,6 +123,81 @@ class CommunityController extends Controller
 
         return response()->json([
             'message' => 'Community deleted successfully'
+        ]);
+    }
+
+    // join community
+    public function join(Community $community)
+    {
+        $user = auth()->user();
+
+        // check already joined/requested
+        $exits = CommunityMember::where([
+            'community_id' => $community->id,
+            'user_id' => $user->id
+        ])->first();
+
+        if ($exits) {
+            return response()->json([
+                'message' => 'Already joined or requested'
+            ], 400);
+        }
+
+        // Public or private
+        $status = $community->visibility === 'public'
+            ? 'approved'
+            : 'pending';
+
+        CommunityMember::create([
+            'community_id' => $community->id,
+            'user_id' => $user->id,
+            'role' => 'member',
+            'status' => $status
+        ]);
+
+        return response()->json([
+            'message' => $status === 'approved'
+                ? 'Joined successfully'
+                : 'Join request sent'
+        ]);
+    }
+
+    public function approve($id)
+    {
+        $member = CommunityMember::findOrFail($id);
+
+        // Only owner can approve
+        if ($member->community->owner_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $member->update([
+            'status' => 'approved'
+        ]);
+
+        return response([
+            'message' => 'Member approved'
+        ]);
+    }
+
+    public function reject($id)
+    {
+        $member = CommunityMember::findOrFail($id);
+
+        if ($member->community->owner_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $member->update([
+            'status' => 'rejected'
+        ]);
+
+        return response()->json([
+            'message' => 'Member rejected'
         ]);
     }
 }

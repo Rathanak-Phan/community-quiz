@@ -37,7 +37,7 @@ class CommunityPolicy
      */
     public function update(User $user, Community $community): bool
     {
-        return $user->id === $community->created_by;
+        return $user->id === $community->owner_id;
     }
 
     /**
@@ -45,7 +45,7 @@ class CommunityPolicy
      */
     public function delete(User $user, Community $community): bool
     {
-        return $user->id === $community->created_by;
+        return $user->id === $community->owner_id;
     }
 
     /**
