@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizMaker\CategoryController;
 use App\Http\Controllers\QuizMaker\CommunityController;
-use App\Http\Controllers\QuizController;
-use App\Http\Controllers\CommunityController;
+use Illuminate\Routing\Route;
 
 /*
 |--------------------------------------------------------------------------
