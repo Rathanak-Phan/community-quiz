@@ -84,17 +84,26 @@ backend/
 │   │   ├── Controllers/
 │   │   │   │
 │   │   │   ├── Auth/
-│   │   │   │   ├── AuthController.php
+│   │   │   │   └── AuthController.php
 │   │   │   │
-│   │   │   ├── CategoryController.php
-│   │   │   ├── CommunityController.php
-│   │   │   ├── QuizController.php
-│   │   │   ├── QuestionController.php
-│   │   │   ├── AttemptController.php
-│   │   │   ├── LeaderboardController.php
-│   │   │   ├── FavoriteController.php
-│   │   │   ├── DashboardController.php
-│   │   │   └── SubmissionController.php
+│   │   │   ├── Admin/
+│   │   │   │   ├── CategoryController.php
+│   │   │   │   └── UserController.php
+│   │   │   │
+│   │   │   ├── QuizMaker/
+│   │   │   │   ├── CategoryController.php
+│   │   │   │   ├── CommunityController.php
+│   │   │   │   ├── QuizController.php
+│   │   │   │   ├── QuestionController.php
+│   │   │   │   └── DashboardController.php
+│   │   │   │
+│   │   │   ├── User/
+│   │   │   │   ├── QuizAttemptController.php
+│   │   │   │   ├── LeaderboardController.php
+│   │   │   │   ├── FavoriteController.php
+│   │   │   │   └── CommunityJoinController.php
+│   │   │   │
+│   │   │   └── FileUploadController.php
 │   │   │
 │   │   ├── Middleware/
 │   │   │   ├── AdminMiddleware.php
@@ -102,65 +111,106 @@ backend/
 │   │   │   └── RoleMiddleware.php
 │   │   │
 │   │   ├── Requests/
+│   │   │   │
 │   │   │   ├── Auth/
 │   │   │   │   ├── LoginRequest.php
 │   │   │   │   └── RegisterRequest.php
 │   │   │   │
-│   │   │   ├── CategoryRequest.php
-│   │   │   ├── CommunityRequest.php
-│   │   │   ├── QuizRequest.php
-│   │   │   ├── QuestionRequest.php
-│   │   │   └── AttemptRequest.php
+│   │   │   ├── Category/
+│   │   │   │   ├── StoreCategoryRequest.php
+│   │   │   │   └── UpdateCategoryRequest.php
+│   │   │   │
+│   │   │   ├── Community/
+│   │   │   │   ├── StoreCommunityRequest.php
+│   │   │   │   └── UpdateCommunityRequest.php
+│   │   │   │
+│   │   │   ├── Quiz/
+│   │   │   │   ├── StoreQuizRequest.php
+│   │   │   │   └── UpdateQuizRequest.php
+│   │   │   │
+│   │   │   ├── Question/
+│   │   │   │   └── StoreQuestionRequest.php
+│   │   │   │
+│   │   │   └── Attempt/
+│   │   │       └── StoreAttemptRequest.php
+│   │   │
+│   │   └── Resources/
+│   │       ├── UserResource.php
+│   │       ├── CategoryResource.php
+│   │       ├── CommunityResource.php
+│   │       ├── QuizResource.php
+│   │       ├── QuestionResource.php
+│   │       └── LeaderboardResource.php
 │   │
 │   ├── Models/
+│   │   ├── Role.php
 │   │   ├── User.php
 │   │   ├── Category.php
 │   │   ├── Community.php
+│   │   ├── CommunityMember.php
 │   │   ├── Quiz.php
 │   │   ├── Question.php
-│   │   ├── Answer.php
-│   │   ├── Attempt.php
-│   │   ├── Submission.php
-│   │   ├── Favorite.php
-│   │   └── CommunityMember.php
+│   │   ├── QuestionOption.php
+│   │   ├── QuizAttempt.php
+│   │   ├── QuizAnswer.php
+│   │   ├── FavoriteQuiz.php
+│   │   └── FavoriteCategory.php
 │   │
 │   ├── Services/
 │   │   ├── AuthService.php
+│   │   ├── CategoryService.php
+│   │   ├── CommunityService.php
 │   │   ├── QuizService.php
+│   │   ├── QuestionService.php
 │   │   ├── AttemptService.php
-│   │   └── LeaderboardService.php
+│   │   ├── LeaderboardService.php
+│   │   └── UploadService.php
+│   │
+│   ├── Repositories/
+│   │   ├── CategoryRepository.php
+│   │   ├── CommunityRepository.php
+│   │   ├── QuizRepository.php
+│   │   ├── QuestionRepository.php
+│   │   ├── AttemptRepository.php
+│   │   └── UserRepository.php
 │   │
 │   ├── Policies/
 │   │   ├── CategoryPolicy.php
-│   │   ├── QuizPolicy.php
-│   │   └── CommunityPolicy.php
+│   │   ├── CommunityPolicy.php
+│   │   └── QuizPolicy.php
 │   │
 │   └── Helpers/
-│       └── ImageUploadHelper.php
+│       └── ImageHelper.php
 │
 │
 ├── bootstrap/
 │
 ├── config/
+│   ├── auth.php
+│   ├── sanctum.php
+│   └── filesystems.php
 │
 ├── database/
 │   │
 │   ├── factories/
 │   │
 │   ├── migrations/
+│   │   ├── create_roles_table.php
 │   │   ├── create_users_table.php
 │   │   ├── create_categories_table.php
 │   │   ├── create_communities_table.php
 │   │   ├── create_community_members_table.php
 │   │   ├── create_quizzes_table.php
 │   │   ├── create_questions_table.php
-│   │   ├── create_answers_table.php
-│   │   ├── create_attempts_table.php
-│   │   ├── create_submissions_table.php
-│   │   └── create_favorites_table.php
+│   │   ├── create_question_options_table.php
+│   │   ├── create_quiz_attempts_table.php
+│   │   ├── create_quiz_answers_table.php
+│   │   ├── create_favorite_quizzes_table.php
+│   │   └── create_favorite_categories_table.php
 │   │
 │   └── seeders/
 │       ├── DatabaseSeeder.php
+│       ├── RoleSeeder.php
 │       ├── UserSeeder.php
 │       ├── CategorySeeder.php
 │       └── QuizSeeder.php
@@ -183,8 +233,9 @@ backend/
 ├── tests/
 │
 ├── .env
+├── artisan
 ├── composer.json
-└── artisan
+└── README.md
 ```
 
 ---
