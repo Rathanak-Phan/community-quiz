@@ -11,17 +11,17 @@ class Community extends Model
         'description',
         'visibility',
         'cover_image',
-        'owner_id'
+        'created_by'
     ];
 
     public function creator()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'community_members')
+        return $this->belongsToMany(User::class, 'community_user')
             ->withPivot('role', 'status')
             ->withTimestamps();
     }
@@ -30,9 +30,5 @@ class Community extends Model
     public function quizzes()
     {
         return $this->hasMany(Quiz::class);
-    }
-
-    public function members(){
-        return $this->hasMany(CommunityMember::class);
     }
 }

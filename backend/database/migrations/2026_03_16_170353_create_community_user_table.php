@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->enum('role', ['owner', 'member'])->default('member');
 
-            $table->enum('status', ['pending', 'approved', 'rejected'])
+            $table->enum('status', ['pending', 'approved'])
                 ->default('pending');
 
             $table->timestamps();
