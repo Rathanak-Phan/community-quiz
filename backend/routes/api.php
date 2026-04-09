@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\QuizController;
-use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\QuizMaker\CategoryController;
+use App\Http\Controllers\QuizMaker\CommunityController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +39,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/communities', [CommunityController::class, 'store']);
     Route::put('/communities/{community}', [CommunityController::class, 'update']);
     Route::delete('/communities/{community}', [CommunityController::class, 'destroy']);
+
+    // Join community
+    Route::post('/communities/{community}/join', [CommunityController::class, 'join']);
+
+    // Approve / Reject
+    Route::post('/community-members/{id}/approve', [CommunityController::class, 'approve']);
+    Route::post('/community-members/{id}/reject', [CommunityController::class, 'reject']);
+
 });
 
 /*
@@ -64,35 +74,4 @@ Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
 
     Route::post('/quizzes', [QuizController::class, 'store']);
     Route::put('/quizzes/{id}', [QuizController::class, 'update']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Quiz Routes (Quiz Maker ONLY)
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
-
-    Route::post('/quizzes', [QuizController::class, 'store']);
-    Route::put('/quizzes/{id}', [QuizController::class, 'update']);
-});
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-/*
-|--------------------------------------------------------------------------
-| Protected Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth:sanctum')->group(function () {
-
-    Route::post('/logout', [AuthController::class, 'logout']);
-
 });
