@@ -31,4 +31,8 @@ class Community extends Model
     {
         return $this->hasMany(Quiz::class);
     }
+
+    public function members(){
+        return $this->hasMany(CommunityMember::class);
+    }
 }
