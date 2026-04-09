@@ -22,8 +22,8 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('user_id')
-                ->constrained()
+            $table->foreignId('created_by')
+                ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->string('title');
@@ -33,6 +33,10 @@ return new class extends Migration
             $table->string('cover_image')->nullable();
 
             $table->timestamps();
+
+            // Performance (IMPORTANT)
+            $table->index(['category_id']);
+            $table->index(['community_id']);
         });
     }
 

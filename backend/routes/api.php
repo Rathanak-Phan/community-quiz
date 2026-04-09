@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizMaker\CategoryController;
 use App\Http\Controllers\QuizMaker\CommunityController;
+use App\Http\Controllers\QuizMaker\QuizController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,16 +62,13 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::get('/categories/{category}', [CategoryController::class, 'show']);
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
-});
 
-/*
-|--------------------------------------------------------------------------
-| Quiz Routes (Quiz Maker ONLY)
-|--------------------------------------------------------------------------
-*/
+    Route::get('/quizzes', [QuizController::class, 'index']);      // GET ALL
+    Route::post('/quizzes', [QuizController::class, 'store']);     // CREATE
+    Route::get('/quizzes/{quiz}', [QuizController::class, 'show']); // GET ONE
+    Route::put('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE
+    Route::put('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE (PATCH)
+    Route::post('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE (multipart/form-data friendly)
+    Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']); // DELETE
 
-Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
-
-    Route::post('/quizzes', [QuizController::class, 'store']);
-    Route::put('/quizzes/{id}', [QuizController::class, 'update']);
 });

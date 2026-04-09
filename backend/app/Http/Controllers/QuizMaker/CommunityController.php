@@ -49,7 +49,7 @@ class CommunityController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'visibility' => $request->visibility,
-            'owner_id' => auth()->id(),
+            'created_by' => auth()->id(),
             'cover_image' => $path
         ]);
 
