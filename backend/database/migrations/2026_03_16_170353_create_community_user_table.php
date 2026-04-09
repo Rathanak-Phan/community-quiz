@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('community_user', function (Blueprint $table) {
+        Schema::create('community_members', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('community_id')
@@ -28,14 +28,14 @@ return new class extends Migration
                 ->default('pending');
 
             $table->timestamps();
+
+            // Prevent duplicate join
+            $table->unique(['community_id', 'user_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('community_user');
+        Schema::dropIfExists('community_members');
     }
 };

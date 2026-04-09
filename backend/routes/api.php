@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\CommunityController;
 
@@ -70,15 +68,14 @@ Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Quiz Maker Routes
+| Quiz Routes (Quiz Maker ONLY)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum','quizmaker'])->group(function(){
+Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
 
-    Route::post('/quizzes',[QuizController::class,'store']);
-    Route::put('/quizzes/{id}',[QuizController::class,'update']);
-
+    Route::post('/quizzes', [QuizController::class, 'store']);
+    Route::put('/quizzes/{id}', [QuizController::class, 'update']);
 });
 /*
 |--------------------------------------------------------------------------

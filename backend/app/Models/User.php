@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
  * 
  *
  *
+ *
  * @method \Laravel\Sanctum\NewAccessToken createToken(string $name, array $abilities = ['*'])
  *
  * @property-read \Laravel\Sanctum\NewAccessToken $currentAccessToken
