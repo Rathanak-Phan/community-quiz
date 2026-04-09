@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\QuizController;
-use App\Http\Controllers\QuizMaker\CategoryController;
-use App\Http\Controllers\QuizMaker\CommunityController;
-use Illuminate\Routing\Route;
+use App\Http\Controllers\CommunityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,4 +64,35 @@ Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
 
     Route::post('/quizzes', [QuizController::class, 'store']);
     Route::put('/quizzes/{id}', [QuizController::class, 'update']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Quiz Routes (Quiz Maker ONLY)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:sanctum', 'role:quiz_maker'])->group(function () {
+
+    Route::post('/quizzes', [QuizController::class, 'store']);
+    Route::put('/quizzes/{id}', [QuizController::class, 'update']);
+});
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+/*
+|--------------------------------------------------------------------------
+| Protected Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+
 });
