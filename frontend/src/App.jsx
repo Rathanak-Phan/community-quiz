@@ -3,12 +3,14 @@ import "./App.css";
 import Login from "./page/auth/Login";
 import Home from "./page/Home";
 import Dashboard from "./page/dashboard/Dashboard";
-import Categories from "./page/dashboard/Categories";
+import Categories from "./page/category/Categories";
+import Communities from "./page/community/Communities";
+import Leaderboard from "./page/Leaderboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
-import CategoryList from "./page/admin/categories/CategoryList";
-import MainLayout from "./layouts/MainLayout";
-import Sidebar from "./layouts/SideBar";
+import CategoryList from "./page/category/CategoryList";
+import MainLayout from "./components/layouts/MainLayout";
+import Sidebar from "./components/layouts/SideBar";
 
 function App() {
   return (
@@ -23,17 +25,25 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
             }
           />
           <Route
             path="/categories"
             element={
-              <ProtectedRoute>
                 <Categories />
-              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/communities"
+            element={
+                <Communities />
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+                <Leaderboard />
             }
           />
         </Route>

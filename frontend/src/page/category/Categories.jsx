@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Search,
   ChevronDown,
@@ -12,6 +12,21 @@ import {
   ShieldCheck,
   Layers,
 } from "lucide-react";
+import CategoryFormModal from "../../components/category/CategoryFormModal";
+import Toast from "../../components/ui/Toast";
+import { getCategories } from "../../api/categoryApi";
+
+const iconMap = {
+  BookOpen,
+  FlaskConical,
+  Globe2,
+  Palette,
+  Sparkles,
+  ShieldCheck,
+  Layers,
+};
+
+const colorMap = ["bg-sky-500", "bg-emerald-500", "bg-violet-500", "bg-orange-500", "bg-cyan-500", "bg-pink-500"];
 
 const sampleCategories = [
   {
@@ -69,10 +84,41 @@ const sortOptions = ["Newest First", "Most Quizzes", "A–Z", "Z–A"];
 export default function Categories() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState(sortOptions[0]);
+  const [categories, setCategories] = useState(sampleCategories);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+
+  useEffect(() => {
+    // Load categories from API
+    const loadCategories = async () => {
+      try {
+        // Uncomment when backend is ready
+        // const response = await getCategories();
+        // setCategories(response.data);
+        // For now, use sample data
+        setCategories(sampleCategories);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+        setToast({ show: true, message: "Failed to load categories", type: "error" });
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const handleSuccess = (message) => {
+    setToast({ show: true, message, type: "success" });
+    // Reload categories after successful create/update
+    // In a real app, you would fetch the updated categories from the API
+    // For now, just show the success message
+  };
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+  };
 
   const filteredCategories = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const filtered = sampleCategories.filter((category) =>
+    const filtered = categories.filter((category) =>
       category.name.toLowerCase().includes(normalizedQuery) ||
       category.description.toLowerCase().includes(normalizedQuery)
     );
@@ -89,10 +135,10 @@ export default function Categories() {
       }
       return b.id - a.id;
     });
-  }, [query, sort]);
+  }, [query, sort, categories]);
 
-  const totalQuizzes = sampleCategories.reduce((sum, category) => sum + category.quizzes, 0);
-  const activeCategories = sampleCategories.length - 1;
+  const totalQuizzes = categories.reduce((sum, category) => sum + category.quizzes, 0);
+  const activeCategories = categories.length - 1;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -107,7 +153,9 @@ export default function Categories() {
             </p>
           </div>
 
-          <button className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/10 transition hover:bg-blue-700">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/10 transition hover:bg-blue-700">
             <Plus size={16} />
             Create Category
           </button>
@@ -193,11 +241,11 @@ export default function Categories() {
 
         <div className="mt-8 grid gap-6 xl:grid-cols-3 lg:grid-cols-2">
           {filteredCategories.map((category) => {
-            const Icon = category.icon;
+            const Icon = iconMap[category.icon] || BookOpen;
             return (
               <article
                 key={category.id}
-                className="group rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="group rounded-4xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className={`${category.color} flex h-14 w-14 items-center justify-center rounded-3xl text-white`}>
@@ -243,6 +291,20 @@ export default function Categories() {
           })}
         </div>
       </div>
+
+      <CategoryFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleSuccess}
+      />
+
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
     </div>
   );
 }

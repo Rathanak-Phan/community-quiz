@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { getCategories, deleteCategory } from "../../../api/categoryApi";
-import CategoryFormModal from "../../../components/admin/CategoryFormModal";
-import ConfirmDeleteModal from "../../../components/admin/ConfirmDeleteModal";
-import Toast from "../../../components/ui/Toast";
+import { getCategories, deleteCategory } from "../../api/categoryApi";
+import CategoryFormModal from "../../components/category/CategoryFormModal";
+import ConfirmDeleteModal from "../../components/category/ConfirmDeleteModal";
+import Toast from "../../components/ui/Toast";
 
 function CategoryList() {
   const [categories, setCategories] = useState([]);
