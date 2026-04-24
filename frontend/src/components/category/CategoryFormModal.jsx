@@ -1,9 +1,39 @@
 import { useState, useEffect } from "react";
 import { createCategory, updateCategory } from "../../api/categoryApi";
+import {
+  BookOpen,
+  FlaskConical,
+  Globe2,
+  Palette,
+  Sparkles,
+  ShieldCheck,
+  Layers,
+  MoreHorizontal,
+} from "lucide-react";
+
+const ICON_OPTIONS = [
+  { id: "BookOpen", label: "Book", icon: BookOpen },
+  { id: "FlaskConical", label: "Flask", icon: FlaskConical },
+  { id: "Palette", label: "Palette", icon: Palette },
+  { id: "Globe2", label: "Globe", icon: Globe2 },
+  { id: "ShieldCheck", label: "Shield", icon: ShieldCheck },
+  { id: "Layers", label: "Layers", icon: Layers },
+];
+
+const COLOR_OPTIONS = [
+  "bg-sky-500",
+  "bg-emerald-500",
+  "bg-violet-500",
+  "bg-orange-500",
+  "bg-cyan-500",
+  "bg-pink-500",
+];
 
 function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState("BookOpen");
+  const [selectedColor, setSelectedColor] = useState("bg-sky-500");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
@@ -14,6 +44,8 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
     if (isOpen) {
       setName(editData?.name || "");
       setDescription(editData?.description || "");
+      setSelectedIcon(editData?.icon || "BookOpen");
+      setSelectedColor(editData?.color || "bg-sky-500");
       setErrors({});
       setApiError("");
     }
@@ -38,10 +70,17 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
     setLoading(true);
     setApiError("");
     try {
+      const categoryData = {
+        name: name.trim(),
+        description: description.trim(),
+        icon: selectedIcon,
+        color: selectedColor,
+      };
+
       if (isEditMode) {
-        await updateCategory(editData.id, { name: name.trim(), description: description.trim() });
+        await updateCategory(editData.id, categoryData);
       } else {
-        await createCategory({ name: name.trim(), description: description.trim() });
+        await createCategory(categoryData);
       }
       onSuccess(isEditMode ? "Category updated successfully!" : "Category created successfully!");
       onClose();
@@ -119,6 +158,60 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
               rows={4}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
+          </div>
+
+          {/* Choose Icon */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Choose Icon
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {ICON_OPTIONS.map((option) => {
+                const IconComponent = option.icon;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setSelectedIcon(option.id)}
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg transition ${
+                      selectedIcon === option.id
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                    title={option.label}
+                  >
+                    <IconComponent size={20} />
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+              >
+                <MoreHorizontal size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Choose Color */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Choose Color
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {COLOR_OPTIONS.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => setSelectedColor(color)}
+                  className={`h-10 w-10 rounded-lg transition ${color} ${
+                    selectedColor === color
+                      ? "ring-2 ring-offset-2 ring-gray-400"
+                      : "hover:opacity-80"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Actions */}
