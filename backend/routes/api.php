@@ -57,12 +57,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () {
 
+    // Category
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::get('/categories/{category}', [CategoryController::class, 'show']);
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
+    // Quiz
     Route::get('/quizzes', [QuizController::class, 'index']);      // GET ALL
     Route::post('/quizzes', [QuizController::class, 'store']);     // CREATE
     Route::get('/quizzes/{quiz}', [QuizController::class, 'show']); // GET ONE
@@ -72,3 +74,5 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']); // DELETE
 
 });
+
+Route::get('/test', [AuthController::class, 'test']);

@@ -11,6 +11,17 @@ class CommunityController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @OA\Get(
+     *     path="/api/communities",
+     *     tags={"Community"},
+     *     summary="Get all communities",
+     *     operationId="communityIndex",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Communities retrieved successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
      */
     public function index()
     {
@@ -29,6 +40,30 @@ class CommunityController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @OA\Post(
+     *     path="/api/communities",
+     *     tags={"Community"},
+     *     summary="Create a community",
+     *     operationId="communityStore",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"name","visibility"},
+     *                 @OA\Property(property="name", type="string", maxLength=255, example="General Knowledge Club"),
+     *                 @OA\Property(property="description", type="string", nullable=true, example="A community for quiz lovers."),
+     *                 @OA\Property(property="visibility", type="string", enum={"public","private"}, example="public"),
+     *                 @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Community created successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
      */
     public function store(Request $request)
     {
@@ -80,6 +115,37 @@ class CommunityController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @OA\Put(
+     *     path="/api/communities/{community}",
+     *     tags={"Community"},
+     *     summary="Update a community",
+     *     operationId="communityUpdate",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="community",
+     *         in="path",
+     *         required=true,
+     *         description="Community ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"name","visibility"},
+     *                 @OA\Property(property="name", type="string", maxLength=255, example="Updated Community"),
+     *                 @OA\Property(property="description", type="string", nullable=true, example="Updated description."),
+     *                 @OA\Property(property="visibility", type="string", enum={"public","private"}, example="private"),
+     *                 @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Community updated successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Community not found")
+     * )
      */
     public function update(Request $request, Community $community)
     {
@@ -114,6 +180,24 @@ class CommunityController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @OA\Delete(
+     *     path="/api/communities/{community}",
+     *     tags={"Community"},
+     *     summary="Delete a community",
+     *     operationId="communityDestroy",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="community",
+     *         in="path",
+     *         required=true,
+     *         description="Community ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(response=200, description="Community deleted successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Community not found")
+     * )
      */
     public function destroy(Community $community)
     {
@@ -127,6 +211,25 @@ class CommunityController extends Controller
     }
 
     // join community
+    /**
+     * @OA\Post(
+     *     path="/api/communities/{community}/join",
+     *     tags={"Community"},
+     *     summary="Join or request to join a community",
+     *     operationId="communityJoin",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="community",
+     *         in="path",
+     *         required=true,
+     *         description="Community ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(response=200, description="Joined successfully or join request sent"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Community not found")
+     * )
+     */
     public function join(Community $community)
     {
         $user = auth()->user();
@@ -162,6 +265,25 @@ class CommunityController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/community-members/{id}/approve",
+     *     tags={"Community"},
+     *     summary="Approve a community member",
+     *     operationId="communityApproveMember",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Community member ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(response=200, description="Member approved"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Community member not found")
+     * )
+     */
     public function approve($id)
     {
         $member = CommunityMember::findOrFail($id);
@@ -182,6 +304,25 @@ class CommunityController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/community-members/{id}/reject",
+     *     tags={"Community"},
+     *     summary="Reject a community member",
+     *     operationId="communityRejectMember",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Community member ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(response=200, description="Member rejected"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Community member not found")
+     * )
+     */
     public function reject($id)
     {
         $member = CommunityMember::findOrFail($id);

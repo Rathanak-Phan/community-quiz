@@ -22,6 +22,27 @@ class AuthController extends Controller
     // =============================
     // REGISTER (SPA - COOKIE)
     // =============================
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     tags={"Auth"},
+     *     summary="Register a new user",
+     *     operationId="authRegister",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","password_confirmation"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Rathanak"),
+     *             @OA\Property(property="email", type="string", format="email", example="user@gmail.com"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=8, example="password123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", minLength=8, example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User registered successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function register(RegisterRequest $request)
     {
         $user = $this->authService->register($request->validated());
@@ -36,6 +57,25 @@ class AuthController extends Controller
     // =============================
     // LOGIN (SPA - COOKIE)
     // =============================
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     tags={"Auth"},
+     *     summary="Log in with email and password",
+     *     operationId="authLogin",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@gmail.com"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=8, example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Logged in successfully"),
+     *     @OA\Response(response=401, description="Invalid credentials"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -59,6 +99,25 @@ class AuthController extends Controller
     // =============================
     // LOGIN TOKEN (POSTMAN)
     // =============================
+    /**
+     * @OA\Post(
+     *     path="/api/login-token",
+     *     tags={"Auth"},
+     *     summary="Log in and create a Sanctum token",
+     *     operationId="authLoginToken",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@gmail.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Token created successfully"),
+     *     @OA\Response(response=401, description="Invalid credentials"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function loginToken(Request $request)
     {
         $request->validate([
@@ -85,6 +144,18 @@ class AuthController extends Controller
     // =============================
     // LOGOUT (SPA - COOKIE)
     // =============================
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     tags={"Auth"},
+     *     summary="Log out the authenticated user",
+     *     operationId="authLogout",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Logged out successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
@@ -114,10 +185,41 @@ class AuthController extends Controller
     // =============================
     // PROFILE (BOTH WORK)
     // =============================
+    /**
+     * @OA\Get(
+     *     path="/api/profile",
+     *     tags={"Auth"},
+     *     summary="Get the authenticated user profile",
+     *     operationId="authProfile",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Authenticated user profile"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function profile(Request $request)
     {
         return response()->json([
             'user' => $request->user()
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/test",
+     *     tags={"Auth"},
+     *     summary="Test endpoint",
+     *     operationId="authTest",
+     *     @OA\Response(response=200, description="OK"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
+    public function test()
+    {
+        return response()->json([
+            'message' => 'Swagger working'
+        ]);
+    }
 }
+
