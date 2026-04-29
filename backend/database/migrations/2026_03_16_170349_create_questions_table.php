@@ -18,7 +18,11 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->enum('type', ['MCQ', 'TF', 'SHORT']);
+            $table->enum('question_type', [
+                'multiple_choice',
+                'true_false',
+                'short_answer'
+            ]);
 
             $table->text('question_text');
 
