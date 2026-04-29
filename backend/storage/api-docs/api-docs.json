@@ -743,6 +743,154 @@
                 ]
             }
         },
+        "/api/questions/{question}/options": {
+            "get": {
+                "tags": [
+                    "Question Options"
+                ],
+                "summary": "Get all options for a specific question",
+                "operationId": "e99392c76be4160a538e99aa0e1192d5",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/options": {
+            "post": {
+                "tags": [
+                    "Question Options"
+                ],
+                "summary": "Create option",
+                "operationId": "0d5f96a841c23325856b7cf5f70c797a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question_id",
+                                    "option_text",
+                                    "is_correct"
+                                ],
+                                "properties": {
+                                    "question_id": {
+                                        "type": "integer"
+                                    },
+                                    "option_text": {
+                                        "type": "string"
+                                    },
+                                    "is_correct": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/options/{option}": {
+            "put": {
+                "tags": [
+                    "Question Options"
+                ],
+                "summary": "Update option",
+                "operationId": "f3b522b7241585599bcb407e4d2470a4",
+                "parameters": [
+                    {
+                        "name": "option",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option_text": {
+                                        "type": "string"
+                                    },
+                                    "is_correct": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Question Options"
+                ],
+                "summary": "Delete option",
+                "operationId": "a2e5d189a9e928f16f269320504f19cb",
+                "parameters": [
+                    {
+                        "name": "option",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/quizzes/{quiz}": {
             "get": {
                 "tags": [
@@ -1109,6 +1257,10 @@
         {
             "name": "Community",
             "description": "Community"
+        },
+        {
+            "name": "Question Options",
+            "description": "Question Options"
         },
         {
             "name": "Quiz",
