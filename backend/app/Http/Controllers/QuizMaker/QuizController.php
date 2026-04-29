@@ -19,6 +19,25 @@ class QuizController extends Controller
         $this->quizService = $quizService;
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/quizzes/{quiz}",
+     *     tags={"Quiz"},
+     *     summary="Get a quiz",
+     *     operationId="quizShow",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="quiz",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(response=200, description="Quiz retrieved successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Quiz not found")
+     * )
+     */
     public function show(Quiz $quiz)
     {
         $this->authorize('view', $quiz);
@@ -26,6 +45,32 @@ class QuizController extends Controller
         return new QuizResource($quiz->loadMissing(['community', 'category', 'creator']));
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/quizzes",
+     *     tags={"Quiz"},
+     *     summary="Create a quiz",
+     *     operationId="quizStore",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"title","category_id","community_id"},
+     *                 @OA\Property(property="title", type="string", maxLength=255, example="World History Quiz"),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="community_id", type="integer", example=1),
+     *                 @OA\Property(property="description", type="string", nullable=true, example="A short quiz about world history."),
+     *                 @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Quiz created successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function store(StoreQuizRequest $request)
     {
         $this->authorize('create', Quiz::class);
@@ -40,6 +85,18 @@ class QuizController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/quizzes",
+     *     tags={"Quiz"},
+     *     summary="Get quizzes visible to the authenticated user",
+     *     operationId="quizIndex",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Quizzes retrieved successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
     public function index()
     {
         $user = auth()->user();
@@ -61,6 +118,69 @@ class QuizController extends Controller
         return QuizResource::collection($quizzes);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/quizzes/{quiz}",
+     *     tags={"Quiz"},
+     *     summary="Update a quiz",
+     *     operationId="quizUpdatePut",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="quiz",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="title", type="string", maxLength=255, example="Updated World History Quiz"),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="community_id", type="integer", example=1),
+     *                 @OA\Property(property="description", type="string", nullable=true, example="Updated quiz description."),
+     *                 @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Quiz updated successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Quiz not found")
+     * )
+     *
+     * @OA\Post(
+     *     path="/api/quizzes/{quiz}",
+     *     tags={"Quiz"},
+     *     summary="Update a quiz with multipart/form-data",
+     *     operationId="quizUpdatePost",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="quiz",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="title", type="string", maxLength=255, example="Updated World History Quiz"),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="community_id", type="integer", example=1),
+     *                 @OA\Property(property="description", type="string", nullable=true, example="Updated quiz description."),
+     *                 @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Quiz updated successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Quiz not found")
+     * )
+     */
     public function update(UpdateQuizRequest $request, Quiz $quiz)
     {
         $this->authorize('update', $quiz);
@@ -70,6 +190,25 @@ class QuizController extends Controller
         return new QuizResource($quiz->loadMissing(['community', 'category', 'creator']));
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/quizzes/{quiz}",
+     *     tags={"Quiz"},
+     *     summary="Delete a quiz",
+     *     operationId="quizDestroy",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="quiz",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(response=200, description="Quiz deleted successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Quiz not found")
+     * )
+     */
     public function destroy(Quiz $quiz)
     {
         $this->authorize('delete', $quiz);
