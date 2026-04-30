@@ -78,6 +78,7 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     // Questions
     Route::post('/questions/mcq', [QuestionController::class, 'storeMcq']);
     Route::post('/questions/true-false', [QuestionController::class, 'storeTrueFalse']);
+    Route::post('/questions/short-answer', [QuestionController::class, 'storeShortAnswer']);
 
     // Options
     Route::get('/questions/{question}/options', [QuestionOptionController::class, 'index']);
