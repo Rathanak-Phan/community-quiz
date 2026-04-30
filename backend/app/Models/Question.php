@@ -14,6 +14,7 @@ class Question extends Model
         'quiz_id',
         'question_type',
         'question_text',
+        'correct_answer',
         'image',
     ];
 
