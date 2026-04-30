@@ -810,6 +810,60 @@
                 ]
             }
         },
+        "/api/questions/true-false": {
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Create a True/False Question",
+                "operationId": "809bb15085a84b506d5f8dcb180c33fe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quiz_id",
+                                    "question_text",
+                                    "correct_answer"
+                                ],
+                                "properties": {
+                                    "quiz_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_text": {
+                                        "type": "string",
+                                        "example": "The sky is blue."
+                                    },
+                                    "correct_answer": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "True/False Question created successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/questions/{question}/options": {
             "get": {
                 "tags": [
