@@ -743,6 +743,73 @@
                 ]
             }
         },
+        "/api/questions/mcq": {
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Create a Multiple Choice Question (MCQ)",
+                "operationId": "8d482105ed8ed783ddfca1572f809306",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quiz_id",
+                                    "question_text",
+                                    "options",
+                                    "correct_option"
+                                ],
+                                "properties": {
+                                    "quiz_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_text": {
+                                        "type": "string",
+                                        "example": "What is the capital of France?"
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Berlin",
+                                            "Paris",
+                                            "Rome"
+                                        ]
+                                    },
+                                    "correct_option": {
+                                        "description": "Index of the correct option in the options array",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "MCQ created successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/questions/{question}/options": {
             "get": {
                 "tags": [
@@ -1257,6 +1324,10 @@
         {
             "name": "Community",
             "description": "Community"
+        },
+        {
+            "name": "Questions",
+            "description": "Questions"
         },
         {
             "name": "Question Options",

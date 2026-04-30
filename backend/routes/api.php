@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\QuizMaker\CategoryController;
 use App\Http\Controllers\QuizMaker\CommunityController;
 use App\Http\Controllers\QuizMaker\QuizController;
+use App\Http\Controllers\QuizMaker\QuestionController;
 use App\Http\Controllers\QuizMaker\QuestionOptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -73,6 +74,9 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE (PATCH)
     Route::post('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE (multipart/form-data friendly)
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']); // DELETE
+
+    // Questions
+    Route::post('/questions/mcq', [QuestionController::class, 'storeMcq']);
 
     // Options
     Route::get('/questions/{question}/options', [QuestionOptionController::class, 'index']);
