@@ -53,4 +53,8 @@ class User extends Authenticatable
             ->withPivot('status', 'role')
             ->withTimestamps();
     }
+    public function quizAttempts()
+    {
+        return $this->hasMany(QuizAttempt::class);
+    }
 }
