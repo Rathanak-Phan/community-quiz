@@ -107,12 +107,14 @@ class QuizAttemptController extends Controller
         }
 
         // 4. Calculate score
-        $score = $this->scoringService->calculateScore($attempt);
+        $results = $this->scoringService->calculateScore($attempt);
 
         // 5. Update attempt record
         $attempt->update([
             'status' => 'submitted',
-            'score' => $score,
+            'score' => $results['total_score'],
+            'max_score' => $results['max_score'],
+            'grading_status' => $results['grading_status'],
             'completed_at' => now(),
         ]);
 

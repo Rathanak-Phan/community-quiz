@@ -21,6 +21,8 @@ class AttemptAnswerResource extends JsonResource
             'selected_option_id' => $this->selected_option_id,
             'answer_boolean' => $this->answer_boolean,
             'answer_text' => $this->answer_text,
+            'is_correct' => $this->is_correct,
+            'score' => $this->score,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

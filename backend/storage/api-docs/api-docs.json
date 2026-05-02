@@ -1785,6 +1785,17 @@
                     "score": {
                         "type": "integer",
                         "nullable": true
+                    },
+                    "max_score": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "grading_status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "completed"
+                        ]
                     }
                 },
                 "type": "object"
@@ -1800,6 +1811,21 @@
                         "enum": [
                             "in_progress",
                             "submitted"
+                        ]
+                    },
+                    "score": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "max_score": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "grading_status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "completed"
                         ]
                     },
                     "quiz": {
@@ -1853,6 +1879,14 @@
                         "type": "string",
                         "example": "Answer text",
                         "nullable": true
+                    },
+                    "is_correct": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "score": {
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "type": "object"

@@ -28,6 +28,8 @@ class QuizAttemptDetailResource extends JsonResource
             'started_at' => $this->started_at,
             'completed_at' => $this->completed_at,
             'score' => $this->score,
+            'max_score' => $this->max_score,
+            'grading_status' => $this->grading_status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 

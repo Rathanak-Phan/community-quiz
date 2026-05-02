@@ -15,10 +15,13 @@ class AttemptAnswer extends Model
         'selected_option_id',
         'answer_boolean',
         'answer_text',
+        'is_correct',
+        'score',
     ];
 
     protected $casts = [
         'answer_boolean' => 'boolean',
+        'is_correct' => 'boolean',
     ];
 
     public function attempt()
