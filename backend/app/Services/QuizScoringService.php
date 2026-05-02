@@ -12,6 +12,7 @@ class QuizScoringService
     {
         $totalScore = 0;
         $maxScore = 0;
+        $hasShortAnswer = false;
         $attempt->load(['quiz.questions.options', 'quiz.questions.shortAnswer', 'answers']);
 
         $questions = $attempt->quiz->questions;
@@ -21,12 +22,22 @@ class QuizScoringService
             $maxScore += $question->points;
             $answer = $answers->get($question->id);
 
+            if ($question->question_type === 'short_answer') {
+                $hasShortAnswer = true;
+            }
+
             if (!$answer) {
                 continue;
             }
 
-            $isCorrect = $this->isCorrect($question, $answer);
-            $pointsEarned = $isCorrect ? $question->points : 0;
+            if ($question->question_type === 'short_answer') {
+                // Short answers require manual review
+                $isCorrect = null;
+                $pointsEarned = null;
+            } else {
+                $isCorrect = $this->isCorrect($question, $answer);
+                $pointsEarned = $isCorrect ? $question->points : 0;
+            }
 
             // Update individual answer record
             $answer->update([
@@ -34,13 +45,15 @@ class QuizScoringService
                 'score' => $pointsEarned,
             ]);
 
-            $totalScore += $pointsEarned;
+            if ($pointsEarned !== null) {
+                $totalScore += $pointsEarned;
+            }
         }
 
         return [
             'total_score' => $totalScore,
             'max_score' => $maxScore,
-            'grading_status' => 'completed',
+            'grading_status' => $hasShortAnswer ? 'pending' : 'graded',
         ];
     }
 

@@ -53,7 +53,7 @@ namespace App\Swagger;
  *     @OA\Property(property="completed_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="score", type="integer", nullable=true),
  *     @OA\Property(property="max_score", type="integer", nullable=true),
- *     @OA\Property(property="grading_status", type="string", enum={"pending", "completed"})
+ *     @OA\Property(property="grading_status", type="string", enum={"pending", "graded"})
  * )
  *
  * @OA\Schema(
@@ -63,7 +63,7 @@ namespace App\Swagger;
  *     @OA\Property(property="status", type="string", enum={"in_progress", "submitted"}),
  *     @OA\Property(property="score", type="integer", nullable=true),
  *     @OA\Property(property="max_score", type="integer", nullable=true),
- *     @OA\Property(property="grading_status", type="string", enum={"pending", "completed"}),
+ *     @OA\Property(property="grading_status", type="string", enum={"pending", "graded"}),
  *     @OA\Property(property="quiz", ref="#/components/schemas/Quiz"),
  *     @OA\Property(property="questions", type="array", @OA\Items(ref="#/components/schemas/Question")),
  *     @OA\Property(property="answers", type="array", @OA\Items(ref="#/components/schemas/AttemptAnswer")),
