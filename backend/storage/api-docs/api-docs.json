@@ -235,6 +235,55 @@
                 }
             }
         },
+        "/api/dashboard/quiz-maker": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get statistics for Quiz Maker dashboard",
+                "operationId": "dashboardQuizMaker",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard statistics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_categories": {
+                                            "type": "integer"
+                                        },
+                                        "total_quizzes": {
+                                            "type": "integer"
+                                        },
+                                        "total_communities": {
+                                            "type": "integer"
+                                        },
+                                        "total_submissions": {
+                                            "type": "integer"
+                                        },
+                                        "pending_reviews": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/favorites": {
             "get": {
                 "tags": [
@@ -2334,6 +2383,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Dashboard"
         },
         {
             "name": "Favorites",

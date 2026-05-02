@@ -7,6 +7,8 @@ use App\Http\Controllers\QuizMaker\QuizController;
 use App\Http\Controllers\QuizMaker\QuestionController;
 use App\Http\Controllers\QuizMaker\QuestionOptionController;
 use App\Http\Controllers\QuizAttemptController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FavoriteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -83,6 +85,10 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
 
     // Manual Reviews
     Route::get('/reviews/pending', [QuizAttemptController::class, 'pendingReviews']);
+
+    // Dashboard
+    Route::get('/dashboard/quiz-maker', [DashboardController::class, 'quizMakerDashboard']);
+
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
