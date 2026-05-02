@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Quiz;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Submission;
 use Illuminate\Http\Request;

@@ -12,6 +12,287 @@
         }
     ],
     "paths": {
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get categories available to the authenticated user",
+                "operationId": "categoryIndex",
+                "responses": {
+                    "200": {
+                        "description": "Categories retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Create a category",
+                "operationId": "categoryStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Science"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/categories/{category}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get a category",
+                "operationId": "categoryShow",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Update a category",
+                "operationId": "categoryUpdate",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Updated Science"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Delete a category",
+                "operationId": "categoryDestroy",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin User Management"
+                ],
+                "summary": "Get all users",
+                "operationId": "adminUserIndex",
+                "responses": {
+                    "200": {
+                        "description": "Users retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/{id}/role": {
+            "put": {
+                "tags": [
+                    "Admin User Management"
+                ],
+                "summary": "Update user role",
+                "operationId": "adminUserUpdateRole",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "role_id"
+                                ],
+                                "properties": {
+                                    "role_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User role updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/register": {
             "post": {
                 "tags": [
@@ -235,796 +516,63 @@
                 }
             }
         },
-        "/api/dashboard/quiz-maker": {
+        "/api/auth/{provider}/redirect": {
             "get": {
                 "tags": [
-                    "Dashboard"
+                    "Social Auth"
                 ],
-                "summary": "Get statistics for Quiz Maker dashboard",
-                "operationId": "dashboardQuizMaker",
-                "responses": {
-                    "200": {
-                        "description": "Dashboard statistics retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "total_categories": {
-                                            "type": "integer"
-                                        },
-                                        "total_quizzes": {
-                                            "type": "integer"
-                                        },
-                                        "total_communities": {
-                                            "type": "integer"
-                                        },
-                                        "total_submissions": {
-                                            "type": "integer"
-                                        },
-                                        "pending_reviews": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                },
-                "security": [
+                "summary": "Redirect to OAuth provider",
+                "description": "Initiates the OAuth flow for the specified provider.",
+                "operationId": "d6c0d543c872b85501bdf7471e725df9",
+                "parameters": [
                     {
-                        "sanctum": []
+                        "name": "provider",
+                        "in": "path",
+                        "description": "OAuth provider name (google, github)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "google",
+                                "github"
+                            ]
+                        }
                     }
-                ]
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect to provider"
+                    }
+                }
             }
         },
-        "/api/favorites": {
+        "/api/auth/{provider}/callback": {
             "get": {
                 "tags": [
-                    "Favorites"
+                    "Social Auth"
                 ],
-                "summary": "List all user favorites",
-                "operationId": "favoriteIndex",
-                "responses": {
-                    "200": {
-                        "description": "Favorites retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Favorite"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Favorites"
-                ],
-                "summary": "Add a quiz or category to favorites",
-                "operationId": "favoriteStore",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "target_type",
-                                    "target_id"
-                                ],
-                                "properties": {
-                                    "target_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "quiz",
-                                            "category"
-                                        ]
-                                    },
-                                    "target_id": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Favorite saved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Favorite"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/favorites/{favorite}": {
-            "delete": {
-                "tags": [
-                    "Favorites"
-                ],
-                "summary": "Remove an item from favorites",
-                "operationId": "favoriteDestroy",
+                "summary": "Handle OAuth provider callback",
+                "operationId": "7d9d4331d1865a5482333f5aded233e1",
                 "parameters": [
                     {
-                        "name": "favorite",
+                        "name": "provider",
                         "in": "path",
-                        "description": "Favorite ID",
+                        "description": "OAuth provider name",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string",
+                            "enum": [
+                                "google",
+                                "github"
+                            ]
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Favorite removed successfully"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Favorite not found"
+                    "302": {
+                        "description": "Redirect to frontend with token"
                     }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/attempts/{attempt}": {
-            "get": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "Get quiz attempt details for resuming",
-                "operationId": "quizAttemptShow",
-                "parameters": [
-                    {
-                        "name": "attempt",
-                        "in": "path",
-                        "description": "Quiz Attempt ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Quiz attempt details retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/QuizAttemptDetail"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/attempts/{attempt}/submit": {
-            "post": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "Submit a quiz attempt",
-                "operationId": "quizAttemptSubmit",
-                "parameters": [
-                    {
-                        "name": "attempt",
-                        "in": "path",
-                        "description": "Quiz Attempt ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Quiz attempt submitted successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/QuizAttemptDetail"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/quizzes/{quiz}/start": {
-            "post": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "Start a quiz attempt",
-                "operationId": "quizAttemptStart",
-                "parameters": [
-                    {
-                        "name": "quiz",
-                        "in": "path",
-                        "description": "Quiz ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "mode",
-                                    "is_anonymous"
-                                ],
-                                "properties": {
-                                    "mode": {
-                                        "type": "string",
-                                        "enum": [
-                                            "practice",
-                                            "scored"
-                                        ],
-                                        "example": "scored"
-                                    },
-                                    "is_anonymous": {
-                                        "type": "boolean",
-                                        "example": false
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Quiz attempt started successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/QuizAttempt"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "409": {
-                        "description": "Active attempt already exists",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "attempt": {
-                                            "$ref": "#/components/schemas/QuizAttempt"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/attempts/{attempt}/answer": {
-            "post": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "Submit or update an answer",
-                "operationId": "quizAttemptSubmitAnswer",
-                "parameters": [
-                    {
-                        "name": "attempt",
-                        "in": "path",
-                        "description": "Quiz Attempt ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "question_id"
-                                ],
-                                "properties": {
-                                    "question_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "selected_option_id": {
-                                        "type": "integer",
-                                        "example": 1,
-                                        "nullable": true
-                                    },
-                                    "answer_boolean": {
-                                        "type": "boolean",
-                                        "example": true,
-                                        "nullable": true
-                                    },
-                                    "answer_text": {
-                                        "type": "string",
-                                        "example": "Paris",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Answer saved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AttemptAnswer"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/attempts/{attempt}/review": {
-            "get": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "Get quiz attempt details for manual review",
-                "operationId": "quizAttemptReview",
-                "parameters": [
-                    {
-                        "name": "attempt",
-                        "in": "path",
-                        "description": "Quiz Attempt ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Quiz attempt review data retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "grading_status": {
-                                            "type": "string"
-                                        },
-                                        "questions": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/QuestionReview"
-                                            }
-                                        },
-                                        "answers": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/AttemptAnswer"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/answers/{answer}/grade": {
-            "post": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "Grade a specific answer manually",
-                "operationId": "quizAttemptGradeAnswer",
-                "parameters": [
-                    {
-                        "name": "answer",
-                        "in": "path",
-                        "description": "Attempt Answer ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "score"
-                                ],
-                                "properties": {
-                                    "score": {
-                                        "type": "integer",
-                                        "example": 5
-                                    },
-                                    "feedback": {
-                                        "type": "string",
-                                        "example": "Good job!",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Answer graded successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "answer": {
-                                            "$ref": "#/components/schemas/AttemptAnswer"
-                                        },
-                                        "attempt_summary": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/reviews/pending": {
-            "get": {
-                "tags": [
-                    "Quiz Attempt"
-                ],
-                "summary": "List all quiz attempts pending manual review",
-                "operationId": "quizAttemptPendingReviews",
-                "responses": {
-                    "200": {
-                        "description": "Pending reviews retrieved successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/categories": {
-            "get": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Get categories available to the authenticated user",
-                "operationId": "categoryIndex",
-                "responses": {
-                    "200": {
-                        "description": "Categories retrieved successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Create a category",
-                "operationId": "categoryStore",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "example": "Science"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Category created successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/categories/{category}": {
-            "get": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Get a category",
-                "operationId": "categoryShow",
-                "parameters": [
-                    {
-                        "name": "category",
-                        "in": "path",
-                        "description": "Category ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Category retrieved successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "404": {
-                        "description": "Category not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Update a category",
-                "operationId": "categoryUpdate",
-                "parameters": [
-                    {
-                        "name": "category",
-                        "in": "path",
-                        "description": "Category ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "example": "Updated Science"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Category updated successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "404": {
-                        "description": "Category not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Category"
-                ],
-                "summary": "Delete a category",
-                "operationId": "categoryDestroy",
-                "parameters": [
-                    {
-                        "name": "category",
-                        "in": "path",
-                        "description": "Category ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Category deleted successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "404": {
-                        "description": "Category not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
+                }
             }
         },
         "/api/communities": {
@@ -1340,13 +888,62 @@
                 ]
             }
         },
+        "/api/dashboard/quiz-maker": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get statistics for Quiz Maker dashboard",
+                "operationId": "dashboardQuizMaker",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard statistics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_categories": {
+                                            "type": "integer"
+                                        },
+                                        "total_quizzes": {
+                                            "type": "integer"
+                                        },
+                                        "total_communities": {
+                                            "type": "integer"
+                                        },
+                                        "total_submissions": {
+                                            "type": "integer"
+                                        },
+                                        "pending_reviews": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/questions/mcq": {
             "post": {
                 "tags": [
                     "Questions"
                 ],
                 "summary": "Create a Multiple Choice Question (MCQ)",
-                "operationId": "8d482105ed8ed783ddfca1572f809306",
+                "operationId": "92267ef074a6d84123c213a7e5930d0b",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1413,7 +1010,7 @@
                     "Questions"
                 ],
                 "summary": "Create a True/False Question",
-                "operationId": "809bb15085a84b506d5f8dcb180c33fe",
+                "operationId": "83a1ffcf093785f1a24cbee6c4f80125",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1467,7 +1064,7 @@
                     "Questions"
                 ],
                 "summary": "Create a Short Answer Question",
-                "operationId": "87b55080ab9cdc896abcfbd4c00e8855",
+                "operationId": "f9672a8556a02a5df3e96fc20a372635",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1525,7 +1122,7 @@
                     "Question Options"
                 ],
                 "summary": "Get all options for a specific question",
-                "operationId": "e99392c76be4160a538e99aa0e1192d5",
+                "operationId": "f8faed67b228b89002674ac9626e73cf",
                 "parameters": [
                     {
                         "name": "question",
@@ -1554,7 +1151,7 @@
                     "Question Options"
                 ],
                 "summary": "Create option",
-                "operationId": "0d5f96a841c23325856b7cf5f70c797a",
+                "operationId": "c1a5e3d1c9370a02ad013294e295a057",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1599,7 +1196,7 @@
                     "Question Options"
                 ],
                 "summary": "Update option",
-                "operationId": "f3b522b7241585599bcb407e4d2470a4",
+                "operationId": "f2522e109930a8f7103efbea6db2db27",
                 "parameters": [
                     {
                         "name": "option",
@@ -1644,7 +1241,7 @@
                     "Question Options"
                 ],
                 "summary": "Delete option",
-                "operationId": "a2e5d189a9e928f16f269320504f19cb",
+                "operationId": "289b63557253629ed45be5eb1c5f34ee",
                 "parameters": [
                     {
                         "name": "option",
@@ -1658,6 +1255,252 @@
                 "responses": {
                     "200": {
                         "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/quizzes/{quiz}/start": {
+            "post": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Start a quiz attempt",
+                "operationId": "quizAttemptStart",
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "description": "Quiz ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mode",
+                                    "is_anonymous"
+                                ],
+                                "properties": {
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": [
+                                            "practice",
+                                            "scored"
+                                        ]
+                                    },
+                                    "is_anonymous": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Attempt started"
+                    },
+                    "409": {
+                        "description": "Active attempt exists"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/attempts/{attempt}/answer": {
+            "post": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Submit or update an answer (Save for later)",
+                "operationId": "quizAttemptSubmitAnswer",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question_id"
+                                ],
+                                "properties": {
+                                    "question_id": {
+                                        "type": "integer"
+                                    },
+                                    "selected_option_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "answer_boolean": {
+                                        "type": "boolean",
+                                        "nullable": true
+                                    },
+                                    "answer_text": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Answer saved"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/attempts/{attempt}/submit": {
+            "post": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Submit a quiz attempt for scoring",
+                "operationId": "quizAttemptSubmit",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Attempt submitted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/attempts/{attempt}": {
+            "get": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Get attempt details for resuming",
+                "operationId": "quizAttemptShow",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Attempt details"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/answers/{id}/grade": {
+            "put": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Grade a specific answer manually",
+                "operationId": "quizAttemptGradeAnswerManual",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "score"
+                                ],
+                                "properties": {
+                                    "score": {
+                                        "type": "integer"
+                                    },
+                                    "feedback": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Answer graded"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reviews/pending": {
+            "get": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "List all quiz attempts pending manual review",
+                "operationId": "quizAttemptPendingReviews",
+                "responses": {
+                    "200": {
+                        "description": "Pending reviews"
                     }
                 },
                 "security": [
@@ -2013,10 +1856,211 @@
                     }
                 ]
             }
+        },
+        "/api/quizzes/{id}/share": {
+            "get": {
+                "tags": [
+                    "Sharing"
+                ],
+                "summary": "Get a public shareable link for a quiz",
+                "operationId": "shareQuizLink",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Quiz ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Share URL generated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "quiz_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "share_url": {
+                                            "type": "string",
+                                            "example": "http://localhost:3000/quiz/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Quiz not found"
+                    }
+                }
+            }
+        },
+        "/api/submissions/{id}/share": {
+            "get": {
+                "tags": [
+                    "Sharing"
+                ],
+                "summary": "Get a shareable link for a quiz result",
+                "operationId": "shareResultLink",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Submission ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Share URL generated successfully"
+                    },
+                    "404": {
+                        "description": "Submission not found"
+                    }
+                }
+            }
+        },
+        "/api/favorites": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "List all user favorites",
+                "operationId": "favoriteIndex",
+                "responses": {
+                    "200": {
+                        "description": "Favorites retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Favorite"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Add a quiz or category to favorites",
+                "operationId": "favoriteStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "target_type",
+                                    "target_id"
+                                ],
+                                "properties": {
+                                    "target_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "quiz",
+                                            "category"
+                                        ]
+                                    },
+                                    "target_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Favorite saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Favorite"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/favorites/{favorite}": {
+            "delete": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Remove an item from favorites",
+                "operationId": "favoriteDestroy",
+                "parameters": [
+                    {
+                        "name": "favorite",
+                        "in": "path",
+                        "description": "Favorite ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Favorite removed successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Favorite not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
+            "Role": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "admin"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "required": [
                     "id",
@@ -2035,6 +2079,9 @@
                     "email": {
                         "type": "string",
                         "example": "user@gmail.com"
+                    },
+                    "role": {
+                        "$ref": "#/components/schemas/Role"
                     }
                 },
                 "type": "object"
@@ -2381,28 +2428,28 @@
     },
     "tags": [
         {
-            "name": "Auth",
-            "description": "Auth"
-        },
-        {
-            "name": "Dashboard",
-            "description": "Dashboard"
-        },
-        {
-            "name": "Favorites",
-            "description": "Favorites"
-        },
-        {
-            "name": "Quiz Attempt",
-            "description": "Quiz Attempt"
-        },
-        {
             "name": "Category",
             "description": "Category"
         },
         {
+            "name": "Admin User Management",
+            "description": "Admin User Management"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Social Auth",
+            "description": "Social Auth"
+        },
+        {
             "name": "Community",
             "description": "Community"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Dashboard"
         },
         {
             "name": "Questions",
@@ -2413,8 +2460,20 @@
             "description": "Question Options"
         },
         {
+            "name": "Quiz Attempt",
+            "description": "Quiz Attempt"
+        },
+        {
             "name": "Quiz",
             "description": "Quiz"
+        },
+        {
+            "name": "Sharing",
+            "description": "Sharing"
+        },
+        {
+            "name": "Favorites",
+            "description": "Favorites"
         }
     ]
 }
