@@ -33,4 +33,9 @@ class Question extends Model
     {
         return $this->hasOne(QuestionAnswer::class);
     }
+
+    public function attemptAnswers()
+    {
+        return $this->hasMany(AttemptAnswer::class);
+    }
 }
