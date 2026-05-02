@@ -11,11 +11,19 @@ use Illuminate\Http\Response;
 use App\Http\Requests\QuizAttempt\SubmitAnswerRequest;
 use App\Http\Resources\AttemptAnswerResource;
 use App\Http\Resources\QuizAttemptDetailResource;
+use App\Services\QuizScoringService;
 use App\Models\AttemptAnswer;
 use App\Models\Question;
 
 class QuizAttemptController extends Controller
 {
+    protected $scoringService;
+
+    public function __construct(QuizScoringService $scoringService)
+    {
+        $this->scoringService = $scoringService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/attempts/{attempt}",
@@ -51,6 +59,64 @@ class QuizAttemptController extends Controller
         $attempt->load(['quiz.questions.options', 'answers']);
 
         return new QuizAttemptDetailResource($attempt);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/attempts/{attempt}/submit",
+     *     tags={"Quiz Attempt"},
+     *     summary="Submit a quiz attempt",
+     *     operationId="quizAttemptSubmit",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="attempt",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz Attempt ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Quiz attempt submitted successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/QuizAttemptDetail")
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Not found"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function submit(QuizAttempt $attempt)
+    {
+        // 1. Check if attempt belongs to user
+        if ($attempt->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        // 2. Check if attempt is in progress
+        if ($attempt->status !== 'in_progress') {
+            return response()->json(['message' => 'This attempt is already completed.'], Response::HTTP_FORBIDDEN);
+        }
+
+        // 3. Optional: Check if all questions are answered
+        $questionCount = $attempt->quiz->questions()->count();
+        $answerCount = $attempt->answers()->count();
+
+        if ($answerCount < $questionCount) {
+            return response()->json(['message' => 'Please answer all questions before submitting.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // 4. Calculate score
+        $score = $this->scoringService->calculateScore($attempt);
+
+        // 5. Update attempt record
+        $attempt->update([
+            'status' => 'submitted',
+            'score' => $score,
+            'completed_at' => now(),
+        ]);
+
+        return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers']));
     }
 
     /**
