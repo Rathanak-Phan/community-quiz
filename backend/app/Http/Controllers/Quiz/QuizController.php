@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\QuizMaker;
+namespace App\Http\Controllers\Quiz;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Quiz\StoreQuizRequest;

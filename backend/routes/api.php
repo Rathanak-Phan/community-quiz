@@ -1,14 +1,16 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\QuizMaker\CategoryController;
-use App\Http\Controllers\QuizMaker\CommunityController;
-use App\Http\Controllers\QuizMaker\QuizController;
-use App\Http\Controllers\QuizMaker\QuestionController;
-use App\Http\Controllers\QuizMaker\QuestionOptionController;
-use App\Http\Controllers\QuizAttemptController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Community\CommunityController;
+use App\Http\Controllers\Quiz\QuizController;
+use App\Http\Controllers\Quiz\QuestionController;
+use App\Http\Controllers\Quiz\QuestionOptionController;
+use App\Http\Controllers\Quiz\QuizAttemptController;
+use App\Http\Controllers\Quiz\ShareController;
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\User\FavoriteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,8 +22,16 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// OAuth
+Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect']);
+Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback']);
+
 // For Postman testing
 Route::post('/login-token', [AuthController::class, 'loginToken']);
+
+// Sharing
+Route::get('/quizzes/{id}/share', [ShareController::class, 'shareQuiz']);
+Route::get('/submissions/{id}/share', [ShareController::class, 'shareResult']);
 
 /*
 |--------------------------------------------------------------------------
@@ -58,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/attempts/{attempt}/answer', [QuizAttemptController::class, 'submitAnswer']);
     Route::post('/attempts/{attempt}/submit', [QuizAttemptController::class, 'submit']);
     Route::get('/attempts/{attempt}/review', [QuizAttemptController::class, 'review']);
-    Route::post('/answers/{answer}/grade', [QuizAttemptController::class, 'gradeAnswer']);
+    Route::put('/answers/{id}/grade', [QuizAttemptController::class, 'gradeAnswer']);
 
     // Leaderboard
     Route::get('/quizzes/{quiz}/leaderboard', [QuizController::class, 'leaderboard']);
@@ -112,5 +122,17 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::put('/options/{option}', [QuestionOptionController::class, 'update']);
     Route::delete('/options/{option}', [QuestionOptionController::class, 'destroy']);
 
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Only Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    // User Management
+    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
+    Route::put('/users/{id}/role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole']);
 });
 

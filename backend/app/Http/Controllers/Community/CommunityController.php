@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\QuizMaker;
+namespace App\Http\Controllers\Community;
 
 use App\Http\Controllers\Controller;
 use App\Models\Community;

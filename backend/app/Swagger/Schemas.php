@@ -4,12 +4,20 @@ namespace App\Swagger;
 
 /**
  * @OA\Schema(
+ *     schema="Role",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="admin")
+ * )
+ *
+ * @OA\Schema(
  *     schema="User",
  *     type="object",
  *     required={"id","name","email"},
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Rathanak"),
- *     @OA\Property(property="email", type="string", example="user@gmail.com")
+ *     @OA\Property(property="email", type="string", example="user@gmail.com"),
+ *     @OA\Property(property="role", ref="#/components/schemas/Role")
  * )
  *
  * @OA\Schema(
