@@ -106,5 +106,14 @@ namespace App\Swagger;
  *     @OA\Property(property="submitted_at", type="string", format="date-time"),
  *     @OA\Property(property="short_answer_count", type="integer")
  * )
+ *
+ * @OA\Schema(
+ *     schema="LeaderboardEntry",
+ *     type="object",
+ *     @OA\Property(property="rank", type="integer"),
+ *     @OA\Property(property="username", type="string"),
+ *     @OA\Property(property="score", type="integer"),
+ *     @OA\Property(property="submitted_at", type="string", format="date-time")
+ * )
  */
 class Schemas {}

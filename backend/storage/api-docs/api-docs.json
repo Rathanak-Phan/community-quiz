@@ -1802,6 +1802,53 @@
                     }
                 ]
             }
+        },
+        "/api/quizzes/{quiz}/leaderboard": {
+            "get": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get quiz leaderboard",
+                "operationId": "quizLeaderboard",
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "description": "Quiz ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Leaderboard retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/LeaderboardEntry"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Quiz not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -2115,6 +2162,24 @@
                     },
                     "short_answer_count": {
                         "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "LeaderboardEntry": {
+                "properties": {
+                    "rank": {
+                        "type": "integer"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "submitted_at": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"

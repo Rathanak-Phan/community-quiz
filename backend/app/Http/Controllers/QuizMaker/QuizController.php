@@ -7,7 +7,9 @@ use App\Http\Requests\Quiz\StoreQuizRequest;
 use App\Http\Requests\Quiz\UpdateQuizRequest;
 use App\Http\Resources\QuizResource;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Services\QuizService;
+use App\Http\Resources\LeaderboardResource;
 use Illuminate\Support\Facades\Storage;
 
 class QuizController extends Controller
@@ -220,5 +222,47 @@ class QuizController extends Controller
         $quiz->delete();
 
         return response()->json(['message' => 'Deleted']);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/quizzes/{quiz}/leaderboard",
+     *     tags={"Quiz"},
+     *     summary="Get quiz leaderboard",
+     *     operationId="quizLeaderboard",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="quiz",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Leaderboard retrieved successfully",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/LeaderboardEntry"))
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=404, description="Quiz not found")
+     * )
+     */
+    public function leaderboard(Quiz $quiz)
+    {
+        $attempts = QuizAttempt::where('quiz_id', $quiz->id)
+            ->where('status', 'submitted')
+            ->where('grading_status', 'graded')
+            ->with('user')
+            ->orderByDesc('score')
+            ->orderBy('completed_at') // Tie-breaker: who finished first?
+            ->get();
+
+        $rank = 1;
+        $leaderboard = $attempts->map(function ($attempt) use (&$rank) {
+            $attempt->rank = $rank++;
+            return $attempt;
+        });
+
+        return LeaderboardResource::collection($leaderboard);
     }
 }
