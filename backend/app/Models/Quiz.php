@@ -32,4 +32,8 @@ class Quiz extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function attempts()
+    {
+        return $this->hasMany(QuizAttempt::class);
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\QuizMaker\CommunityController;
 use App\Http\Controllers\QuizMaker\QuizController;
 use App\Http\Controllers\QuizMaker\QuestionController;
 use App\Http\Controllers\QuizMaker\QuestionOptionController;
+use App\Http\Controllers\QuizAttemptController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Approve / Reject
     Route::post('/community-members/{id}/approve', [CommunityController::class, 'approve']);
     Route::post('/community-members/{id}/reject', [CommunityController::class, 'reject']);
+
+    // Quiz Attempt
+    Route::post('/quizzes/{quiz}/start', [QuizAttemptController::class, 'start']);
 
 });
 
