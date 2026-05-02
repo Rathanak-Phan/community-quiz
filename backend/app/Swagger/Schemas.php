@@ -96,5 +96,15 @@ namespace App\Swagger;
  *     @OA\Property(property="correct_answer", type="string", nullable=true),
  *     @OA\Property(property="options", type="array", @OA\Items(ref="#/components/schemas/QuestionOption"))
  * )
+ *
+ * @OA\Schema(
+ *     schema="PendingReview",
+ *     type="object",
+ *     @OA\Property(property="attempt_id", type="integer"),
+ *     @OA\Property(property="quiz_title", type="string"),
+ *     @OA\Property(property="user_name", type="string"),
+ *     @OA\Property(property="submitted_at", type="string", format="date-time"),
+ *     @OA\Property(property="short_answer_count", type="integer")
+ * )
  */
 class Schemas {}
