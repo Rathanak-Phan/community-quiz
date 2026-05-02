@@ -1794,7 +1794,7 @@
                         "type": "string",
                         "enum": [
                             "pending",
-                            "completed"
+                            "graded"
                         ]
                     }
                 },
@@ -1825,7 +1825,7 @@
                         "type": "string",
                         "enum": [
                             "pending",
-                            "completed"
+                            "graded"
                         ]
                     },
                     "quiz": {
