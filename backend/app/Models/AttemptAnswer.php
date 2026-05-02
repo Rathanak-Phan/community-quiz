@@ -17,16 +17,25 @@ class AttemptAnswer extends Model
         'answer_text',
         'is_correct',
         'score',
+        'graded_by',
+        'graded_at',
+        'feedback',
     ];
 
     protected $casts = [
         'answer_boolean' => 'boolean',
         'is_correct' => 'boolean',
+        'graded_at' => 'datetime',
     ];
 
     public function attempt()
     {
         return $this->belongsTo(QuizAttempt::class, 'quiz_attempt_id');
+    }
+
+    public function gradedBy()
+    {
+        return $this->belongsTo(User::class, 'graded_by');
     }
 
     public function question()

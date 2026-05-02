@@ -506,6 +506,143 @@
                 ]
             }
         },
+        "/api/attempts/{attempt}/review": {
+            "get": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Get quiz attempt details for manual review",
+                "operationId": "quizAttemptReview",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "description": "Quiz Attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz attempt review data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "grading_status": {
+                                            "type": "string"
+                                        },
+                                        "questions": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/QuestionReview"
+                                            }
+                                        },
+                                        "answers": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AttemptAnswer"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/answers/{answer}/grade": {
+            "post": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Grade a specific answer manually",
+                "operationId": "quizAttemptGradeAnswer",
+                "parameters": [
+                    {
+                        "name": "answer",
+                        "in": "path",
+                        "description": "Attempt Answer ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "score"
+                                ],
+                                "properties": {
+                                    "score": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "feedback": {
+                                        "type": "string",
+                                        "example": "Good job!",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Answer graded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "answer": {
+                                            "$ref": "#/components/schemas/AttemptAnswer"
+                                        },
+                                        "attempt_summary": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/categories": {
             "get": {
                 "tags": [
@@ -1887,6 +2024,51 @@
                     "score": {
                         "type": "integer",
                         "example": 1
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "graded_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "graded_by": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "QuestionReview": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question_type": {
+                        "type": "string"
+                    },
+                    "question_text": {
+                        "type": "string"
+                    },
+                    "points": {
+                        "type": "integer"
+                    },
+                    "correct_answer": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuestionOption"
+                        }
                     }
                 },
                 "type": "object"
