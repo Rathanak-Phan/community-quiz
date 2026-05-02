@@ -23,6 +23,9 @@ class AttemptAnswerResource extends JsonResource
             'answer_text' => $this->answer_text,
             'is_correct' => $this->is_correct,
             'score' => $this->score,
+            'feedback' => $this->feedback,
+            'graded_at' => $this->graded_at,
+            'graded_by' => new UserResource($this->whenLoaded('gradedBy')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

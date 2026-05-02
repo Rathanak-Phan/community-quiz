@@ -57,6 +57,22 @@ class QuizScoringService
         ];
     }
 
+    public function recalculateTotalScore(QuizAttempt $attempt): void
+    {
+        $attempt->load('answers');
+        $totalScore = $attempt->answers->sum('score');
+        
+        // If any score is still null, it remains pending
+        $isPending = $attempt->answers->contains(function ($answer) {
+            return is_null($answer->score);
+        });
+
+        $attempt->update([
+            'score' => $totalScore,
+            'grading_status' => $isPending ? 'pending' : 'graded',
+        ]);
+    }
+
     private function isCorrect(Question $question, AttemptAnswer $answer): bool
     {
         switch ($question->question_type) {

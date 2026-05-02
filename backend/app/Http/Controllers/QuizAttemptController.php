@@ -14,6 +14,8 @@ use App\Http\Resources\QuizAttemptDetailResource;
 use App\Services\QuizScoringService;
 use App\Models\AttemptAnswer;
 use App\Models\Question;
+use App\Http\Resources\QuestionReviewResource;
+use Illuminate\Http\Request;
 
 class QuizAttemptController extends Controller
 {
@@ -262,5 +264,128 @@ class QuizAttemptController extends Controller
         );
 
         return new AttemptAnswerResource($answer);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/attempts/{attempt}/review",
+     *     tags={"Quiz Attempt"},
+     *     summary="Get quiz attempt details for manual review",
+     *     operationId="quizAttemptReview",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="attempt",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz Attempt ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Quiz attempt review data retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="grading_status", type="string"),
+     *             @OA\Property(property="questions", type="array", @OA\Items(ref="#/components/schemas/QuestionReview")),
+     *             @OA\Property(property="answers", type="array", @OA\Items(ref="#/components/schemas/AttemptAnswer"))
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
+    public function review(QuizAttempt $attempt)
+    {
+        // 1. Check if user is quiz maker or admin
+        $quiz = $attempt->quiz;
+        if ($quiz->created_by !== auth()->id() && auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        // 2. Load relationships
+        $attempt->load(['quiz.questions.options', 'quiz.questions.shortAnswer', 'answers.gradedBy']);
+
+        return [
+            'id' => $attempt->id,
+            'status' => $attempt->status,
+            'score' => $attempt->score,
+            'max_score' => $attempt->max_score,
+            'grading_status' => $attempt->grading_status,
+            'quiz' => $attempt->quiz,
+            'questions' => QuestionReviewResource::collection($attempt->quiz->questions),
+            'answers' => AttemptAnswerResource::collection($attempt->answers),
+        ];
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/answers/{answer}/grade",
+     *     tags={"Quiz Attempt"},
+     *     summary="Grade a specific answer manually",
+     *     operationId="quizAttemptGradeAnswer",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="answer",
+     *         in="path",
+     *         required=true,
+     *         description="Attempt Answer ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"score"},
+     *             @OA\Property(property="score", type="integer", example=5),
+     *             @OA\Property(property="feedback", type="string", nullable=true, example="Good job!")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Answer graded successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="answer", ref="#/components/schemas/AttemptAnswer"),
+     *             @OA\Property(property="attempt_summary", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function gradeAnswer(Request $request, AttemptAnswer $answer)
+    {
+        $request->validate([
+            'score' => 'required|integer|min:0',
+            'feedback' => 'nullable|string',
+        ]);
+
+        // 1. Check if user is quiz maker or admin
+        $attempt = $answer->attempt;
+        $quiz = $attempt->quiz;
+        if ($quiz->created_by !== auth()->id() && auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        // 2. Update answer
+        $question = $answer->question;
+        $isCorrect = $request->score >= ($question->points / 2); // Simple heuristic or explicit flag
+
+        $answer->update([
+            'score' => $request->score,
+            'is_correct' => $isCorrect,
+            'feedback' => $request->feedback,
+            'graded_by' => auth()->id(),
+            'graded_at' => now(),
+        ]);
+
+        // 3. Recalculate attempt score
+        $this->scoringService->recalculateTotalScore($attempt);
+
+        return response()->json([
+            'message' => 'Answer graded successfully',
+            'answer' => new AttemptAnswerResource($answer->load('gradedBy')),
+            'attempt_summary' => [
+                'score' => $attempt->fresh()->score,
+                'grading_status' => $attempt->fresh()->grading_status,
+            ]
+        ]);
     }
 }

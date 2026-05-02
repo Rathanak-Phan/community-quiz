@@ -80,7 +80,21 @@ namespace App\Swagger;
  *     @OA\Property(property="answer_boolean", type="boolean", nullable=true, example=true),
  *     @OA\Property(property="answer_text", type="string", nullable=true, example="Answer text"),
  *     @OA\Property(property="is_correct", type="boolean", nullable=true),
- *     @OA\Property(property="score", type="integer", example=1)
+ *     @OA\Property(property="score", type="integer", example=1),
+ *     @OA\Property(property="feedback", type="string", nullable=true),
+ *     @OA\Property(property="graded_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="graded_by", ref="#/components/schemas/User", nullable=true)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="QuestionReview",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="question_type", type="string"),
+ *     @OA\Property(property="question_text", type="string"),
+ *     @OA\Property(property="points", type="integer"),
+ *     @OA\Property(property="correct_answer", type="string", nullable=true),
+ *     @OA\Property(property="options", type="array", @OA\Items(ref="#/components/schemas/QuestionOption"))
  * )
  */
 class Schemas {}
