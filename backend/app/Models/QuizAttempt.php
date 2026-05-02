@@ -18,6 +18,8 @@ class QuizAttempt extends Model
         'started_at',
         'completed_at',
         'score',
+        'max_score',
+        'grading_status',
     ];
 
     protected $casts = [
