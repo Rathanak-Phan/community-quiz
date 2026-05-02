@@ -235,6 +235,103 @@
                 }
             }
         },
+        "/api/attempts/{attempt}": {
+            "get": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Get quiz attempt details for resuming",
+                "operationId": "quizAttemptShow",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "description": "Quiz Attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz attempt details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuizAttemptDetail"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/attempts/{attempt}/submit": {
+            "post": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "Submit a quiz attempt",
+                "operationId": "quizAttemptSubmit",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "description": "Quiz Attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz attempt submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuizAttemptDetail"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/quizzes/{quiz}/start": {
             "post": {
                 "tags": [
@@ -1569,21 +1666,75 @@
                 },
                 "type": "object"
             },
-            "AuthResponse": {
+            "Quiz": {
                 "properties": {
-                    "user": {
-                        "$ref": "#/components/schemas/User"
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "General Knowledge"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "A quiz about everything"
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "cover_image": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"
             },
-            "TokenResponse": {
+            "QuestionOption": {
                 "properties": {
-                    "token": {
-                        "type": "string"
+                    "id": {
+                        "type": "integer",
+                        "example": 1
                     },
-                    "user": {
-                        "$ref": "#/components/schemas/User"
+                    "option_text": {
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "is_correct": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "Question": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question_type": {
+                        "type": "string",
+                        "enum": [
+                            "multiple_choice",
+                            "true_false",
+                            "short_answer"
+                        ]
+                    },
+                    "question_text": {
+                        "type": "string",
+                        "example": "What is the capital of France?"
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuestionOption"
+                        }
                     }
                 },
                 "type": "object"
@@ -1618,7 +1769,7 @@
                         "type": "string",
                         "enum": [
                             "in_progress",
-                            "completed"
+                            "submitted"
                         ],
                         "example": "in_progress"
                     },
@@ -1633,6 +1784,42 @@
                     },
                     "score": {
                         "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "QuizAttemptDetail": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "in_progress",
+                            "submitted"
+                        ]
+                    },
+                    "quiz": {
+                        "$ref": "#/components/schemas/Quiz"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Question"
+                        }
+                    },
+                    "answers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttemptAnswer"
+                        }
+                    },
+                    "last_question_id": {
+                        "type": "integer",
+                        "example": 5,
                         "nullable": true
                     }
                 },
