@@ -15,6 +15,7 @@ use App\Services\QuizScoringService;
 use App\Models\AttemptAnswer;
 use App\Models\Question;
 use App\Http\Resources\QuestionReviewResource;
+use App\Http\Resources\PendingReviewResource;
 use Illuminate\Http\Request;
 
 class QuizAttemptController extends Controller
@@ -387,5 +388,39 @@ class QuizAttemptController extends Controller
                 'grading_status' => $attempt->fresh()->grading_status,
             ]
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/reviews/pending",
+     *     tags={"Quiz Attempt"},
+     *     summary="List all quiz attempts pending manual review",
+     *     operationId="quizAttemptPendingReviews",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Pending reviews retrieved successfully"
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden")
+     * )
+     */
+    public function pendingReviews()
+    {
+        $user = auth()->user();
+
+        $query = QuizAttempt::where('grading_status', 'pending')
+            ->with(['quiz', 'user']);
+
+        // Role-based filtering
+        if ($user->role !== 'admin') {
+            $query->whereHas('quiz', function ($q) use ($user) {
+                $q->where('created_by', $user->id);
+            });
+        }
+
+        $attempts = $query->latest('completed_at')->get();
+
+        return PendingReviewResource::collection($attempts);
     }
 }
