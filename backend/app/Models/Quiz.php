@@ -41,4 +41,9 @@ class Quiz extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
 }

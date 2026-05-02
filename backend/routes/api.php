@@ -61,6 +61,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Leaderboard
     Route::get('/quizzes/{quiz}/leaderboard', [QuizController::class, 'leaderboard']);
 
+    // Favorites
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{favorite}', [FavoriteController::class, 'destroy']);
+
 });
 
 /*

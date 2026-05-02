@@ -235,6 +235,121 @@
                 }
             }
         },
+        "/api/favorites": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "List all user favorites",
+                "operationId": "favoriteIndex",
+                "responses": {
+                    "200": {
+                        "description": "Favorites retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Favorite"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Add a quiz or category to favorites",
+                "operationId": "favoriteStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "target_type",
+                                    "target_id"
+                                ],
+                                "properties": {
+                                    "target_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "quiz",
+                                            "category"
+                                        ]
+                                    },
+                                    "target_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Favorite saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Favorite"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/favorites/{favorite}": {
+            "delete": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Remove an item from favorites",
+                "operationId": "favoriteDestroy",
+                "parameters": [
+                    {
+                        "name": "favorite",
+                        "in": "path",
+                        "description": "Favorite ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Favorite removed successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Favorite not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/attempts/{attempt}": {
             "get": {
                 "tags": [
@@ -2183,6 +2298,27 @@
                     }
                 },
                 "type": "object"
+            },
+            "Favorite": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "target_type": {
+                        "type": "string",
+                        "enum": [
+                            "quiz",
+                            "category"
+                        ]
+                    },
+                    "target_id": {
+                        "type": "integer"
+                    },
+                    "details": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -2198,6 +2334,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Favorites",
+            "description": "Favorites"
         },
         {
             "name": "Quiz Attempt",
