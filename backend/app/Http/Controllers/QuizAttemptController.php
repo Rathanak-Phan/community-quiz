@@ -10,11 +10,49 @@ use Illuminate\Http\Response;
 
 use App\Http\Requests\QuizAttempt\SubmitAnswerRequest;
 use App\Http\Resources\AttemptAnswerResource;
+use App\Http\Resources\QuizAttemptDetailResource;
 use App\Models\AttemptAnswer;
 use App\Models\Question;
 
 class QuizAttemptController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/attempts/{attempt}",
+     *     tags={"Quiz Attempt"},
+     *     summary="Get quiz attempt details for resuming",
+     *     operationId="quizAttemptShow",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="attempt",
+     *         in="path",
+     *         required=true,
+     *         description="Quiz Attempt ID",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Quiz attempt details retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/QuizAttemptDetail")
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
+    public function show(QuizAttempt $attempt)
+    {
+        // 1. Check if attempt belongs to user
+        if ($attempt->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        // 2. Load relationships
+        $attempt->load(['quiz.questions.options', 'answers']);
+
+        return new QuizAttemptDetailResource($attempt);
+    }
+
     /**
      * @OA\Post(
      *     path="/api/quizzes/{quiz}/start",
