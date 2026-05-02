@@ -115,5 +115,14 @@ namespace App\Swagger;
  *     @OA\Property(property="score", type="integer"),
  *     @OA\Property(property="submitted_at", type="string", format="date-time")
  * )
+ *
+ * @OA\Schema(
+ *     schema="Favorite",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer"),
+ *     @OA\Property(property="target_type", type="string", enum={"quiz", "category"}),
+ *     @OA\Property(property="target_id", type="integer"),
+ *     @OA\Property(property="details", type="object")
+ * )
  */
 class Schemas {}
