@@ -89,21 +89,19 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
     setLoading(true);
     setApiError("");
     try {
-      const communityData = {
-        name: name.trim(),
-        description: description.trim(),
-        status,
-      };
-
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      formData.append("description", description.trim());
+      formData.append("status", status);
+      
       if (coverImage) {
-        // In a real app, you'd upload the image to a server or storage service
-        communityData.coverImage = coverImagePreview;
+        formData.append("cover_image", coverImage);
       }
 
       if (isEditMode) {
-        await updateCommunity(editData.id, communityData);
+        await updateCommunity(editData.id, formData);
       } else {
-        await createCommunity(communityData);
+        await createCommunity(formData);
       }
       onSuccess(isEditMode ? "Community updated successfully!" : "Community created successfully!");
       onClose();

@@ -11,6 +11,7 @@ class RegisterRequest extends FormRequest{
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string|in:user,quiz_maker',
         ];
     }
 }

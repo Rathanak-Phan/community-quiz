@@ -11,7 +11,7 @@ class ShareService
 
     public function __construct()
     {
-        $this->frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $this->frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
     }
 
     /**

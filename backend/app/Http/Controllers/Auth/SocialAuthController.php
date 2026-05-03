@@ -66,15 +66,15 @@ class SocialAuthController extends Controller
 
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
-            
+
             $user = $this->handleUser($socialUser, $provider);
 
             // Generate Sanctum token
             $token = $user->createToken('auth_token')->plainTextToken;
 
             // Redirect to frontend
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
-            return redirect()->away("{$frontendUrl}/social-login-success?token={$token}");
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            return redirect()->away("{$frontendUrl}/social-login?token={$token}");
 
         } catch (Exception $e) {
             \Log::error("Social Auth Error ($provider): " . $e->getMessage());
@@ -92,7 +92,7 @@ class SocialAuthController extends Controller
     protected function handleUser($socialUser, string $provider): User
     {
         $email = $socialUser->getEmail();
-        
+
         // Handle cases where email might be null (e.g., GitHub)
         if (!$email) {
             $email = $socialUser->getId() . "@{$provider}.com";
@@ -117,7 +117,7 @@ class SocialAuthController extends Controller
      */
     protected function redirectWithError(string $error): RedirectResponse
     {
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
         return redirect()->away("{$frontendUrl}/login?error={$error}");
     }
 }

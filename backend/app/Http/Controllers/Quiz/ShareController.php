@@ -36,7 +36,7 @@ class ShareController extends Controller
      *         description="Share URL generated successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="quiz_id", type="integer", example=1),
-     *             @OA\Property(property="share_url", type="string", example="http://localhost:3000/quiz/1")
+     *             @OA\Property(property="share_url", type="string", example="http://localhost:5173/quiz/1")
      *         )
      *     ),
      *     @OA\Response(response=404, description="Quiz not found")

@@ -1,7 +1,7 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
-  BarChart2, Heart, User
+  BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle
 } from "lucide-react";
 
 const navItems = [
@@ -11,50 +11,130 @@ const navItems = [
   { to: "/quizzes", label: "Quizzes", icon: BookOpen },
   { to: "/leaderboard", label: "Leaderboard", icon: BarChart2 },
   { to: "/favorites", label: "Favorites", icon: Heart },
-  { to: "/profile", label: "Profile", icon: User },
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const role = user?.role || "user";
+
+  const filteredNavItems = navItems.filter(item => {
+    if (item.to === "/dashboard") return role === "admin" || role === "quiz_maker";
+    return true;
+  });
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
-    <div style={{ display: "flex" }}>
-      <aside style={{
-        width: 220, minHeight: "100vh", borderRight: "1px solid #e5e7eb",
-        padding: "20px 12px", display: "flex", flexDirection: "column", gap: 4
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24, padding: "0 8px" }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 10, background: "#1a6ef5",
-            display: "flex", alignItems: "center", justifyContent: "center"
-          }}>
-            <BookOpen size={18} color="#fff" />
+    <div className="flex min-h-screen bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-700">
+      {/* Sidebar */}
+      <aside className="w-72 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen z-20">
+        <div className="p-8 flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+            <BookOpen size={20} />
           </div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 500 }}>Quiz Community</div>
-            <div style={{ fontSize: 11, color: "#6b7280" }}>Academic Excellence</div>
-          </div>
+          <span className="font-black text-xl tracking-tight text-slate-900 uppercase">Quizly</span>
         </div>
 
-        {navItems.map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} style={({ isActive }) => ({
-            display: "flex", alignItems: "center", gap: 10,
-            padding: "9px 12px", borderRadius: 8, textDecoration: "none",
-            background: isActive ? "#e8f0fe" : "transparent",
-            color: isActive ? "#1a6ef5" : "#6b7280",
-            fontWeight: isActive ? 500 : 400, fontSize: 13,
-          })}>
-            {({ isActive }) => (
-              <>
-                <Icon size={16} color={isActive ? "#1a6ef5" : "#6b7280"} />
-                {label}
-              </>
-            )}
-          </NavLink>
-        ))}
+        <div className="px-6 py-4">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Main Menu</p>
+          <nav className="space-y-1">
+            {filteredNavItems.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  }`
+                }
+              >
+                <Icon size={18} className="transition-transform group-hover:scale-110" />
+                <span className="text-sm tracking-tight">{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        <div className="px-6 py-4 mt-auto">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Settings</p>
+          <nav className="space-y-1">
+            <SideLink icon={<Settings size={18}/>} label="Settings" />
+            <SideLink icon={<HelpCircle size={18}/>} label="Help Center" />
+          </nav>
+          
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all duration-300 group font-bold"
+            >
+              <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
+              <span className="text-sm">Logout</span>
+            </button>
+          </div>
+        </div>
       </aside>
 
-      <main>
-          <Outlet />
-      </main>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Top Header */}
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-10 sticky top-0 z-10 shrink-0">
+          <div className="relative w-96 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search everything..." 
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all font-medium text-sm"
+            />
+          </div>
+          
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2">
+              <button className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition relative">
+                <Bell size={20} />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white shadow-sm"></span>
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-4 pl-8 border-l border-slate-100">
+              <div className="text-right">
+                <p className="text-sm font-black text-slate-900 tracking-tight">{user?.name || "Anonymous"}</p>
+                <div className="flex items-center justify-end gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">
+                    {role === "admin" ? "Admin" : role === "quiz_maker" ? "Creator" : "Student"}
+                  </p>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg shadow-blue-600/20 border-2 border-white">
+                {user?.name?.charAt(0) || "U"}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto p-10 bg-slate-50/50">
+          <div className="max-w-6xl mx-auto">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
+  );
+}
+
+function SideLink({ icon, label }) {
+  return (
+    <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-300 group">
+      <span className="transition-transform group-hover:scale-110">{icon}</span>
+      <span className="text-sm font-medium">{label}</span>
+    </button>
   );
 }

@@ -10,10 +10,16 @@ class AuthService
 {
     public function register(array $data): User
     {
-        $role = Role::firstWhere('name', 'user');
+        $roleName = $data['role'] ?? 'user';
+        $role = Role::firstWhere('name', $roleName);
 
         if (!$role) {
-            throw new \Exception('Role not found. Please run RoleSeeder.');
+            // Fallback to user if specified role doesn't exist
+            $role = Role::firstWhere('name', 'user');
+        }
+
+        if (!$role) {
+            throw new \Exception('Default role not found. Please run RoleSeeder.');
         }
 
         return User::create([
