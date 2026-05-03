@@ -64,11 +64,17 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string',
+            'color' => 'nullable|string',
         ]);
 
         $category = Category::create([
             'name' => $request->name,
+            'description' => $request->description,
+            'icon' => $request->icon,
+            'color' => $request->color,
             'user_id' => $request->user()->id
         ]);
 
@@ -137,11 +143,17 @@ class CategoryController extends Controller
         $this->authorize('update', $category);
 
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string',
+            'color' => 'nullable|string',
         ]);
 
         $category->update([
-            'name' => $request->name
+            'name' => $request->name,
+            'description' => $request->description,
+            'icon' => $request->icon,
+            'color' => $request->color,
         ]);
 
         return response()->json($category);
