@@ -25,7 +25,26 @@ class CommunityController extends Controller
      */
     public function index()
     {
-        $communities = Community::with('creator:id,name,email')->get();
+        $user = auth('sanctum')->user();
+
+        $communities = Community::with('creator:id,name,email')
+            ->when(!$user, function ($query) {
+                return $query->where('visibility', 'public');
+            })
+            ->when($user, function ($query) use ($user) {
+                if ($user->role === 'admin') return $query;
+                
+                return $query->where('visibility', 'public')
+                    ->orWhere(function ($q) use ($user) {
+                        $q->where('visibility', 'private')
+                          ->whereHas('members', function ($m) use ($user) {
+                              $m->where('user_id', $user->id)
+                                ->where('status', 'approved');
+                          });
+                    });
+            })
+            ->withCount('members')
+            ->get();
 
         return response()->json($communities);
     }
@@ -102,7 +121,54 @@ class CommunityController extends Controller
      */
     public function show(Community $community)
     {
-        //
+        $user = auth('sanctum')->user();
+
+        // Guest check
+        if (!$user && $community->visibility === 'private') {
+            return response()->json(['message' => 'Unauthenticated or Private Community'], 401);
+        }
+
+        // Auth check (if private, must be member or admin)
+        if ($user && $community->visibility === 'private') {
+            $isMember = $community->members()
+                ->where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->exists();
+
+            if (!$isMember && $user->role !== 'admin') {
+                return response()->json(['message' => 'Access Denied'], 403);
+            }
+        }
+
+        return response()->json($community->load(['creator:id,name', 'members.user:id,name']));
+    }
+
+    public function quizzes(Community $community)
+    {
+        $user = auth('sanctum')->user();
+
+        // Visibility check
+        if ($community->visibility === 'private') {
+            if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+            
+            $isMember = $community->members()
+                ->where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->exists();
+
+            if (!$isMember && $user->role !== 'admin') {
+                return response()->json(['message' => 'Access Denied'], 403);
+            }
+        }
+
+        $quizzes = $community->quizzes()
+            ->with(['category', 'creator:id,name'])
+            ->withCount('attempts')
+            ->get();
+
+        return response()->json([
+            'data' => $quizzes
+        ]);
     }
 
     /**

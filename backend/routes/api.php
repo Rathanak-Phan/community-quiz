@@ -33,6 +33,11 @@ Route::post('/login-token', [AuthController::class, 'loginToken']);
 Route::get('/quizzes/{id}/share', [ShareController::class, 'shareQuiz']);
 Route::get('/submissions/{id}/share', [ShareController::class, 'shareResult']);
 
+// Public Community Browsing
+Route::get('/communities', [CommunityController::class, 'index']);
+Route::get('/communities/{community}', [CommunityController::class, 'show']);
+Route::get('/communities/{community}/quizzes', [CommunityController::class, 'quizzes']);
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes (ALL AUTH USERS)
@@ -50,7 +55,6 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/communities', [CommunityController::class, 'index']);
     Route::post('/communities', [CommunityController::class, 'store']);
     Route::put('/communities/{community}', [CommunityController::class, 'update']);
     Route::delete('/communities/{community}', [CommunityController::class, 'destroy']);

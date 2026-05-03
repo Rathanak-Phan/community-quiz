@@ -101,13 +101,17 @@ class QuizController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         $quizzes = Quiz::with(['community', 'category', 'creator'])
             ->whereHas('community', function ($q) use ($user) {
+                if (!$user) {
+                    return $q->where('visibility', 'public');
+                }
+
+                if ($user->role === 'admin') return $q;
 
                 $q->where('visibility', 'public')
-
                     ->orWhere(function ($q2) use ($user) {
                         $q2->where('visibility', 'private')
                             ->whereHas('members', function ($m) use ($user) {
