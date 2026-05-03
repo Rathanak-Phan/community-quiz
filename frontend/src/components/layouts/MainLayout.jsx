@@ -1,11 +1,11 @@
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { BookOpen, LayoutDashboard, LogIn, UserPlus } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user, token } = useAuth();
 
   const isActive = (path) => location.pathname === path;
 

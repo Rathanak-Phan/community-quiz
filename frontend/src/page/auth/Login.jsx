@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login as loginApi } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 import { BookOpen, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 
 import googleLogo from "../../assets/images/google_logo.png";
@@ -10,15 +10,15 @@ const BACKEND_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 function Login() {
   const navigate = useNavigate();
+  const { login, token } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) navigate("/dashboard");
-  }, [navigate]);
+  }, [token, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,10 +26,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await loginApi({ email, password });
-      const { token, user } = res.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      await login({ email, password });
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");

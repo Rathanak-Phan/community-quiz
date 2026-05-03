@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { register as registerApi } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 import { BookOpen, Mail, Lock, User, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 
 function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,7 +29,7 @@ function Register() {
     setLoading(true);
 
     try {
-      await registerApi(formData);
+      await register(formData);
       setSuccess(true);
       // Wait a moment then redirect to login
       setTimeout(() => {

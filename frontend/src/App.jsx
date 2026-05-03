@@ -16,65 +16,81 @@ import MainLayout from "./components/layouts/MainLayout";
 import Sidebar from "./components/layouts/SideBar";
 import CommunityDetail from "./page/community/CommunityDetail";
 
+import { AuthProvider } from "./context/AuthContext";
+
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route element={<MainLayout />}>               
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/social-login" element={<SocialLogin />} />
-        </Route>
+      <AuthProvider>
+        <Routes>
+          <Route element={<MainLayout />}>               
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/social-login" element={<SocialLogin />} />
+          </Route>
 
-        <Route element={<Sidebar />}>
-          <Route
-            path="/dashboard"
-            element={
-                <Dashboard />
-            }
-          />
-          <Route
-            path="/categories"
-            element={
-                <Categories />
-            }
-          />
-          <Route
-            path="/communities"
-            element={
-                <Communities />
-            }
-          />
-          <Route
-            path="/communities/:id"
-            element={
-                <CommunityDetail />
-            }
-          />
-          <Route
-            path="/quizzes"
-            element={
-                <Quizzes />
-            }
-          />
-          <Route
-            path="/leaderboard"
-            element={
-                <Leaderboard />
-            }
-          />
-        </Route>
+          <Route element={<Sidebar />}>
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <ProtectedRoute>
+                  <Categories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities"
+              element={
+                <ProtectedRoute>
+                  <Communities />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities/:id"
+              element={
+                <ProtectedRoute>
+                  <CommunityDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quizzes"
+              element={
+                <ProtectedRoute>
+                  <Quizzes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/leaderboard"
+              element={
+                <ProtectedRoute>
+                  <Leaderboard />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-        <Route
-            path="/admin/categories"
-            element={
-              <AdminRoute>
-                <CategoryList />
-              </AdminRoute>
-            }
-          />
-      </Routes>
+          <Route
+              path="/admin/categories"
+              element={
+                <AdminRoute>
+                  <CategoryList />
+                </AdminRoute>
+              }
+            />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }
