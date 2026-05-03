@@ -212,7 +212,7 @@ function CategoryList() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                          <div className={`w-8 h-8 rounded-lg ${cat.color || 'bg-blue-100'} ${cat.color ? 'text-white' : 'text-blue-600'} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
                             {cat.name?.[0]?.toUpperCase() || "?"}
                           </div>
                           <span className="font-semibold text-gray-900">
@@ -232,9 +232,9 @@ function CategoryList() {
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-1.5 text-gray-600">
                           <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs flex items-center justify-center font-semibold leading-none">
-                            {(cat.created_by || cat.createdBy || "A")?.[0]?.toUpperCase()}
+                            {(cat.user?.name || "A")?.[0]?.toUpperCase()}
                           </span>
-                          {cat.created_by || cat.createdBy || "Admin"}
+                          {cat.user?.name || "Admin"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-gray-500">
