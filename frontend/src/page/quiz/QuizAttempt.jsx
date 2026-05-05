@@ -58,10 +58,15 @@ export default function QuizAttempt() {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
-    const handleAnswerChange = async (questionId, value) => {
+    const handleAnswerChange = async (questionId, value, type) => {
         setAnswers(prev => ({ ...prev, [questionId]: value }));
         try {
-            await submitAnswer(attemptId, { question_id: questionId, answer_text: value });
+            const payload = { question_id: questionId };
+            if (type === 'multiple_choice') payload.selected_option_id = value;
+            else if (type === 'true_false') payload.answer_boolean = value;
+            else if (type === 'short_answer') payload.answer_text = value;
+
+            await submitAnswer(attemptId, payload);
         } catch (error) {
             console.error("Cloud sync failed");
         }
@@ -71,7 +76,7 @@ export default function QuizAttempt() {
         if (!window.confirm("Ready to finalize your attempt?")) return;
         setSubmitting(true);
         try {
-            await submitAttempt(attemptId, { is_anonymous: isAnonymous });
+            await submitAttempt(attemptId);
             navigate(`/attempts/${attemptId}/review`);
         } catch (error) {
             setToast({ show: true, message: "Cloud submission failed", type: "error" });
@@ -167,45 +172,48 @@ export default function QuizAttempt() {
                         )}
 
                         <div className="grid grid-cols-1 gap-5">
-                            {currentQuestion?.type === 'mcq' && currentQuestion.options?.map((opt, idx) => (
+                            {currentQuestion?.question_type === 'multiple_choice' && currentQuestion.options?.map((opt, idx) => (
                                 <OptionBtn 
                                     key={opt.id}
                                     label={opt.option_text}
                                     letter={String.fromCharCode(65 + idx)}
-                                    active={answers[currentQuestion.id] === opt.option_text}
-                                    onClick={() => handleAnswerChange(currentQuestion.id, opt.option_text)}
+                                    active={answers[currentQuestion.id] === opt.id}
+                                    onClick={() => handleAnswerChange(currentQuestion.id, opt.id, 'multiple_choice')}
                                 />
                             ))}
 
-                            {currentQuestion?.type === 'true_false' && (
+                            {currentQuestion?.question_type === 'true_false' && (
                                 <div className="grid grid-cols-2 gap-6">
-                                    {['True', 'False'].map(val => (
+                                    {[
+                                        { label: 'True', value: 1 },
+                                        { label: 'False', value: 0 }
+                                    ].map(item => (
                                         <button 
-                                            key={val}
-                                            onClick={() => handleAnswerChange(currentQuestion.id, val)}
+                                            key={item.label}
+                                            onClick={() => handleAnswerChange(currentQuestion.id, item.value, 'true_false')}
                                             className={`py-12 rounded-[2.5rem] border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
-                                                answers[currentQuestion.id] === val
+                                                answers[currentQuestion.id] === item.value
                                                 ? 'border-blue-600 bg-blue-50/50 text-blue-700 shadow-xl shadow-blue-600/10'
                                                 : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 text-slate-600'
                                             }`}
                                         >
-                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner ${answers[currentQuestion.id] === val ? 'bg-blue-600 text-white' : 'bg-white text-slate-200'}`}>
-                                                {val.charAt(0)}
+                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner ${answers[currentQuestion.id] === item.value ? 'bg-blue-600 text-white' : 'bg-white text-slate-200'}`}>
+                                                {item.label.charAt(0)}
                                             </div>
-                                            <span className="font-black uppercase tracking-[0.2em] text-xs">{val}</span>
+                                            <span className="font-black uppercase tracking-[0.2em] text-xs">{item.label}</span>
                                         </button>
                                     ))}
                                 </div>
                             )}
 
-                            {currentQuestion?.type === 'short_answer' && (
+                            {currentQuestion?.question_type === 'short_answer' && (
                                 <div className="space-y-4">
                                     <textarea 
-                                        className="w-full p-10 bg-slate-50 border-2 border-slate-50 rounded-[2.5rem] focus:bg-white focus:border-blue-600 transition-all duration-500 outline-none min-h-[250px] text-lg font-bold placeholder:text-slate-200"
+                                        className="w-full p-10 bg-slate-50 border-2 border-slate-50 rounded-[2.5rem] focus:bg-white focus:border-blue-600 transition-all duration-500 outline-none min-h-[200px] text-lg font-bold placeholder:text-slate-200"
                                         placeholder="Type your structured response here..."
                                         value={answers[currentQuestion.id] || ""}
                                         onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
-                                        onBlur={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                                        onBlur={(e) => handleAnswerChange(currentQuestion.id, e.target.value, 'short_answer')}
                                     />
                                     <div className="flex items-center gap-2 px-6">
                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>

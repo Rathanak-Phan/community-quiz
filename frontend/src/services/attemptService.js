@@ -5,8 +5,8 @@ import apiClient from "../config/api";
  * Handles quiz attempts, answers, and grading.
  */
 
-export const startAttempt = (quizId, anonymous = false) =>
-  apiClient.post(`/quizzes/${quizId}/start`, { anonymous });
+export const startAttempt = (quizId, mode = 'scored', is_anonymous = false) =>
+  apiClient.post(`/quizzes/${quizId}/start`, { mode, is_anonymous });
 
 export const getAttempt = (attemptId) =>
   apiClient.get(`/attempts/${attemptId}`);

@@ -13,6 +13,8 @@ import AdminRoute from "./components/AdminRoute";
 import CategoryList from "./page/category/CategoryList";
 import Quizzes from "./page/quiz/Quizzes";
 import QuestionList from "./page/quiz/QuestionList";
+import QuizDetail from "./page/quiz/QuizDetail";
+import QuizAttempt from "./page/quiz/QuizAttempt";
 import MainLayout from "./components/layouts/MainLayout";
 import Sidebar from "./components/layouts/SideBar";
 import CommunityDetail from "./page/community/CommunityDetail";
@@ -90,10 +92,26 @@ function App() {
               }
             />
             <Route
+              path="/quizzes/:id"
+              element={
+                <ProtectedRoute>
+                  <QuizDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/quizzes/:quizId/questions"
               element={
                 <ProtectedRoute>
                   <QuestionList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/attempts/:attemptId"
+              element={
+                <ProtectedRoute>
+                  <QuizAttempt />
                 </ProtectedRoute>
               }
             />
