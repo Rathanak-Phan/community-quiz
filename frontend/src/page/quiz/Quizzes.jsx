@@ -205,6 +205,16 @@ function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
                     {(isAdmin || quiz.created_by === userId) && (
                         <>
                             <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/quizzes/${quiz.id}/questions`);
+                                }}
+                                title="Manage Questions"
+                                className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-amber-600 hover:bg-amber-600 hover:text-white transition shadow-lg"
+                            >
+                                <HelpCircle size={16} />
+                            </button>
+                            <button 
                                 onClick={(e) => onEdit(e, quiz)}
                                 className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-blue-600 hover:bg-blue-600 hover:text-white transition shadow-lg"
                             >
