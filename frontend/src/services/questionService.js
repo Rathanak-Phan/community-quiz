@@ -32,6 +32,21 @@ export const createShortAnswer = (data) => {
   return apiClient.post("/questions/short-answer", data);
 };
 
+export const getQuestions = (quizId) =>
+  apiClient.get(`/quizzes/${quizId}/questions`);
+
+export const updateQuestion = (id, data) => {
+  if (data instanceof FormData) {
+    return apiClient.post(`/questions/${id}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }
+  return apiClient.put(`/questions/${id}`, data);
+};
+
+export const deleteQuestion = (id) =>
+  apiClient.delete(`/questions/${id}`);
+
 // Options
 export const getQuestionOptions = (questionId) =>
   apiClient.get(`/questions/${questionId}/options`);

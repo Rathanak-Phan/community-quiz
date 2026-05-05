@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import CategoryList from "./page/category/CategoryList";
 import Quizzes from "./page/quiz/Quizzes";
+import QuestionList from "./page/quiz/QuestionList";
 import MainLayout from "./components/layouts/MainLayout";
 import Sidebar from "./components/layouts/SideBar";
 import CommunityDetail from "./page/community/CommunityDetail";
@@ -85,6 +86,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Quizzes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quizzes/:quizId/questions"
+              element={
+                <ProtectedRoute>
+                  <QuestionList />
                 </ProtectedRoute>
               }
             />

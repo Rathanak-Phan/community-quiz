@@ -19,8 +19,11 @@ class QuestionResource extends JsonResource
             'quiz_id' => $this->quiz_id,
             'question_type' => $this->question_type,
             'question_text' => $this->question_text,
+            'points' => $this->points,
             'image' => $this->image,
+            'correct_answer' => $this->correct_answer,
             'options' => QuestionOptionResource::collection($this->whenLoaded('options')),
+            'short_answer' => $this->whenLoaded('shortAnswer'),
         ];
     }
 }

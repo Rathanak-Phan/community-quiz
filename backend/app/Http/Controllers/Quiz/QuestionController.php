@@ -176,4 +176,93 @@ class QuestionController extends Controller
             ], 500);
         }
     }
+
+    public function index(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        $questions = $quiz->questions()
+            ->with(['options', 'shortAnswer'])
+            ->get();
+
+        return QuestionResource::collection($questions);
+    }
+
+    public function show(Question $question)
+    {
+        $this->authorize('update', $question->quiz);
+        return new QuestionResource($question->load(['options', 'shortAnswer']));
+    }
+
+    public function update(Request $request, Question $question)
+    {
+        $this->authorize('update', $question->quiz);
+
+        $request->validate([
+            'question_text' => 'required|string',
+            'points' => 'nullable|integer',
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $data = $request->only(['question_text', 'points']);
+            
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('questions', 'public');
+            }
+
+            $question->update($data);
+
+            // Handle type-specific updates
+            if ($question->question_type === 'multiple_choice' && $request->has('options')) {
+                $question->options()->delete();
+                foreach ($request->options as $index => $optionText) {
+                    $question->options()->create([
+                        'option_text' => $optionText,
+                        'is_correct' => $index === (int)$request->correct_option,
+                    ]);
+                }
+            } elseif ($question->question_type === 'true_false' && $request->has('correct_answer')) {
+                $question->update(['correct_answer' => $request->correct_answer ? 'true' : 'false']);
+            } elseif ($question->question_type === 'short_answer' && $request->has('correct_answer')) {
+                $question->shortAnswer()->updateOrCreate(
+                    ['question_id' => $question->id],
+                    [
+                        'answer_text' => $request->correct_answer,
+                        'is_manual_grading' => $request->boolean('is_manual_grading', false)
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Question updated successfully',
+                'data' => new QuestionResource($question->load(['options', 'shortAnswer']))
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update question',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy(Question $question)
+    {
+        $this->authorize('update', $question->quiz);
+
+        $question->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Question deleted successfully'
+        ]);
+    }
 }

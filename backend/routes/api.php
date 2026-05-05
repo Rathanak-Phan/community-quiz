@@ -117,9 +117,13 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']); // DELETE
 
     // Questions
+    Route::get('/quizzes/{quiz}/questions', [QuestionController::class, 'index']);
+    Route::get('/questions/{question}', [QuestionController::class, 'show']);
     Route::post('/questions/mcq', [QuestionController::class, 'storeMcq']);
     Route::post('/questions/true-false', [QuestionController::class, 'storeTrueFalse']);
     Route::post('/questions/short-answer', [QuestionController::class, 'storeShortAnswer']);
+    Route::put('/questions/{question}', [QuestionController::class, 'update']);
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
 
     // Options
     Route::get('/questions/{question}/options', [QuestionOptionController::class, 'index']);
