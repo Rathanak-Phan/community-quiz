@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Search, ChevronDown, Plus, Users, Globe, Lock, ShieldCheck, TrendingUp, Sparkles } from "lucide-react";
 import CommunityCard from "../../components/community/CommunityCard";
 import CommunityFormModal from "../../components/community/CommunityFormModal";
-import ManageRequestsModal from "../../components/community/ManageRequestsModal";
 import Toast from "../../components/ui/Toast";
 import { getCommunities, joinCommunity, deleteCommunity } from "../../api/communityApi";
 
@@ -19,7 +18,6 @@ export default function Communities() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [manageRequests, setManageRequests] = useState({ open: false, id: null, name: "" });
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -123,7 +121,7 @@ export default function Communities() {
   };
 
   const handleApproveMembers = (community) => {
-    setManageRequests({ open: true, id: community.id, name: community.name });
+    navigate(`/communities/${community.id}/requests`);
   };
 
   return (
@@ -214,13 +212,6 @@ export default function Communities() {
         onClose={() => setIsModalOpen(false)} 
         onSuccess={handleSuccess} 
         editData={editData}
-      />
-
-      <ManageRequestsModal
-        isOpen={manageRequests.open}
-        onClose={() => setManageRequests({ open: false, id: null, name: "" })}
-        communityId={manageRequests.id}
-        communityName={manageRequests.name}
       />
 
       {toast.show && (
