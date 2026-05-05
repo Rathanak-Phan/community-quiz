@@ -1,7 +1,7 @@
-import { Users, Lock, Globe, CheckCircle, Clock, ChevronRight } from "lucide-react";
+import { Users, Lock, Globe, CheckCircle, Clock, ChevronRight, Trash2, Settings } from "lucide-react";
 import { STORAGE_URL } from "../../config/api";
 
-export default function CommunityCard({ community, onJoin, onViewMore, onApprove }) {
+export default function CommunityCard({ community, onJoin, onViewMore, onApprove, onEdit, onDelete }) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const isGuest = !localStorage.getItem("token");
   const isOwner = community.owner_id === user?.id;
@@ -109,13 +109,42 @@ export default function CommunityCard({ community, onJoin, onViewMore, onApprove
           </button>
 
           {!isGuest && isOwner && (
-             <button
-               onClick={() => onApprove(community)}
-               className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition shadow-sm flex items-center justify-center border border-emerald-100"
-               title="Approve Members"
-             >
-               <Users size={18} />
-             </button>
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onApprove(community);
+                }}
+                className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition shadow-sm flex items-center justify-center border border-emerald-100"
+                title="Manage Requests"
+              >
+                <Users size={18} />
+              </button>
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(community);
+                }}
+                className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition shadow-sm flex items-center justify-center border border-blue-100"
+                title="Edit Community"
+              >
+                <Settings size={18} />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm(`Are you sure you want to delete ${community.name}?`)) {
+                    onDelete(community.id);
+                  }
+                }}
+                className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition shadow-sm flex items-center justify-center border border-rose-100"
+                title="Delete Community"
+              >
+                <Trash2 size={18} /> 
+              </button>
+            </>
           )}
         </div>
       </div>

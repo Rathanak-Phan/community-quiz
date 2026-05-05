@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Users, BookOpen, Clock, Play, ArrowLeft, 
-  Globe, Lock, ShieldCheck, TrendingUp, Sparkles, AlertCircle
+  Globe, Lock, ShieldCheck, TrendingUp, Sparkles, AlertCircle, Settings
 } from 'lucide-react';
 import apiClient, { STORAGE_URL } from '../../config/api';
 import Toast from '../../components/ui/Toast';
+import CommunityFormModal from '../../components/community/CommunityFormModal';
+import ManageRequestsModal from '../../components/community/ManageRequestsModal';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -14,6 +16,8 @@ const CommunityDetail = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [manageRequests, setManageRequests] = useState({ open: false, id: null, name: "" });
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -124,14 +128,35 @@ const CommunityDetail = () => {
               <p className="text-white/80 font-bold uppercase tracking-widest text-[10px] max-w-2xl">{community.description}</p>
             </div>
 
-            {!community.is_member && (
-              <button 
-                onClick={handleJoin}
-                className="bg-white text-slate-900 px-10 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-2xl active:scale-95"
-              >
-                {isGuest ? "Login to Join" : "Request Access"}
-              </button>
-            )}
+            <div className="flex gap-4">
+              {!community.is_member && (
+                <button 
+                  onClick={handleJoin}
+                  className="bg-white text-slate-900 px-10 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-2xl active:scale-95"
+                >
+                  {isGuest ? "Login to Join" : "Request Access"}
+                </button>
+              )}
+
+              {user?.id === community.created_by && (
+                <>
+                  <button 
+                    onClick={() => setManageRequests({ open: true, id: community.id, name: community.name })}
+                    className="bg-emerald-500 text-white px-8 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-2xl active:scale-95 flex items-center gap-2"
+                  >
+                    <Users size={18} />
+                    Requests
+                  </button>
+                  <button 
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="bg-blue-600 text-white px-8 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-blue-700 transition-all shadow-2xl active:scale-95 flex items-center gap-2"
+                  >
+                    <Settings size={18} />
+                    Edit
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -206,6 +231,24 @@ const CommunityDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      <CommunityFormModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        onSuccess={(msg) => {
+          setToast({ show: true, message: msg, type: "success" });
+          fetchData();
+        }}
+        editData={community}
+      />
+
+      <ManageRequestsModal
+        isOpen={manageRequests.open}
+        onClose={() => setManageRequests({ open: false, id: null, name: "" })}
+        communityId={manageRequests.id}
+        communityName={manageRequests.name}
+      />
 
       {toast.show && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />

@@ -43,3 +43,6 @@ export const approveMember = (memberId) =>
 
 export const rejectMember = (memberId) =>
   apiClient.post(`/community-members/${memberId}/reject`);
+
+export const getPendingMembers = (communityId) =>
+  apiClient.get(`/communities/${communityId}/pending-members`);

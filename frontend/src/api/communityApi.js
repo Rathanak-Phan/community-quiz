@@ -11,4 +11,5 @@ export {
   joinCommunity,
   approveMember,
   rejectMember,
+  getPendingMembers,
 } from "../services/communityService";
