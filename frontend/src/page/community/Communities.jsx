@@ -1,20 +1,25 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, ChevronDown, Plus, Users, Globe, Lock, ShieldCheck, TrendingUp, Sparkles } from "lucide-react";
 import CommunityCard from "../../components/community/CommunityCard";
 import CommunityFormModal from "../../components/community/CommunityFormModal";
+import ManageRequestsModal from "../../components/community/ManageRequestsModal";
 import Toast from "../../components/ui/Toast";
-import { getCommunities, joinCommunity } from "../../api/communityApi";
+import { getCommunities, joinCommunity, deleteCommunity } from "../../api/communityApi";
 
 const filterOptions = ["All Communities", "My Communities", "Public", "Private"];
 const sortOptions = ["Newest First", "Most Members", "A–Z"];
 
 export default function Communities() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("All Communities");
   const [sort, setSortBy] = useState("Newest First");
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [manageRequests, setManageRequests] = useState({ open: false, id: null, name: "" });
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -81,14 +86,44 @@ export default function Communities() {
 
   const handleJoin = async (community) => {
     try {
-      await joinCommunity(community.id);
+      const res = await joinCommunity(community.id);
+      const isPublic = community.status === "public";
+      
       setCommunities((prev) =>
-        prev.map((c) => (c.id === community.id ? { ...c, isMember: true } : c))
+        prev.map((c) =>
+          c.id === community.id
+            ? {
+                ...c,
+                isMember: isPublic,
+                join_status: isPublic ? null : "pending",
+                members: isPublic ? c.members + 1 : c.members,
+              }
+            : c
+        )
       );
-      setToast({ show: true, message: `Welcome to ${community.name}!`, type: "success" });
+      setToast({ show: true, message: res.data?.message || `Join request sent!`, type: "success" });
     } catch (err) {
       setToast({ show: true, message: err.response?.data?.message || `Join request failed`, type: "error" });
     }
+  };
+
+  const handleEdit = (community) => {
+    setEditData(community);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteCommunity(id);
+      setCommunities(prev => prev.filter(c => c.id !== id));
+      setToast({ show: true, message: "Community deleted successfully", type: "success" });
+    } catch (err) {
+      setToast({ show: true, message: "Failed to delete community", type: "error" });
+    }
+  };
+
+  const handleApproveMembers = (community) => {
+    setManageRequests({ open: true, id: community.id, name: community.name });
   };
 
   return (
@@ -101,7 +136,10 @@ export default function Communities() {
         </div>
         {!isGuest && role !== "user" && (
             <button 
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setEditData(null);
+                setIsModalOpen(true);
+              }}
               className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
             >
                 <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/40">
@@ -152,6 +190,9 @@ export default function Communities() {
               community={community}
               onJoin={handleJoin}
               onViewMore={() => navigate(`/communities/${community.id}`)}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onApprove={handleApproveMembers}
             />
           ))}
         </div>
@@ -168,7 +209,20 @@ export default function Communities() {
       )}
 
       {/* Modals & Toasts */}
-      <CommunityFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={handleSuccess} />
+      <CommunityFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={handleSuccess} 
+        editData={editData}
+      />
+
+      <ManageRequestsModal
+        isOpen={manageRequests.open}
+        onClose={() => setManageRequests({ open: false, id: null, name: "" })}
+        communityId={manageRequests.id}
+        communityName={manageRequests.name}
+      />
+
       {toast.show && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
       )}

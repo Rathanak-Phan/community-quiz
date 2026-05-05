@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createCommunity, updateCommunity } from "../../api/communityApi";
+import { STORAGE_URL } from "../../config/api";
 import { Cloud } from "lucide-react";
 
 function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
@@ -21,7 +22,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
       setDescription(editData?.description || "");
       setStatus(editData?.status || "public");
       setCoverImage(null);
-      setCoverImagePreview(editData?.coverImage || null);
+      setCoverImagePreview(editData?.cover_image ? `${STORAGE_URL}/${editData.cover_image}` : null);
       setErrors({});
       setApiError("");
     }

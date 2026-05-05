@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/communities/{community}/join', [CommunityController::class, 'join']);
 
     // Approve / Reject
+    Route::get('/communities/{community}/pending-members', [CommunityController::class, 'pendingMembers']);
     Route::post('/community-members/{id}/approve', [CommunityController::class, 'approve']);
     Route::post('/community-members/{id}/reject', [CommunityController::class, 'reject']);
 

@@ -407,4 +407,19 @@ class CommunityController extends Controller
             'message' => 'Member rejected'
         ]);
     }
+
+    public function pendingMembers(Community $community)
+    {
+        // Only owner can see pending members
+        if ($community->creator->id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $pendingMembers = $community->members()
+            ->where('status', 'pending')
+            ->with('user:id,name,email')
+            ->get();
+
+        return response()->json($pendingMembers);
+    }
 }
