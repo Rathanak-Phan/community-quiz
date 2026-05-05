@@ -7,7 +7,6 @@ import {
 import apiClient, { STORAGE_URL } from '../../config/api';
 import Toast from '../../components/ui/Toast';
 import CommunityFormModal from '../../components/community/CommunityFormModal';
-import ManageRequestsModal from '../../components/community/ManageRequestsModal';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -17,7 +16,6 @@ const CommunityDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [manageRequests, setManageRequests] = useState({ open: false, id: null, name: "" });
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -141,7 +139,7 @@ const CommunityDetail = () => {
               {user?.id === community.created_by && (
                 <>
                   <button 
-                    onClick={() => setManageRequests({ open: true, id: community.id, name: community.name })}
+                    onClick={() => navigate(`/communities/${community.id}/requests`)}
                     className="bg-emerald-500 text-white px-8 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-2xl active:scale-95 flex items-center gap-2"
                   >
                     <Users size={18} />
@@ -241,13 +239,6 @@ const CommunityDetail = () => {
           fetchData();
         }}
         editData={community}
-      />
-
-      <ManageRequestsModal
-        isOpen={manageRequests.open}
-        onClose={() => setManageRequests({ open: false, id: null, name: "" })}
-        communityId={manageRequests.id}
-        communityName={manageRequests.name}
       />
 
       {toast.show && (
