@@ -23,18 +23,8 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $request->user();
-
-        // Admin → all categories
-        if ($user->role->name === 'admin') {
-            return response()->json(
-                Category::with('user')->get()
-            );
-        }
-
-        // Quiz Maker → own categories
         return response()->json(
-            Category::where('user_id', $user->id)->get()
+            Category::with('user')->get()
         );
     }
 

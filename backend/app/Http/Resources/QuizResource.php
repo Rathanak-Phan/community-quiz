@@ -24,9 +24,21 @@ class QuizResource extends JsonResource
                 'name' => $this->community->name,
                 'visibility' => $this->community->visibility,
             ],
-
+            'category' => [
+                'id' => $this->category->id,
+                'name' => $this->category->name,
+            ],
             'category_id' => $this->category_id,
+            'community_id' => $this->community_id,
             'cover_image' => $this->cover_image,
+            'created_by' => $this->created_by,
+            'created_at' => $this->created_at,
+            'creator' => [
+                'id' => $this->creator->id,
+                'name' => $this->creator->name,
+            ],
+            'time_limit' => $this->time_limit,
+            'attempts_count' => $this->attempts()->count(),
         ];
     }
 }
