@@ -2,18 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles } from "lucide-react";
 import { getQuizzes, deleteQuiz } from "../../services/quizService";
 import Toast from "../../components/ui/Toast";
+import QuizFormModal from "../../components/quiz/QuizFormModal";
 import { STORAGE_URL } from "../../config/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Quizzes() {
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user") || "null");
-    const role = user?.role || "guest";
+    const { user, isAdmin, isQuizMaker } = useAuth();
     const isGuest = !localStorage.getItem("token");
     
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editData, setEditData] = useState(null);
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
     const loadQuizzes = useCallback(async () => {
@@ -32,6 +35,17 @@ export default function Quizzes() {
     useEffect(() => {
         loadQuizzes();
     }, [loadQuizzes]);
+
+    const handleSuccess = (message) => {
+        setToast({ show: true, message, type: "success" });
+        loadQuizzes();
+    };
+
+    const handleEdit = (e, quiz) => {
+        e.stopPropagation();
+        setEditData(quiz);
+        setIsModalOpen(true);
+    };
 
     const handleDelete = async (e, id) => {
         e.stopPropagation();
@@ -58,8 +72,14 @@ export default function Quizzes() {
                     <h1 className="text-4xl font-black text-slate-900 tracking-tight">Challenge <span className="text-blue-600">Yourself.</span></h1>
                     <p className="text-slate-500 font-medium max-w-lg">Explore thousands of quizzes created by our vibrant learning community.</p>
                 </div>
-                {!isGuest && role !== "user" && (
-                    <button className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group">
+                {!isGuest && (isAdmin || isQuizMaker) && (
+                    <button 
+                        onClick={() => {
+                            setEditData(null);
+                            setIsModalOpen(true);
+                        }}
+                        className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                    >
                         <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/40">
                           <Plus size={16} />
                         </div>
@@ -100,8 +120,9 @@ export default function Quizzes() {
                         <QuizCard 
                             key={quiz.id} 
                             quiz={quiz} 
-                            role={role} 
+                            isAdmin={isAdmin}
                             userId={user?.id}
+                            onEdit={handleEdit}
                             onDelete={handleDelete}
                             onClick={() => navigate(`/quizzes/${quiz.id}`)}
                         />
@@ -119,6 +140,13 @@ export default function Quizzes() {
                 </div>
             )}
 
+            <QuizFormModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleSuccess}
+                editData={editData}
+            />
+
             {toast.show && (
                 <Toast 
                     message={toast.message} 
@@ -130,7 +158,7 @@ export default function Quizzes() {
     );
 }
 
-function QuizCard({ quiz, role, userId, onDelete, onClick }) {
+function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
     const isGuest = !localStorage.getItem("token");
     
     const handleAction = (e) => {
@@ -148,18 +176,23 @@ function QuizCard({ quiz, role, userId, onDelete, onClick }) {
             className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group cursor-pointer relative flex flex-col"
         >
             <div className="h-48 relative bg-slate-50 overflow-hidden">
-                {quiz.image ? (
-                    <img src={`${STORAGE_URL}/${quiz.image}`} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={quiz.title} />
+                {quiz.cover_image ? (
+                    <img src={`${STORAGE_URL}/${quiz.cover_image}`} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={quiz.title} />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center">
                         <Sparkles size={48} className="text-blue-200" />
                     </div>
                 )}
                 
-                <div className="absolute top-6 left-6">
+                <div className="absolute top-6 left-6 flex flex-col gap-2">
                     <span className="px-4 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[10px] font-black text-slate-900 uppercase tracking-widest shadow-lg border border-white/50">
                         {quiz.category?.name || "General"}
                     </span>
+                    {quiz.community?.name && (
+                      <span className="px-4 py-1.5 rounded-xl bg-slate-900/80 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-widest shadow-lg border border-white/10">
+                          {quiz.community.name}
+                      </span>
+                    )}
                 </div>
 
                 <div className="absolute top-6 right-6 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -169,13 +202,21 @@ function QuizCard({ quiz, role, userId, onDelete, onClick }) {
                     >
                         <Heart size={16} fill={quiz.is_favorite ? "currentColor" : "none"} />
                     </button>
-                    {(role === 'admin' || quiz.user_id === userId) && (
-                        <button 
-                            onClick={(e) => onDelete(e, quiz.id)}
-                            className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-600 hover:bg-rose-600 hover:text-white transition shadow-lg"
-                        >
-                            <Trash2 size={16} />
-                        </button>
+                    {(isAdmin || quiz.created_by === userId) && (
+                        <>
+                            <button 
+                                onClick={(e) => onEdit(e, quiz)}
+                                className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-blue-600 hover:bg-blue-600 hover:text-white transition shadow-lg"
+                            >
+                                <Edit3 size={16} />
+                            </button>
+                            <button 
+                                onClick={(e) => onDelete(e, quiz.id)}
+                                className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-rose-600 hover:bg-rose-600 hover:text-white transition shadow-lg"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </>
                     )}
                 </div>
             </div>

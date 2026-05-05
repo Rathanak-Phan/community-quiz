@@ -6,7 +6,7 @@ import { Cloud } from "lucide-react";
 function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("public");
+  const [visibility, setVisibility] = useState("public");
   const [coverImage, setCoverImage] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
@@ -20,7 +20,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
     if (isOpen) {
       setName(editData?.name || "");
       setDescription(editData?.description || "");
-      setStatus(editData?.status || "public");
+      setVisibility(editData?.visibility || "public");
       setCoverImage(null);
       setCoverImagePreview(editData?.cover_image ? `${STORAGE_URL}/${editData.cover_image}` : null);
       setErrors({});
@@ -93,7 +93,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
       const formData = new FormData();
       formData.append("name", name.trim());
       formData.append("description", description.trim());
-      formData.append("status", status);
+      formData.append("visibility", visibility);
       
       if (coverImage) {
         formData.append("cover_image", coverImage);
@@ -197,9 +197,9 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setStatus("public")}
+                onClick={() => setVisibility("public")}
                 className={`p-4 rounded-lg border-2 transition text-left ${
-                  status === "public"
+                  visibility === "public"
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
@@ -207,18 +207,18 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      status === "public"
+                      visibility === "public"
                         ? "border-blue-500 bg-blue-500"
                         : "border-gray-300"
                     }`}
                   >
-                    {status === "public" && (
+                    {visibility === "public" && (
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     )}
                   </div>
                 </div>
                 <p className={`text-sm font-semibold mt-2 ${
-                  status === "public" ? "text-gray-900" : "text-gray-700"
+                  visibility === "public" ? "text-gray-900" : "text-gray-700"
                 }`}>
                   Public
                 </p>
@@ -227,9 +227,9 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
 
               <button
                 type="button"
-                onClick={() => setStatus("private")}
+                onClick={() => setVisibility("private")}
                 className={`p-4 rounded-lg border-2 transition text-left ${
-                  status === "private"
+                  visibility === "private"
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
@@ -237,18 +237,18 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      status === "private"
+                      visibility === "private"
                         ? "border-blue-500 bg-blue-500"
                         : "border-gray-300"
                     }`}
                   >
-                    {status === "private" && (
+                    {visibility === "private" && (
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     )}
                   </div>
                 </div>
                 <p className={`text-sm font-semibold mt-2 ${
-                  status === "private" ? "text-gray-900" : "text-gray-700"
+                  visibility === "private" ? "text-gray-900" : "text-gray-700"
                 }`}>
                   Private
                 </p>

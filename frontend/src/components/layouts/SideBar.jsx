@@ -7,9 +7,9 @@ import {
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
-  // Admin Links
+  // Admin & Creator Links
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "quiz_maker"] },
-  { to: "/admin/categories", label: "Manage Categories", icon: Grid2X2, roles: ["admin"] },
+  { to: "/categories", label: "Manage Categories", icon: Grid2X2, roles: ["admin", "quiz_maker"] },
   
   // Quiz Maker Links
   { to: "/quizzes/my", label: "My Quizzes", icon: BookOpen, roles: ["quiz_maker"] },

@@ -20,6 +20,9 @@ function CategoryList() {
   // Toast state
   const [toast, setToast] = useState(null);
 
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role?.name === "admin" || user?.role_id === 1;
+
   const showToast = useCallback((message, type = "success") => {
     setToast({ message, type });
   }, []);
@@ -202,70 +205,82 @@ function CategoryList() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {categories.map((cat, idx) => (
-                    <tr
-                      key={cat.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 text-gray-400 font-medium">
-                        {idx + 1}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg ${cat.color || 'bg-blue-100'} ${cat.color ? 'text-white' : 'text-blue-600'} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
-                            {cat.name?.[0]?.toUpperCase() || "?"}
-                          </div>
-                          <span className="font-semibold text-gray-900">
-                            {cat.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-500 max-w-xs">
-                        <span className="line-clamp-2">
-                          {cat.description || (
-                            <span className="italic text-gray-300">
-                              No description
+                    {categories.map((cat, idx) => {
+                      const canManage = cat.user_id === user?.id || isAdmin;
+
+                      return (
+                        <tr
+                          key={cat.id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 text-gray-400 font-medium">
+                            {idx + 1}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-lg ${cat.color || 'bg-blue-100'} ${cat.color ? 'text-white' : 'text-blue-600'} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
+                                {cat.name?.[0]?.toUpperCase() || "?"}
+                              </div>
+                              <span className="font-semibold text-gray-900">
+                                {cat.name}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-gray-500 max-w-xs">
+                            <span className="line-clamp-2">
+                              {cat.description || (
+                                <span className="italic text-gray-300">
+                                  No description
+                                </span>
+                              )}
                             </span>
-                          )}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 text-gray-600">
-                          <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs flex items-center justify-center font-semibold leading-none">
-                            {(cat.user?.name || "A")?.[0]?.toUpperCase()}
-                          </span>
-                          {cat.user?.name || "Admin"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-gray-500">
-                        {formatDate(cat.created_at || cat.createdAt)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          {/* Edit */}
-                          <button
-                            onClick={() => handleOpenEdit(cat)}
-                            title="Edit"
-                            className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.415.586H8v-2.414A2 2 0 018.586 12z" />
-                            </svg>
-                          </button>
-                          {/* Delete */}
-                          <button
-                            onClick={() => handleDeleteClick(cat)}
-                            title="Delete"
-                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a1 1 0 00-1-1H9a1 1 0 00-1 1H5m14 0H5" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center gap-1.5 text-gray-600">
+                              <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs flex items-center justify-center font-semibold leading-none">
+                                {(cat.user?.name || "A")?.[0]?.toUpperCase()}
+                              </span>
+                              {cat.user?.name || "Admin"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-500">
+                            {formatDate(cat.created_at || cat.createdAt)}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                              {canManage ? (
+                                <>
+                                  {/* Edit */}
+                                  <button
+                                    onClick={() => handleOpenEdit(cat)}
+                                    title="Edit"
+                                    className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.415.586H8v-2.414A2 2 0 018.586 12z" />
+                                    </svg>
+                                  </button>
+                                  {/* Delete */}
+                                  <button
+                                    onClick={() => handleDeleteClick(cat)}
+                                    title="Delete"
+                                    className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a1 1 0 00-1-1H9a1 1 0 00-1 1H5m14 0H5" />
+                                    </svg>
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-3 py-1 bg-slate-50 rounded-lg">
+                                  Read Only
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>

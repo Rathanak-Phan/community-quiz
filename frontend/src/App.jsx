@@ -40,11 +40,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+              <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <div>Users management coming soon</div>
+                </AdminRoute>
+              }
+            />
             <Route
               path="/categories"
               element={
                 <ProtectedRoute>
-                  <Categories />
+                  <CategoryList />
                 </ProtectedRoute>
               }
             />
@@ -90,14 +98,6 @@ function App() {
             />
           </Route>
 
-          <Route
-              path="/admin/categories"
-              element={
-                <AdminRoute>
-                  <CategoryList />
-                </AdminRoute>
-              }
-            />
         </Routes>
       </AuthProvider>
     </Router>

@@ -14,13 +14,7 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category): bool
     {
-        // Admin can view all categories
-        if ($user->role->name === 'admin') {
-            return true;
-        }
-
-        // Quiz Maker can only view their own categories
-        return $category->user_id === $user->id;
+        return true;
     }
 
     /**
