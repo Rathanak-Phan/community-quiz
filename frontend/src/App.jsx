@@ -16,6 +16,7 @@ import MainLayout from "./components/layouts/MainLayout";
 import Sidebar from "./components/layouts/SideBar";
 import CommunityDetail from "./page/community/CommunityDetail";
 import CommunityRequests from "./page/community/CommunityRequests";
+import CommunityQuizList from "./page/community/CommunityQuizList";
 
 import { AuthProvider } from "./context/AuthContext";
 
@@ -77,6 +78,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CommunityRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities/:id/quizzes"
+              element={
+                <ProtectedRoute>
+                  <CommunityQuizList />
                 </ProtectedRoute>
               }
             />

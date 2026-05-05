@@ -7,6 +7,8 @@ import {
 import apiClient, { STORAGE_URL } from '../../config/api';
 import Toast from '../../components/ui/Toast';
 import CommunityFormModal from '../../components/community/CommunityFormModal';
+import QuizCard from '../../components/quiz/QuizCard';
+import { useAuth } from '../../context/AuthContext';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -18,7 +20,7 @@ const CommunityDetail = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user, isAdmin } = useAuth();
   const isGuest = !localStorage.getItem("token");
 
   const fetchData = useCallback(async () => {
@@ -166,55 +168,26 @@ const CommunityDetail = () => {
               <BookOpen size={28} className="text-blue-600" />
               Community Quizzes
            </h2>
-           <div className="bg-slate-50 p-2 rounded-2xl flex gap-2">
-              <TabBtn label="All" active />
-              <TabBtn label="Newest" />
-           </div>
+           <button 
+              onClick={() => navigate(`/communities/${id}/quizzes`)}
+              className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+           >
+              See Full Library →
+           </button>
         </div>
 
         {quizzes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {quizzes.map((quiz) => (
-              <div 
+            {quizzes.slice(0, 6).map((quiz) => (
+              <QuizCard 
                 key={quiz.id} 
-                className="bg-white rounded-[3rem] border border-slate-100 p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group flex flex-col h-full"
-              >
-                <div className="space-y-6 flex-1">
-                  <div className="flex justify-between items-start">
-                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500 shadow-inner">
-                      <BookOpen size={24} />
-                    </div>
-                    <span className="px-3 py-1 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      {quiz.category?.name}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 uppercase tracking-tight">
-                    {quiz.title}
-                  </h3>
-                  
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <Clock size={14} className="text-slate-300" />
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{quiz.time_limit || 30}M</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <TrendingUp size={14} className="text-emerald-500" />
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{quiz.attempts_count || 0} PLAYS</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-10 pt-8 border-t border-slate-50">
-                  <button 
-                    onClick={() => handleAttemptQuiz(quiz.id)}
-                    className="w-full bg-slate-900 text-white py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-blue-600 transition shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95"
-                  >
-                    <Play size={16} />
-                    {isGuest ? "Login to Attempt" : "Attempt Quiz"}
-                  </button>
-                </div>
-              </div>
+                quiz={quiz} 
+                isAdmin={isAdmin}
+                userId={user?.id}
+                onClick={() => handleAttemptQuiz(quiz.id)}
+                onEdit={() => {}} // Handle if needed
+                onDelete={() => {}}
+              />
             ))}
           </div>
         ) : (
