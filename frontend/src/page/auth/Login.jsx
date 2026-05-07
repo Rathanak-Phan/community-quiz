@@ -1,24 +1,48 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { BookOpen, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { 
+  GraduationCap, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  LogIn, 
+  Loader2 
+} from "lucide-react";
 
 import googleLogo from "../../assets/images/google_logo.png";
 import githubLogo from "../../assets/images/github_logo.png";
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 function Login() {
   const navigate = useNavigate();
-  const { login, token } = useAuth();
+  const { login, token, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (token) navigate("/dashboard");
-  }, [token, navigate]);
+    if (token && !authLoading) {
+      const userDataStr = localStorage.getItem("user");
+      if (userDataStr) {
+        const userData = JSON.parse(userDataStr);
+        const isAdmin = userData.role?.name === "admin" || Number(userData.role_id) === 1;
+        const isMaker = userData.role?.name === "quiz_maker" || Number(userData.role_id) === 2;
+        
+        if (isAdmin) {
+            navigate("/admin/dashboard");
+        } else if (isMaker) {
+            navigate("/dashboard");
+        } else {
+            navigate("/"); // Regular user goes home
+        }
+      }
+    }
+  }, [token, authLoading, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,8 +50,15 @@ function Login() {
     setLoading(true);
 
     try {
-      await login({ email, password });
-      navigate("/dashboard");
+      const res = await login({ email, password });
+      const userData = res.data.user;
+      const isAdmin = (userData.role?.name === "admin" || Number(userData.role_id) === 1);
+      
+      if (isAdmin) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {
@@ -36,112 +67,144 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-12">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100 rounded-full blur-[120px] opacity-50"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-100 rounded-full blur-[120px] opacity-50"></div>
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 font-sans">
+      {/* Background blobs for depth */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60"></div>
+        <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60"></div>
       </div>
 
-      <div className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl shadow-slate-200/50 p-12 border border-slate-100 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
-        
-        <div className="flex flex-col items-center text-center mb-10">
-          <div className="w-16 h-16 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-blue-600/20 mb-6">
-            <BookOpen size={28} />
+      <div className="w-full max-w-[480px] relative z-10">
+        {/* Logo Section */}
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-14 h-14 bg-[#2563EB] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 mb-6">
+            <GraduationCap size={32} />
           </div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Welcome Back</h2>
-          <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-2">Log in to your Quizly account</p>
+          <h1 className="text-3xl font-bold text-[#0F172A] tracking-tight mb-2">Quiz Community</h1>
+          <p className="text-[#64748B] text-sm font-medium text-center max-w-[320px]">
+            Manage and share knowledge with your community
+          </p>
         </div>
 
-        {error && (
-          <div className="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-2xl text-xs font-bold mb-6 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></div>
-            {error}
-          </div>
-        )}
+        {/* Main Card */}
+        <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-10 md:p-12">
+          {error && (
+            <div className="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-semibold mb-6 animate-shake">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-              <input
-                type="email"
-                placeholder="name@company.com"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#334155] ml-1">Email Address</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-medium placeholder:text-slate-400"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-1">
+                <label className="text-xs font-bold text-[#334155]">Password</label>
+                <Link to="#" className="text-[11px] font-bold text-[#2563EB] hover:underline">Forgot password?</Link>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-12 pr-12 py-4 outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-medium placeholder:text-slate-400"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center gap-3 px-1">
+              <input 
+                type="checkbox" 
+                id="remember"
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
+              <label htmlFor="remember" className="text-xs font-medium text-[#64748B] cursor-pointer">Remember me for 30 days</label>
             </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#2563EB] text-white py-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-600/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <Loader2 className="animate-spin" size={18} />
+              ) : (
+                <>
+                  Sign in <LogIn size={18} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Social Divider */}
+          <div className="flex items-center my-8">
+            <div className="flex-grow h-px bg-slate-100"></div>
+            <span className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or continue with</span>
+            <div className="flex-grow h-px bg-slate-100"></div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between items-center px-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Password</label>
-              <Link to="#" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Forgot?</Link>
-            </div>
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+          {/* Social Buttons */}
+          <div className="grid grid-cols-2 gap-4">
+            <button 
+              onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/google/redirect`)}
+              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155]"
+            >
+              <img src={googleLogo} alt="Google" className="w-5 h-5" />
+              Google
+            </button>
+            <button 
+              onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/github/redirect`)}
+              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155]"
+            >
+              <img src={githubLogo} alt="GitHub" className="w-5 h-5" />
+              GitHub
+            </button>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : "Sign In"}
-            {!loading && <ArrowRight size={18} />}
-          </button>
-        </form>
-
-        <div className="flex items-center my-10">
-          <div className="flex-grow h-px bg-slate-100"></div>
-          <span className="px-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Social Connect</span>
-          <div className="flex-grow h-px bg-slate-100"></div>
+          <p className="text-center text-xs font-medium text-slate-500 mt-10">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-[#2563EB] font-bold hover:underline">Register now</Link>
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <SocialBtn 
-            icon={<img src={googleLogo} alt="Google" className="w-5 h-5" />} 
-            label="Google" 
-            onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/google/redirect`)}
-          />
-          <SocialBtn 
-            icon={<img src={githubLogo} alt="GitHub" className="w-5 h-5" />} 
-            label="GitHub" 
-            onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/github/redirect`)}
-          />
+        {/* Footer Links */}
+        <div className="mt-12 flex justify-center gap-6">
+          <Link to="#" className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest hover:text-slate-600">Documentation</Link>
+          <Link to="#" className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest hover:text-slate-600">Privacy</Link>
+          <Link to="#" className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest hover:text-slate-600">Terms</Link>
         </div>
-
-        <p className="text-center text-xs font-bold text-slate-400 mt-10 uppercase tracking-widest">
-          New here?{" "}
-          <Link to="/register" className="text-blue-600 hover:underline">Create Account</Link>
+        <p className="text-[10px] text-[#CBD5E1] font-medium text-center mt-4">
+          © 2024 Quiz Community. All rights reserved.
         </p>
       </div>
     </div>
-  );
-}
-
-function SocialBtn({ icon, label, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center gap-3 border-2 border-slate-50 rounded-2xl py-4 hover:bg-slate-50 hover:border-slate-100 transition-all duration-300 active:scale-95"
-    >
-      {icon}
-      <span className="text-xs font-black text-slate-700 uppercase tracking-widest">{label}</span>
-    </button>
   );
 }
 

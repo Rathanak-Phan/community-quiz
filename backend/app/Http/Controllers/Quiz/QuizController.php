@@ -99,6 +99,20 @@ class QuizController extends Controller
      *     @OA\Response(response=404, description="Not found")
      * )
      */
+    /**
+     * Get quizzes created by the authenticated user.
+     */
+    public function myQuizzes()
+    {
+        $user = auth()->user();
+        $quizzes = Quiz::where('created_by', $user->id)
+            ->with(['community', 'category', 'creator'])
+            ->latest()
+            ->get();
+
+        return QuizResource::collection($quizzes);
+    }
+
     public function index()
     {
         $user = auth('sanctum')->user();
@@ -109,7 +123,7 @@ class QuizController extends Controller
                     return $q->where('visibility', 'public');
                 }
 
-                if ($user->role === 'admin') return $q;
+                if ($user->isAdmin()) return $q;
 
                 $q->where('visibility', 'public')
                     ->orWhere(function ($q2) use ($user) {
@@ -258,7 +272,7 @@ class QuizController extends Controller
             ->where('grading_status', 'graded')
             ->with('user')
             ->orderByDesc('score')
-            ->orderBy('completed_at') // Tie-breaker: who finished first?
+            ->orderByDesc('completed_at') // Tie-breaker: latest submission first per scope
             ->get();
 
         $rank = 1;

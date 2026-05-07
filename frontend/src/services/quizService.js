@@ -8,6 +8,9 @@ import apiClient from "../config/api";
 export const getQuizzes = (params = {}) =>
   apiClient.get("/quizzes", { params });
 
+export const getMyQuizzes = () =>
+  apiClient.get("/quizzes/my");
+
 export const getQuizById = (id) =>
   apiClient.get(`/quizzes/${id}`);
 

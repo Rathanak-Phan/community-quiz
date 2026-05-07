@@ -15,7 +15,9 @@ export const AuthProvider = ({ children }) => {
         try {
           // If we have a token, fetch the latest user profile to ensure session is valid
           const res = await getProfile();
-          setUser(res.data.user);
+          const freshUser = res.data.user;
+          setUser(freshUser);
+          localStorage.setItem("user", JSON.stringify(freshUser));
         } catch (err) {
           console.error("Auth initialization failed", err);
           logout();
@@ -38,6 +40,11 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const completeSocialLogin = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+  };
+
   const register = async (data) => {
     const res = await registerApi(data);
     return res;
@@ -52,6 +59,20 @@ export const AuthProvider = ({ children }) => {
     apiClient.post("/logout").catch(() => {});
   };
 
+  const refreshProfile = async () => {
+    if (token) {
+      try {
+        const res = await getProfile();
+        const freshUser = res.data.user;
+        setUser(freshUser);
+        localStorage.setItem("user", JSON.stringify(freshUser));
+        return freshUser;
+      } catch (err) {
+        console.error("Profile refresh failed", err);
+      }
+    }
+  };
+
   const value = {
     user,
     token,
@@ -59,8 +80,10 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAdmin: user?.role?.name === "admin" || user?.role_id === 1, // Depending on how backend returns role
-    isQuizMaker: user?.role?.name === "quiz_maker" || user?.role_id === 2,
+    completeSocialLogin,
+    refreshProfile,
+    isAdmin: user?.role?.name === "admin" || Number(user?.role_id) === 1, 
+    isQuizMaker: user?.role?.name === "quiz_maker" || Number(user?.role_id) === 2,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

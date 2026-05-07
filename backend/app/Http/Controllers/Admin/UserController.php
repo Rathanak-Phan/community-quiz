@@ -80,4 +80,35 @@ class UserController extends Controller
             'user' => $updatedUser
         ]);
     }
+    /**
+     * @OA\Delete(
+     *     path="/api/admin/users/{id}",
+     *     tags={"Admin User Management"},
+     *     summary="Delete a user",
+     *     operationId="adminUserDestroy",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="User deleted successfully"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="User not found")
+     * )
+     */
+    public function destroy($id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        
+        // Prevent admin from deleting themselves
+        if ($user->id === auth()->id()) {
+            return response()->json(['message' => 'Cannot delete yourself'], 403);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully']);
+    }
 }

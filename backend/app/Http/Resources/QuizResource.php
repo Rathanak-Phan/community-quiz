@@ -39,6 +39,8 @@ class QuizResource extends JsonResource
             ],
             'time_limit' => $this->time_limit,
             'attempts_count' => $this->attempts()->count(),
+            'questions_count' => $this->questions()->count(),
+            'questions' => QuestionResource::collection($this->whenLoaded('questions')),
         ];
     }
 }

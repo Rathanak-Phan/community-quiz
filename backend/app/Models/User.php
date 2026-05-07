@@ -25,7 +25,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'maker_status'
     ];
 
     protected $hidden = [
@@ -66,5 +67,19 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
+    }
+    public function isAdmin(): bool
+    {
+        return $this->role?->name === 'admin';
+    }
+
+    public function isQuizMaker(): bool
+    {
+        return $this->role?->name === 'quiz_maker';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role?->name === 'user';
     }
 }

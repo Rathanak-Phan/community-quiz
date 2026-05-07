@@ -8,7 +8,7 @@ import {
 import { getQuestions, deleteQuestion } from '../../services/questionService';
 import { getQuizById } from '../../services/quizService';
 import QuestionFormModal from '../../components/quiz/QuestionFormModal';
-import Toast from '../ui/Toast';
+import Toast from '../../components/ui/Toast';
 
 const QuestionList = () => {
   const { quizId } = useParams();

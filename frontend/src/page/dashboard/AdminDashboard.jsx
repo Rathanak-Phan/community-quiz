@@ -99,11 +99,11 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-10 py-6">
                       <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm ${
-                        user.role === 'admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 
-                        user.role === 'quiz_maker' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 
+                        (user.role?.name || user.role) === 'admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 
+                        (user.role?.name || user.role) === 'quiz_maker' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 
                         'bg-blue-50 text-blue-600 border border-blue-100'
                       }`}>
-                        {user.role}
+                        {user.role?.name || user.role || 'user'}
                       </span>
                     </td>
                     <td className="px-10 py-6">

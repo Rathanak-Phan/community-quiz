@@ -2,14 +2,21 @@ import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
-  BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X
+  BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
+    Shield, AlertTriangle, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
-  // Admin & Creator Links
+  // Dashboard for both
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "quiz_maker"] },
+  
+  // Admin Specific
+  { to: "/admin/users", label: "Manage Users", icon: Shield, roles: ["admin"] },
   { to: "/categories", label: "Manage Categories", icon: Grid2X2, roles: ["admin", "quiz_maker"] },
+  { to: "/admin/moderation/quizzes", label: "Moderate Quizzes", icon: AlertTriangle, roles: ["admin"] },
+  { to: "/admin/moderation/communities", label: "Moderate Communities", icon: Users, roles: ["admin"] },
+  { to: "/admin/maker-requests", label: "Maker Requests", icon: ShieldCheck, roles: ["admin"] },
   
   // Quiz Maker Links
   { to: "/quizzes/my", label: "My Quizzes", icon: BookOpen, roles: ["quiz_maker"] },

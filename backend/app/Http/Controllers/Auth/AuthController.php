@@ -49,8 +49,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+        
         return response()->json([
-            'user' => $user
+            'user' => $user->load('role'),
+            'token' => $token
         ], 201);
     }
 
@@ -91,8 +94,11 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        $token = Auth::user()->createToken('auth_token')->plainTextToken;
+        
         return response()->json([
-            'user' => Auth::user()
+            'user' => Auth::user()->load('role'),
+            'token' => $token
         ]);
     }
 
@@ -200,7 +206,7 @@ class AuthController extends Controller
     public function profile(Request $request)
     {
         return response()->json([
-            'user' => $request->user()
+            'user' => $request->user()->load('role')
         ]);
     }
 

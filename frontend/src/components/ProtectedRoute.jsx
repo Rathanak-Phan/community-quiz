@@ -20,7 +20,7 @@ function ProtectedRoute({ children, roles = [] }) {
   if (roles.length > 0) {
     const userRole = user?.role?.name || "";
     if (!roles.includes(userRole)) {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/" replace />;
     }
   }
 

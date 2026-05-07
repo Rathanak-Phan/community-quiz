@@ -25,7 +25,7 @@ class CategoryPolicy
     public function update(User $user, Category $category): bool
     {
         // Admin can update all categories
-        if ($user->role->name === 'admin') {
+        if ($user->isAdmin()) {
             return true;
         }
 
@@ -41,7 +41,7 @@ class CategoryPolicy
     public function delete(User $user, Category $category): bool
     {
         // Admin can delete all categories
-        if ($user->role->name === 'admin') {
+        if ($user->isAdmin()) {
             return true;
         }
 

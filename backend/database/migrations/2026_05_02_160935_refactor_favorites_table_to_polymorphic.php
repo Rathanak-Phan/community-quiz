@@ -38,11 +38,50 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('favorites', function (Blueprint $table) {
-            $table->dropUnique('user_favorite_unique');
-            $table->dropColumn(['favoritable_id', 'favoritable_type']);
-            $table->unsignedBigInteger('quiz_id')->nullable()->after('user_id');
-            $table->unsignedBigInteger('category_id')->nullable()->after('quiz_id');
-        });
+        if (Schema::hasTable('favorites')) {
+            Schema::table('favorites', function (Blueprint $table) {
+                // Drop foreign key on user_id first as it depends on the unique index
+                try {
+                    $table->dropForeign(['user_id']);
+                } catch (\Exception $e) {
+                    // Ignore if it doesn't exist
+                }
+                
+                try {
+                    $table->dropUnique('user_favorite_unique');
+                } catch (\Exception $e) {
+                    // Ignore if it doesn't exist
+                }
+
+                if (Schema::hasColumn('favorites', 'favoritable_id')) {
+                    $table->dropColumn('favoritable_id');
+                }
+                if (Schema::hasColumn('favorites', 'favoritable_type')) {
+                    $table->dropColumn('favoritable_type');
+                }
+                
+                if (!Schema::hasColumn('favorites', 'quiz_id')) {
+                    $table->unsignedBigInteger('quiz_id')->nullable()->after('user_id');
+                }
+                if (!Schema::hasColumn('favorites', 'category_id')) {
+                    $table->unsignedBigInteger('category_id')->nullable()->after('quiz_id');
+                }
+            });
+
+            // Re-add foreign keys in a separate block
+            Schema::table('favorites', function (Blueprint $table) {
+                try {
+                    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                } catch (\Exception $e) {}
+                
+                try {
+                    $table->foreign('quiz_id')->references('id')->on('quizzes')->onDelete('cascade');
+                } catch (\Exception $e) {}
+                
+                try {
+                    $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+                } catch (\Exception $e) {}
+            });
+        }
     }
 };

@@ -293,6 +293,41 @@
                 ]
             }
         },
+        "/api/admin/users/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin User Management"
+                ],
+                "summary": "Delete a user",
+                "operationId": "adminUserDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/register": {
             "post": {
                 "tags": [
@@ -937,6 +972,46 @@
                 ]
             }
         },
+        "/api/dashboard/admin": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get system-wide statistics for Admin dashboard",
+                "operationId": "dashboardAdmin",
+                "responses": {
+                    "200": {
+                        "description": "Admin stats retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_users": {
+                                            "type": "integer"
+                                        },
+                                        "total_quizzes": {
+                                            "type": "integer"
+                                        },
+                                        "total_communities": {
+                                            "type": "integer"
+                                        },
+                                        "total_submissions": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/questions/mcq": {
             "post": {
                 "tags": [
@@ -1510,6 +1585,44 @@
                 ]
             }
         },
+        "/api/my-attempts": {
+            "get": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "List current user's in-progress attempts",
+                "operationId": "quizAttemptMyAttempts",
+                "responses": {
+                    "200": {
+                        "description": "In-progress attempts"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/my-submissions": {
+            "get": {
+                "tags": [
+                    "Quiz Attempt"
+                ],
+                "summary": "List current user's past submissions",
+                "operationId": "quizAttemptMySubmissions",
+                "responses": {
+                    "200": {
+                        "description": "Past submissions"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/quizzes/{quiz}": {
             "get": {
                 "tags": [
@@ -1888,7 +2001,7 @@
                                         },
                                         "share_url": {
                                             "type": "string",
-                                            "example": "http://localhost:3000/quiz/1"
+                                            "example": "http://localhost:5173/quiz/1"
                                         }
                                     },
                                     "type": "object"

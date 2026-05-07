@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles } from "lucide-react";
+import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles, HelpCircle } from "lucide-react";
 import { getQuizzes, deleteQuiz } from "../../services/quizService";
 import Toast from "../../components/ui/Toast";
 import QuizFormModal from "../../components/quiz/QuizFormModal";
@@ -78,10 +78,10 @@ export default function Quizzes() {
                             setEditData(null);
                             setIsModalOpen(true);
                         }}
-                        className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                        className="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-bold flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-900/10 active:scale-95 group"
                     >
-                        <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/40">
-                          <Plus size={16} />
+                        <div className="w-5 h-5 bg-white/20 rounded-md flex items-center justify-center transition-colors group-hover:bg-white/40">
+                          <Plus size={14} />
                         </div>
                         CREATE QUIZ
                     </button>
@@ -89,13 +89,13 @@ export default function Quizzes() {
             </div>
 
             {/* Search & Filters */}
-            <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100 flex flex-col md:flex-row items-center gap-6">
+            <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-5">
                 <div className="relative flex-1 group w-full">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                     <input 
                         type="text" 
                         placeholder="Search quizzes by title or category..." 
-                        className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-[1.5rem] outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
+                        className="w-full pl-14 pr-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/30 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-medium"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -159,6 +159,7 @@ export default function Quizzes() {
 }
 
 function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
+    const navigate = useNavigate();
     const isGuest = !localStorage.getItem("token");
     
     const handleAction = (e) => {
@@ -173,7 +174,7 @@ function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
     return (
         <div 
             onClick={handleAction}
-            className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group cursor-pointer relative flex flex-col"
+            className="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group cursor-pointer relative flex flex-col"
         >
             <div className="h-48 relative bg-slate-50 overflow-hidden">
                 {quiz.cover_image ? (
@@ -231,32 +232,32 @@ function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
                 </div>
             </div>
 
-            <div className="p-8 flex flex-col flex-1">
-                <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-3">
+            <div className="p-7 flex flex-col flex-1">
+                <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-2">
                     {quiz.title}
                 </h3>
-                <p className="text-slate-500 text-sm font-medium line-clamp-2 min-h-[40px] leading-relaxed mb-8">
+                <p className="text-slate-500 text-xs font-medium line-clamp-2 min-h-[32px] leading-relaxed mb-6">
                     {quiz.description || "Challenge your knowledge with this community-contributed module."}
                 </p>
                 
-                <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
-                    <div className="flex items-center gap-6">
+                <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                                <Clock size={14} />
+                            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                <Clock size={12} />
                             </div>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{quiz.time_limit || 30}M</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{quiz.time_limit || 30}M</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                <Users size={14} />
+                            <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                <Users size={12} />
                             </div>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{quiz.attempts_count || 0} ATTEMPTS</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{quiz.attempts_count || 0} ATTEMPTS</span>
                         </div>
                     </div>
                     
-                    <button className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-900/10 group-hover:shadow-blue-600/20 active:scale-90">
-                        <ChevronRight size={20} />
+                    <button className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-all duration-300 shadow-sm active:scale-90">
+                        <ChevronRight size={18} />
                     </button>
                 </div>
             </div>
@@ -266,8 +267,8 @@ function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
 
 function FilterBtn({ label, active }) {
     return (
-        <button className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-            active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-50 text-slate-400 hover:text-slate-900'
+        <button className={`px-5 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${
+            active ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-slate-50 text-slate-400 hover:text-slate-900'
         }`}>
             {label}
         </button>

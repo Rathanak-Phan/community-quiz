@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\QuizAttempt;
 use App\Models\Question;
 use App\Models\AttemptAnswer;
+use App\Models\Submission;
 
 class QuizScoringService
 {

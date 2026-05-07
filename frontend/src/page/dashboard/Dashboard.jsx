@@ -6,18 +6,22 @@ import {
   UserPlus, TrendingUp, Calculator
 } from 'lucide-react';
 import { getQuizMakerDashboard } from "../../services/dashboardService";
+import api from "../../config/api";
+import { useAuth } from "../../context/AuthContext";
 import AdminDashboard from "./AdminDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = user?.role || "user";
+  const { user, isAdmin } = useAuth();
+  const [makerStatus, setMakerStatus] = useState(user?.maker_status || 'none');
+  const [applying, setApplying] = useState(false);
+  const role = isAdmin ? 'admin' : (user?.role?.name || "user");
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (role === 'admin') return; // Admin has its own data fetch in AdminDashboard
+    if (role === 'admin' || role === 'user') return; // Admin has its own logic, Learner (user) doesn't have maker stats
     
     const loadDashboard = async () => {
       setLoading(true);
@@ -32,6 +36,18 @@ const Dashboard = () => {
     };
     loadDashboard();
   }, [role]);
+
+  const handleApply = async () => {
+    setApplying(true);
+    try {
+      await api.post('/maker-request');
+      setMakerStatus('pending');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setApplying(false);
+    }
+  };
 
   // Render AdminDashboard if role is admin
   if (role === 'admin') {
@@ -106,6 +122,49 @@ const Dashboard = () => {
               <button className="w-full bg-white text-blue-600 py-2.5 rounded-lg font-bold hover:bg-gray-50 transition shadow-sm">Join Now</button>
             </div>
           </div>
+
+          {/* Become a Creator Section for Users */}
+          {role === 'user' && (
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative group">
+              <div className="absolute -top-4 -right-4 w-20 h-20 bg-emerald-50 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="relative z-10 space-y-4">
+                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                  <UserPlus size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900">Become a Creator</h3>
+                  <p className="text-xs text-slate-500 mt-1">Want to create and share your own quizzes? Apply to become a Quiz Maker!</p>
+                </div>
+                
+                {makerStatus === 'pending' ? (
+                  <div className="flex items-center gap-2 py-3 px-4 bg-amber-50 text-amber-600 rounded-xl text-xs font-bold uppercase tracking-wider">
+                    <TrendingUp size={14} className="animate-pulse" /> Request Pending Review
+                  </div>
+                ) : makerStatus === 'rejected' ? (
+                  <div className="space-y-3">
+                    <div className="py-3 px-4 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold uppercase tracking-wider">
+                      Request Rejected
+                    </div>
+                    <button 
+                      onClick={handleApply}
+                      disabled={applying}
+                      className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-blue-600 transition shadow-sm disabled:opacity-50"
+                    >
+                      {applying ? "Submitting..." : "Apply Again"}
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={handleApply}
+                    disabled={applying}
+                    className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-blue-600 transition shadow-sm disabled:opacity-50"
+                  >
+                    {applying ? "Submitting..." : "Send Application"}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
