@@ -5,10 +5,17 @@ namespace App\Http\Controllers\Community;
 use App\Http\Controllers\Controller;
 use App\Models\Community;
 use App\Models\CommunityMember;
+use App\Services\CommunityService;
 use Illuminate\Http\Request;
 
 class CommunityController extends Controller
 {
+    protected $communityService;
+
+    public function __construct(CommunityService $communityService)
+    {
+        $this->communityService = $communityService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -32,7 +39,7 @@ class CommunityController extends Controller
                 return $query->where('visibility', 'public');
             })
             ->when($user, function ($query) use ($user) {
-                if ($user->role === 'admin') return $query;
+                if ($user->isAdmin()) return $query;
                 
                 return $query->where('visibility', 'public')
                     ->orWhere(function ($q) use ($user) {
@@ -92,26 +99,10 @@ class CommunityController extends Controller
             'cover_image' => 'nullable|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $path = null;
-
-        if ($request->hasFile('cover_image')) {
-            $path = $request->file('cover_image')
-                ->store('communities', 'public');
-        }
-
-        $community = Community::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'visibility' => $request->visibility,
-            'created_by' => auth()->id(),
-            'cover_image' => $path
-        ]);
-
-        // Attach owner (IMPORTANT)
-        $community->users()->attach(auth()->id(), [
-            'role' => 'owner',
-            'status' => 'approved'
-        ]);
+        $community = $this->communityService->createCommunity(
+            $request->all() + ['cover_image' => $request->file('cover_image')],
+            auth()->id()
+        );
 
         return response()->json($community, 201);
     }
@@ -135,7 +126,7 @@ class CommunityController extends Controller
                 ->where('status', 'approved')
                 ->exists();
 
-            if (!$isMember && $user->role !== 'admin') {
+            if (!$isMember && !$user->isAdmin()) {
                 return response()->json(['message' => 'Access Denied'], 403);
             }
         }
@@ -156,7 +147,7 @@ class CommunityController extends Controller
                 ->where('status', 'approved')
                 ->exists();
 
-            if (!$isMember && $user->role !== 'admin') {
+            if (!$isMember && !$user->isAdmin()) {
                 return response()->json(['message' => 'Access Denied'], 403);
             }
         }
@@ -312,22 +303,10 @@ class CommunityController extends Controller
             ], 400);
         }
 
-        // Public or private
-        $status = $community->visibility === 'public'
-            ? 'approved'
-            : 'pending';
-
-        CommunityMember::create([
-            'community_id' => $community->id,
-            'user_id' => $user->id,
-            'role' => 'member',
-            'status' => $status
-        ]);
+        $result = $this->communityService->joinCommunity($community, $user->id);
 
         return response()->json([
-            'message' => $status === 'approved'
-                ? 'Joined successfully'
-                : 'Join request sent'
+            'message' => $result['message']
         ]);
     }
 
@@ -355,7 +334,7 @@ class CommunityController extends Controller
         $member = CommunityMember::findOrFail($id);
 
         // Only owner can approve
-        if ($member->community->owner_id !== auth()->id()) {
+        if ($member->community->created_by !== auth()->id()) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 403);
@@ -393,7 +372,7 @@ class CommunityController extends Controller
     {
         $member = CommunityMember::findOrFail($id);
 
-        if ($member->community->owner_id !== auth()->id()) {
+        if ($member->community->created_by !== auth()->id()) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 403);
@@ -411,7 +390,7 @@ class CommunityController extends Controller
     public function pendingMembers(Community $community)
     {
         // Only owner can see pending members
-        if ($community->creator->id !== auth()->id()) {
+        if ($community->created_by !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

@@ -68,4 +68,32 @@ class DashboardController extends Controller
             'pending_reviews' => $pendingReviews,
         ]);
     }
+    /**
+     * @OA\Get(
+     *     path="/api/dashboard/admin",
+     *     tags={"Dashboard"},
+     *     summary="Get system-wide statistics for Admin dashboard",
+     *     operationId="dashboardAdmin",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Admin stats retrieved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="total_users", type="integer"),
+     *             @OA\Property(property="total_quizzes", type="integer"),
+     *             @OA\Property(property="total_communities", type="integer"),
+     *             @OA\Property(property="total_submissions", type="integer")
+     *         )
+     *     )
+     * )
+     */
+    public function adminDashboard()
+    {
+        return response()->json([
+            'total_users' => \App\Models\User::count(),
+            'total_quizzes' => Quiz::count(),
+            'total_communities' => Community::count(),
+            'total_submissions' => QuizAttempt::where('status', 'submitted')->count(),
+        ]);
+    }
 }

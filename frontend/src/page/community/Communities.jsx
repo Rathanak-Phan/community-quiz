@@ -6,11 +6,15 @@ import CommunityFormModal from "../../components/community/CommunityFormModal";
 import Toast from "../../components/ui/Toast";
 import { getCommunities, joinCommunity, deleteCommunity } from "../../api/communityApi";
 
+import { useAuth } from "../../context/AuthContext";
+
 const filterOptions = ["All Communities", "My Communities", "Public", "Private"];
 const sortOptions = ["Newest First", "Most Members", "A–Z"];
 
 export default function Communities() {
   const navigate = useNavigate();
+  const { user, token, isAdmin, isQuizMaker } = useAuth();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("All Communities");
   const [sort, setSortBy] = useState("Newest First");
@@ -20,9 +24,8 @@ export default function Communities() {
   const [editData, setEditData] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const role = user?.role || "guest";
-  const isGuest = !localStorage.getItem("token");
+  const isGuest = !token;
+  const canCreate = isAdmin || isQuizMaker;
 
   const loadCommunities = useCallback(async () => {
     setLoading(true);
@@ -132,7 +135,7 @@ export default function Communities() {
             <h1 className="text-4xl font-black text-slate-900 tracking-tight">Global <span className="text-blue-600">Communities.</span></h1>
             <p className="text-slate-500 font-medium max-w-lg">Find your niche and learn together with specialized interest groups.</p>
         </div>
-        {!isGuest && role !== "user" && (
+        {canCreate && (
             <button 
               onClick={() => {
                 setEditData(null);

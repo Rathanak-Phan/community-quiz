@@ -8,6 +8,7 @@ use App\Http\Requests\Question\StoreShortAnswerRequest;
 use App\Http\Requests\Question\StoreTrueFalseRequest;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Http\Resources\QuestionResource;
 use Illuminate\Support\Facades\DB;
 
 class QuestionController extends Controller

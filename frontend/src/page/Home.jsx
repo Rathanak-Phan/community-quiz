@@ -4,17 +4,29 @@ import {
   Users, ListChecks, Trophy, LayoutDashboard, Star, TrendingUp,
   UserPlus, Network, Edit3, BarChart3, ArrowRight, Play, CheckCircle2
 } from 'lucide-react';
+import api from '../config/api';
+import { useAuth } from '../context/AuthContext';
 import { getCommunities } from '../services/communityService';
 import { getTopUsers } from '../services/leaderboardService';
+import Toast from '../components/ui/Toast';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user, token: authToken, refreshProfile } = useAuth();
+  const [makerStatus, setMakerStatus] = useState(user?.maker_status || 'none');
+  const [applying, setApplying] = useState(false);
   const [communities, setCommunities] = useState([]);
   const [topPerformers, setTopPerformers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [toast, setToast] = useState(null);
 
-  const token = localStorage.getItem("token");
+  // Sync local status when global user changes
+  useEffect(() => {
+    if (user) {
+      setMakerStatus(user.maker_status || 'none');
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +50,20 @@ const LandingPage = () => {
     };
     fetchData();
   }, []);
+
+  const handleApply = async () => {
+    setApplying(true);
+    try {
+      await api.post('/maker-request');
+      await refreshProfile();
+      setToast({ message: 'Application submitted successfully!', type: 'success' });
+    } catch (err) {
+      console.error(err);
+      setToast({ message: err.response?.data?.message || 'Failed to submit application', type: 'error' });
+    } finally {
+      setApplying(false);
+    }
+  };
 
   return (
     <div className="bg-white">
@@ -67,21 +93,24 @@ const LandingPage = () => {
               Join the world's most interactive community-driven quiz platform. Create, share, and compete with friends in real-time.
             </p>
             
-            <div className="flex flex-wrap gap-4 pt-4">
-              <button 
-                onClick={() => navigate(token ? "/dashboard" : "/register")}
-                className="bg-slate-900 text-white px-10 py-5 rounded-[2rem] font-black text-lg hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-slate-900/20 hover:shadow-blue-600/30 flex items-center gap-3 active:scale-95"
-              >
-                Get Started Free
-                <ArrowRight size={20} />
-              </button>
-              <button 
-                onClick={() => navigate("/communities")}
-                className="bg-white text-slate-900 border-2 border-slate-100 px-10 py-5 rounded-[2rem] font-black text-lg hover:border-slate-200 transition-all duration-300 flex items-center gap-3 active:scale-95"
-              >
-                <Play size={20} className="text-blue-600" />
-                Explore
-              </button>
+            <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
+                <button 
+                    onClick={() => {
+                      if (!authToken) navigate("/register");
+                      else if (user?.role?.name === 'admin') navigate("/admin/dashboard");
+                      else if (user?.role?.name === 'quiz_maker') navigate("/dashboard");
+                      else navigate("/"); 
+                    }}
+                    className="w-full sm:w-auto px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold text-base hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95"
+                >
+                    Browse Quizzes
+                </button>
+                <button 
+                    onClick={() => navigate("/communities")}
+                    className="w-full sm:w-auto px-10 py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-bold text-base hover:bg-slate-50 transition-all duration-300 active:scale-95"
+                >
+                    Join Community
+                </button>
             </div>
 
             <div className="flex items-center gap-6 pt-8">
@@ -97,52 +126,52 @@ const LandingPage = () => {
           </div>
 
           <div className="relative lg:block hidden">
-            <div className="relative z-10 bg-white rounded-[3rem] p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 rotate-2 hover:rotate-0 transition-transform duration-700">
-               <div className="flex items-center justify-between mb-10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white">
-                      <Star size={24} fill="white" />
+            <div className="relative z-10 bg-white rounded-3xl p-8 shadow-xl border border-slate-100 rotate-2 hover:rotate-0 transition-transform duration-700">
+               <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white">
+                      <Star size={20} fill="white" />
                     </div>
                     <div>
-                      <h3 className="font-black text-slate-900 uppercase tracking-tight">Quiz of the Day</h3>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quantum Mechanics</p>
+                      <h3 className="font-bold text-slate-900 uppercase tracking-tight text-sm">Quiz of the Day</h3>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Quantum Mechanics</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-black text-blue-600 tracking-tighter">84% SCORE</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top 5%</p>
+                    <p className="text-xs font-bold text-blue-600 tracking-tighter">84% SCORE</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Top 5%</p>
                   </div>
                </div>
                
-               <div className="space-y-6">
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 font-black">1</div>
-                      <span className="font-bold text-slate-700">Newtonian Physics</span>
+               <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">1</div>
+                      <span className="font-bold text-slate-700 text-sm">Newtonian Physics</span>
                     </div>
-                    <CheckCircle2 size={20} className="text-emerald-500" />
+                    <CheckCircle2 size={18} className="text-emerald-500" />
                   </div>
-                  <div className="p-5 rounded-2xl bg-blue-600 border border-blue-500 flex items-center justify-between shadow-lg shadow-blue-600/20">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white font-black">2</div>
-                      <span className="font-bold text-white">String Theory</span>
+                  <div className="p-4 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-between shadow-lg shadow-blue-600/20">
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold text-xs">2</div>
+                      <span className="font-bold text-white text-sm">String Theory</span>
                     </div>
-                    <div className="w-5 h-5 rounded-full border-2 border-white/30"></div>
+                    <div className="w-4 h-4 rounded-full border-2 border-white/30"></div>
                   </div>
-                  <div className="p-5 rounded-2xl bg-white border border-slate-100 flex items-center justify-between opacity-50">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 font-black">3</div>
-                      <span className="font-bold text-slate-400">Black Hole Dynamics</span>
+                  <div className="p-4 rounded-xl bg-white border border-slate-100 flex items-center justify-between opacity-50">
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300 font-bold text-xs">3</div>
+                      <span className="font-bold text-slate-400 text-sm">Black Hole Dynamics</span>
                     </div>
                   </div>
                </div>
 
-               <div className="mt-10 pt-8 border-t border-slate-100 flex items-center justify-between">
+               <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Users size={16} className="text-slate-400" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">2.4k ATTEMPTS</span>
+                    <Users size={14} className="text-slate-400" />
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">2.4k ATTEMPTS</span>
                   </div>
-                  <button className="text-xs font-black text-blue-600 hover:underline">VIEW LEADERBOARD</button>
+                  <button className="text-[10px] font-bold text-blue-600 hover:underline">VIEW LEADERBOARD</button>
                </div>
             </div>
             {/* Abstract Background Shapes */}
@@ -166,8 +195,8 @@ const LandingPage = () => {
       <section className="py-32 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-2xl mb-20 space-y-4">
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight">Everything you need to <br/><span className="text-blue-600">Master any subject.</span></h2>
-            <p className="text-lg text-slate-500 leading-relaxed">Built for creators, students, and lifelong learners who want more than just static questions.</p>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tight text-left">Everything you need to <br/><span className="text-blue-600">Master any subject.</span></h2>
+            <p className="text-lg text-slate-500 leading-relaxed text-left">Built for creators, students, and lifelong learners who want more than just static questions.</p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -205,6 +234,55 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Become a Creator Section (Only for Regular Users) */}
+      {authToken && user?.role?.name === 'user' && (
+        <section className="py-32 bg-slate-900 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[50%] h-full bg-blue-600 skew-x-12 translate-x-24 -z-0 opacity-20"></div>
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-20 items-center">
+              <div className="space-y-8">
+                <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/20">
+                  <UserPlus size={32} />
+                </div>
+                <h2 className="text-5xl font-black text-white leading-tight text-left">Ready to share <br/><span className="text-blue-500">Your Knowledge?</span></h2>
+                <p className="text-xl text-slate-400 leading-relaxed max-w-md text-left">
+                  Join our elite group of Quiz Makers. Create engaging content, build your own communities, and track learner progress with professional analytics.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-12 rounded-[3rem] space-y-8">
+                <div className="space-y-6">
+                  <BenefitItem text="Create unlimited public & private quizzes" />
+                  <BenefitItem text="Build and manage your own learning communities" />
+                  <BenefitItem text="Detailed performance analytics for your students" />
+                </div>
+                
+                {makerStatus === 'pending' ? (
+                  <div className="w-full py-6 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-3xl font-black text-center uppercase tracking-widest flex items-center justify-center gap-3">
+                    <TrendingUp size={20} className="animate-pulse" /> Application Pending Review
+                  </div>
+                ) : makerStatus === 'approved' ? (
+                  <button 
+                    onClick={() => navigate("/dashboard")}
+                    className="w-full py-6 bg-emerald-600 text-white rounded-3xl font-black text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95"
+                  >
+                    Go to Creator Dashboard
+                  </button>
+                ) : (
+                  <button 
+                    onClick={handleApply}
+                    disabled={applying}
+                    className="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-lg hover:bg-white hover:text-blue-600 transition-all shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50"
+                  >
+                    {applying ? "Submitting Application..." : "Apply to be a Creator"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Social Proof Section */}
       <section className="py-32 bg-white">
         <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
@@ -218,10 +296,10 @@ const LandingPage = () => {
               <TestimonialCard name="Maya Patel" role="Developer" text="Creating technical quizzes is so fast. The MCQ builder is top-notch." />
             </div>
           </div>
-          <div className="space-y-8 order-1 lg:order-2">
+          <div className="space-y-8 order-1 lg:order-2 text-left">
             <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">Don't just take our <br/>word for it.</h2>
             <p className="text-lg text-slate-500 leading-relaxed">Join 100,000+ users who have already leveled up their knowledge base through collaborative learning.</p>
-            <div className="pt-4">
+            <div className="pt-4 flex">
               <button onClick={() => navigate("/register")} className="text-lg font-black text-blue-600 hover:text-indigo-600 flex items-center gap-2 group transition-all">
                 Join the community
                 <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
@@ -230,6 +308,14 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
     </div>
   );
 };
@@ -248,18 +334,27 @@ const FeatureCard = ({ icon, title, desc }) => (
     <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-8 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500 shadow-inner">
       {icon}
     </div>
-    <h3 className="text-xl font-black text-slate-900 mb-4 uppercase tracking-tight">{title}</h3>
-    <p className="text-slate-500 leading-relaxed text-sm">{desc}</p>
+    <h3 className="text-xl font-black text-slate-900 mb-4 uppercase tracking-tight text-left">{title}</h3>
+    <p className="text-slate-500 leading-relaxed text-sm text-left">{desc}</p>
   </div>
 );
 
 const TestimonialCard = ({ name, role, text }) => (
   <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 space-y-4 shadow-sm">
-    <p className="text-slate-600 italic font-medium leading-relaxed">"{text}"</p>
-    <div>
+    <p className="text-slate-600 italic font-medium leading-relaxed text-left">"{text}"</p>
+    <div className="text-left">
       <p className="font-black text-slate-900 text-sm tracking-tight">{name}</p>
       <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{role}</p>
     </div>
+  </div>
+);
+
+const BenefitItem = ({ text }) => (
+  <div className="flex items-center gap-4 text-left">
+    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white shrink-0">
+      <CheckCircle2 size={14} />
+    </div>
+    <span className="text-white font-medium">{text}</span>
   </div>
 );
 

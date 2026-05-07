@@ -234,6 +234,7 @@ class QuizAttemptController extends Controller
      */
     public function gradeAnswer(Request $request, $id)
     {
+        $user = auth()->user();
         $request->validate([
             'score' => 'required|integer|min:0',
             'feedback' => 'nullable|string',
@@ -243,7 +244,7 @@ class QuizAttemptController extends Controller
         $attempt = $attemptAnswer->attempt;
         
         // Authorization: Admin or Quiz Creator
-        if (auth()->user()->role !== 'admin' && $attempt->quiz->created_by !== auth()->id()) {
+        if (!$user->isAdmin() && $attempt->quiz->created_by !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
@@ -302,11 +303,68 @@ class QuizAttemptController extends Controller
         $user = auth()->user();
         $query = QuizAttempt::where('grading_status', 'pending');
 
-        if ($user->role !== 'admin') {
+        if (!$user->isAdmin()) {
             $query->whereHas('quiz', fn($q) => $q->where('created_by', $user->id));
         }
 
         return PendingReviewResource::collection($query->with(['quiz', 'user'])->latest('completed_at')->get());
+    }
+
+    /**
+     * Get review details for a completed attempt.
+     */
+    public function review(QuizAttempt $attempt)
+    {
+        if ($attempt->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        $attempt->load(['quiz.questions.options', 'answers.question']);
+        return new QuizAttemptDetailResource($attempt);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/my-attempts",
+     *     tags={"Quiz Attempt"},
+     *     summary="List current user's in-progress attempts",
+     *     operationId="quizAttemptMyAttempts",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="In-progress attempts")
+     * )
+     */
+    public function myAttempts()
+    {
+        $attempts = QuizAttempt::where('user_id', auth()->id())
+            ->where('status', 'in_progress')
+            ->with(['quiz'])
+            ->latest('started_at')
+            ->get();
+
+        return QuizAttemptResource::collection($attempts);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/my-submissions",
+     *     tags={"Quiz Attempt"},
+     *     summary="List current user's past submissions",
+     *     operationId="quizAttemptMySubmissions",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Past submissions")
+     * )
+     */
+    public function mySubmissions()
+    {
+        $submissions = Submission::where('user_id', auth()->id())
+            ->with(['quiz'])
+            ->latest('submitted_at')
+            ->get();
+
+        // We can reuse a resource or return raw. Let's use a simple map for now or create a resource.
+        return response()->json([
+            'data' => $submissions
+        ]);
     }
 }
 

@@ -19,3 +19,4 @@ class QuestionAnswer extends Model
     {
         return $this->belongsTo(Question::class);
     }
+}

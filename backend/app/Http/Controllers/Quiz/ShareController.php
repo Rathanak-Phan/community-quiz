@@ -77,15 +77,29 @@ class ShareController extends Controller
     {
         $submission = Submission::findOrFail($id);
         
-        // Basic privacy check: if anonymous, the frontend should handle hiding names,
-        // but here we just return the link.
-        
-        $shareUrl = $this->shareService->generateResultShareUrl($submission);
+        $shareUrl = route('share.result.preview', ['id' => $submission->id]);
+        $frontendUrl = $this->shareService->generateResultShareUrl($submission);
 
         return response()->json([
             'submission_id' => $submission->id,
             'score' => $submission->score,
-            'share_url' => $shareUrl
+            'share_url' => $shareUrl,
+            'frontend_url' => $frontendUrl,
+            'facebook_url' => $this->shareService->getFacebookShareUrl($shareUrl),
+            'linkedin_url' => $this->shareService->getLinkedInShareUrl($shareUrl)
+        ]);
+    }
+
+    /**
+     * Show a public HTML preview for social media bots.
+     */
+    public function showSharePreview($id)
+    {
+        $submission = Submission::with(['quiz', 'user'])->findOrFail($id);
+        
+        return view('share.result', [
+            'submission' => $submission,
+            'frontend_url' => $this->shareService->generateResultShareUrl($submission)
         ]);
     }
 }
