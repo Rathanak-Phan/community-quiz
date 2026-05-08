@@ -34,10 +34,14 @@ Route::get('/quizzes/{id}/share', [ShareController::class, 'shareQuiz']);
 Route::get('/submissions/{id}/share', [ShareController::class, 'shareResult']);
 Route::get('/share/result/{id}', [ShareController::class, 'showSharePreview'])->name('share.result.preview');
 
-// Public Community Browsing
+// Public Browsing
 Route::get('/communities', [CommunityController::class, 'index']);
 Route::get('/communities/{community}', [CommunityController::class, 'show']);
 Route::get('/communities/{community}/quizzes', [CommunityController::class, 'quizzes']);
+Route::get('/quizzes', [QuizController::class, 'index']);
+Route::get('/quizzes/trending', [\App\Http\Controllers\LeaderboardController::class, 'trendingQuizzes']);
+Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index']);
+Route::get('/leaderboard/top-users', [\App\Http\Controllers\LeaderboardController::class, 'topUsers']);
 
 /*
 |--------------------------------------------------------------------------
@@ -49,21 +53,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/profile/avatar', [AuthController::class, 'updateAvatar']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Community Routes (ALL AUTH USERS)
-    |--------------------------------------------------------------------------
-    */
-
-    // Join community
+    // Community Join & Leave
     Route::post('/communities/{community}/join', [CommunityController::class, 'join']);
+    Route::post('/communities/{community}/leave', [CommunityController::class, 'leave']);
 
     // User's own attempts & submissions
     Route::get('/my-attempts', [QuizAttemptController::class, 'myAttempts']);
     Route::get('/my-submissions', [QuizAttemptController::class, 'mySubmissions']);
 
-    // Approve / Reject
+    // Community Member Management
     Route::get('/communities/{community}/pending-members', [CommunityController::class, 'pendingMembers']);
     Route::post('/community-members/{id}/approve', [CommunityController::class, 'approve']);
     Route::post('/community-members/{id}/reject', [CommunityController::class, 'reject']);
@@ -76,10 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/attempts/{attempt}/review', [QuizAttemptController::class, 'review']);
     Route::put('/answers/{id}/grade', [QuizAttemptController::class, 'gradeAnswer']);
 
-    // Leaderboard
-    Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index']);
-    Route::get('/leaderboard/top-users', [\App\Http\Controllers\LeaderboardController::class, 'topUsers']);
-    Route::get('/quizzes/trending', [\App\Http\Controllers\LeaderboardController::class, 'trendingQuizzes']);
+    // Protected Stats
     Route::get('/quizzes/{quiz}/leaderboard', [QuizController::class, 'leaderboard']);
 
     // Favorites
@@ -91,26 +89,31 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/maker-request', [\App\Http\Controllers\MakerRequestController::class, 'apply']);
     Route::get('/maker-status', [\App\Http\Controllers\MakerRequestController::class, 'status']);
 
+    // Dashboard
+    Route::get('/dashboard/student', [DashboardController::class, 'studentDashboard']);
+
     // Quiz Browsing (All authenticated users)
-    Route::get('/quizzes/my', [\App\Http\Controllers\Quiz\QuizController::class, 'myQuizzes']); // Moved up to avoid wildcard conflict
-    Route::get('/quizzes', [QuizController::class, 'index']);      // GET ALL
-    Route::get('/quizzes/{quiz}', [QuizController::class, 'show']); // GET ONE
+    Route::get('/quizzes/my', [\App\Http\Controllers\Quiz\QuizController::class, 'myQuizzes']);
+    Route::get('/my-communities', [CommunityController::class, 'myCommunities']);
 });
+
+Route::get('/quizzes/{quiz}', [QuizController::class, 'show']);
 
 /*
 |--------------------------------------------------------------------------
-| Category Routes (Admin + Quiz Maker)
+| Category & Management Routes (Admin + Quiz Maker)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () {
 
-    // Category
+    // Category Management
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::post('/categories', [CategoryController::class, 'store']);
-    Route::get('/categories/{category}', [CategoryController::class, 'show']);
+    Route::put('/categories/{category}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
-    // Community Management (Admin + Quiz Maker)
+    // Community Management
     Route::post('/communities', [CommunityController::class, 'store']);
     Route::put('/communities/{community}', [CommunityController::class, 'update']);
     Route::delete('/communities/{community}', [CommunityController::class, 'destroy']);
@@ -122,31 +125,22 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::get('/dashboard/quiz-maker', [DashboardController::class, 'quizMakerDashboard']);
     Route::get('/dashboard/admin', [DashboardController::class, 'adminDashboard']);
 
-    Route::put('/categories/{category}', [CategoryController::class, 'update']);
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+    // Quiz Management
+    Route::post('/quizzes', [QuizController::class, 'store']);
+    Route::put('/quizzes/{quiz}', [QuizController::class, 'update']);
+    Route::post('/quizzes/{quiz}', [QuizController::class, 'update']); // multipart support
+    Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']);
 
-    // Quiz Management (Admin + Quiz Maker)
-    Route::post('/quizzes', [QuizController::class, 'store']);     // CREATE
-    Route::put('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE
-    Route::put('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE (PATCH)
-    Route::post('/quizzes/{quiz}', [QuizController::class, 'update']); // UPDATE (multipart/form-data friendly)
-    Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']); // DELETE
-
-    // Questions
+    // Questions & Options
     Route::get('/quizzes/{quiz}/questions', [QuestionController::class, 'index']);
-    Route::get('/questions/{question}', [QuestionController::class, 'show']);
     Route::post('/questions/mcq', [QuestionController::class, 'storeMcq']);
     Route::post('/questions/true-false', [QuestionController::class, 'storeTrueFalse']);
     Route::post('/questions/short-answer', [QuestionController::class, 'storeShortAnswer']);
     Route::put('/questions/{question}', [QuestionController::class, 'update']);
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
-
-    // Options
-    Route::get('/questions/{question}/options', [QuestionOptionController::class, 'index']);
     Route::post('/options', [QuestionOptionController::class, 'store']);
     Route::put('/options/{option}', [QuestionOptionController::class, 'update']);
     Route::delete('/options/{option}', [QuestionOptionController::class, 'destroy']);
-
 });
 
 /*
@@ -156,21 +150,16 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
 */
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
-    // User Management
     Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
     Route::put('/users/{id}/role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole']);
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);
-
-    // Quiz Moderation
     Route::get('/quizzes', [\App\Http\Controllers\Admin\QuizModerationController::class, 'index']);
     Route::delete('/quizzes/{id}', [\App\Http\Controllers\Admin\QuizModerationController::class, 'destroy']);
-
-    // Community Moderation
+    Route::get('/quizzes/{id}/favorites', [\App\Http\Controllers\Admin\QuizModerationController::class, 'quizFavorites']);
     Route::get('/communities', [\App\Http\Controllers\Admin\CommunityModerationController::class, 'index']);
     Route::delete('/communities/{id}', [\App\Http\Controllers\Admin\CommunityModerationController::class, 'destroy']);
-
-    // Maker Requests Management
     Route::get('/maker-requests', [\App\Http\Controllers\Admin\MakerRequestController::class, 'index']);
+    Route::get('/maker-requests/count', [\App\Http\Controllers\Admin\MakerRequestController::class, 'count']);
     Route::post('/maker-requests/{id}/approve', [\App\Http\Controllers\Admin\MakerRequestController::class, 'approve']);
     Route::post('/maker-requests/{id}/reject', [\App\Http\Controllers\Admin\MakerRequestController::class, 'reject']);
 });

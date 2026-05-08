@@ -1,10 +1,10 @@
-import { Users, Lock, Globe, CheckCircle, Clock, ChevronRight, Trash2, Settings } from "lucide-react";
+import { Users, Lock, Globe, CheckCircle, Clock, ChevronRight, Trash2, Settings, LogOut } from "lucide-react";
 import { STORAGE_URL } from "../../config/api";
 
-export default function CommunityCard({ community, onJoin, onViewMore, onApprove, onEdit, onDelete }) {
+export default function CommunityCard({ community, onJoin, onLeave, onViewMore, onApprove, onEdit, onDelete }) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const isGuest = !localStorage.getItem("token");
-  const isOwner = community.owner_id === user?.id;
+  const isOwner = community.created_by === user?.id;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -71,19 +71,34 @@ export default function CommunityCard({ community, onJoin, onViewMore, onApprove
         <div className="mt-auto pt-8 border-t border-slate-50 flex gap-4">
           {isGuest ? (
              <button 
-                onClick={() => window.location.href = '/login'}
+                onClick={() => window.location.href = '/'}
                 className="flex-1 py-4 px-6 rounded-2xl bg-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 hover:text-blue-600 transition flex items-center justify-center gap-2"
               >
                 Login to Join
               </button>
           ) : community.isMember ? (
-            <button 
-              onClick={() => onViewMore(community)}
-              className="flex-1 py-4 px-6 rounded-2xl bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition flex items-center justify-center gap-2"
-            >
-              <CheckCircle size={14} className="text-emerald-500" />
-              Member
-            </button>
+            <div className="flex-1 flex gap-2">
+              <button 
+                onClick={() => onViewMore(community)}
+                className="flex-1 py-4 px-6 rounded-2xl bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition flex items-center justify-center gap-2"
+              >
+                <CheckCircle size={14} className="text-emerald-500" />
+                Member
+              </button>
+              {!isOwner && onLeave && (
+                <button 
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to leave ${community.name}?`)) {
+                      onLeave(community);
+                    }
+                  }}
+                  className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition flex items-center justify-center border border-rose-100 shadow-sm"
+                  title="Leave Community"
+                >
+                  <LogOut size={16} />
+                </button>
+              )}
+            </div>
           ) : community.join_status === 'pending' ? (
             <button 
               disabled

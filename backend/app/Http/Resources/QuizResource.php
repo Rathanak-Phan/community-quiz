@@ -32,6 +32,7 @@ class QuizResource extends JsonResource
             'community_id' => $this->community_id,
             'cover_image' => $this->cover_image,
             'created_by' => $this->created_by,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'creator' => [
                 'id' => $this->creator->id,

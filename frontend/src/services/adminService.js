@@ -15,6 +15,7 @@ const adminService = {
     // Quiz Moderation
     getQuizzes: () => api.get('/admin/quizzes'),
     deleteQuiz: (id) => api.delete(`/admin/quizzes/${id}`),
+    getQuizFavorites: (id) => api.get(`/admin/quizzes/${id}/favorites`),
 
     // Community Moderation
     getCommunities: () => api.get('/admin/communities'),
@@ -22,6 +23,7 @@ const adminService = {
 
     // Maker Requests
     getMakerRequests: () => api.get('/admin/maker-requests'),
+    getMakerRequestsCount: () => api.get('/admin/maker-requests/count'),
     approveMakerRequest: (id) => api.post(`/admin/maker-requests/${id}/approve`),
     rejectMakerRequest: (id) => api.post(`/admin/maker-requests/${id}/reject`),
 };

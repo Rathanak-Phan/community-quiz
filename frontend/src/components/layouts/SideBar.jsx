@@ -1,41 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
-    Shield, AlertTriangle, ShieldCheck
+    Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import UserAvatar from "../ui/UserAvatar";
+import adminService from "../../services/adminService";
 
 const navItems = [
+  // Shared Top Links
+  { to: "/", label: "Home", icon: Home, roles: ["admin", "quiz_maker", "user"] },
+
   // Dashboard for both
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "quiz_maker"] },
+  { to: "/dashboard", label: "Dashboard Overview", icon: LayoutDashboard, roles: ["admin", "quiz_maker"] },
   
   // Admin Specific
   { to: "/admin/users", label: "Manage Users", icon: Shield, roles: ["admin"] },
-  { to: "/categories", label: "Manage Categories", icon: Grid2X2, roles: ["admin", "quiz_maker"] },
   { to: "/admin/moderation/quizzes", label: "Moderate Quizzes", icon: AlertTriangle, roles: ["admin"] },
   { to: "/admin/moderation/communities", label: "Moderate Communities", icon: Users, roles: ["admin"] },
   { to: "/admin/maker-requests", label: "Maker Requests", icon: ShieldCheck, roles: ["admin"] },
   
-  // Quiz Maker Links
+  // Workspace / Quiz Maker Specific
   { to: "/quizzes/my", label: "My Quizzes", icon: BookOpen, roles: ["quiz_maker"] },
-  
-  // Student/User Links
-  { to: "/quizzes", label: "Browse Quizzes", icon: Search, roles: ["user"] },
-  { to: "/favorites", label: "Favorites", icon: Heart, roles: ["user"] },
+  { to: "/quizzes/my-activity", label: "My Activity", icon: ClipboardCheck, roles: ["user"] },
+  { to: "/communities/my", label: "My Communities", icon: Users, roles: ["quiz_maker", "user"] },
+  { to: "/reviews/pending", label: "Pending Reviews", icon: ClipboardCheck, roles: ["quiz_maker", "admin"] },
+  { to: "/categories", label: "Categories", icon: Grid2X2, roles: ["admin", "quiz_maker"] },
 
-  // Shared Links
-  { to: "/communities", label: "Communities", icon: Users, roles: ["admin", "quiz_maker", "user"] },
-  { to: "/leaderboard", label: "Leaderboard", icon: BarChart2, roles: ["admin", "quiz_maker", "user"] },
+  // User Settings/Profile
+  { to: "/favorites", label: "Favorites", icon: Heart, roles: ["user", "quiz_maker", "admin"] },
+  { to: "/profile", label: "My Profile", icon: User, roles: ["admin", "quiz_maker", "user"] },
 ];
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
 
-  const roleName = user?.role?.name || "user";
+  const isAdmin = user?.role?.name === "admin" || Number(user?.role_id) === 1;
+  const isQuizMaker = user?.role?.name === "quiz_maker" || Number(user?.role_id) === 2;
+  const roleName = isAdmin ? "admin" : isQuizMaker ? "quiz_maker" : "user";
+
+  useEffect(() => {
+    if (isAdmin) {
+      const fetchCount = async () => {
+        try {
+          const res = await adminService.getMakerRequestsCount();
+          setPendingRequestsCount(res.data.count || 0);
+        } catch (err) {
+          console.error("Failed to fetch pending requests count", err);
+        }
+      };
+      fetchCount();
+      const interval = setInterval(fetchCount, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [isAdmin]);
 
   const filteredNavItems = navItems.filter(item => 
     item.roles.includes(roleName)
@@ -43,7 +66,6 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
   };
 
   const roleLabel = roleName === "admin" ? "Admin" : roleName === "quiz_maker" ? "Creator" : "Student";
@@ -85,6 +107,7 @@ export default function Sidebar() {
               <NavLink
                 key={to}
                 to={to}
+                end={to === "/"}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
@@ -95,17 +118,22 @@ export default function Sidebar() {
                 }
               >
                 <Icon size={18} className="transition-transform group-hover:scale-110" />
-                <span className="text-sm tracking-tight">{label}</span>
+                <span className="text-sm tracking-tight flex-1">{label}</span>
+                {label === "Maker Requests" && pendingRequestsCount > 0 && (
+                  <span className="flex items-center justify-center w-5 h-5 bg-rose-500 text-white text-[10px] font-black rounded-lg shadow-lg shadow-rose-500/20 animate-pulse">
+                    {pendingRequestsCount}
+                  </span>
+                )}
               </NavLink>
             ))}
           </nav>
         </div>
 
         <div className="px-6 py-4 mt-auto">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Settings</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Support</p>
           <nav className="space-y-1">
-            <SideLink icon={<Settings size={18}/>} label="Settings" />
-            <SideLink icon={<HelpCircle size={18}/>} label="Help Center" />
+            <SideLink to="/profile" icon={<Settings size={18}/>} label="Settings" onClick={() => setIsMobileMenuOpen(false)} />
+            <SideLink to="/" icon={<HelpCircle size={18}/>} label="Help Center" onClick={() => setIsMobileMenuOpen(false)} />
           </nav>
           
           <div className="mt-8 pt-6 border-t border-slate-100">
@@ -159,9 +187,7 @@ export default function Sidebar() {
                   </p>
                 </div>
               </div>
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xs lg:text-sm shadow-lg shadow-blue-600/20 border-2 border-white shrink-0">
-                {user?.name?.charAt(0) || "U"}
-              </div>
+              <UserAvatar user={user} size="md" className="lg:w-12 lg:h-12 border-2 border-white" />
             </div>
           </div>
         </header>
@@ -177,11 +203,21 @@ export default function Sidebar() {
   );
 }
 
-function SideLink({ icon, label }) {
+function SideLink({ icon, label, to, onClick }) {
   return (
-    <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-300 group">
+    <NavLink 
+      to={to} 
+      onClick={onClick}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
+          isActive
+            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
+            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+        }`
+      }
+    >
       <span className="transition-transform group-hover:scale-110">{icon}</span>
       <span className="text-sm font-medium">{label}</span>
-    </button>
+    </NavLink>
   );
 }

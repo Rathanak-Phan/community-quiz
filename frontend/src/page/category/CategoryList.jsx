@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { 
+  Plus, Search, Grid2X2, Settings, Trash2, 
+  Layout, Calendar, User, ChevronRight, Hash, Heart
+} from "lucide-react";
 import { getCategories, deleteCategory } from "../../api/categoryApi";
+import { addFavorite, removeFavorite } from "../../services/favoriteService";
 import CategoryFormModal from "../../components/category/CategoryFormModal";
 import ConfirmDeleteModal from "../../components/category/ConfirmDeleteModal";
 import Toast from "../../components/ui/Toast";
@@ -8,16 +13,12 @@ function CategoryList() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Modal state
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
-
-  // Delete state
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: "" });
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  // Toast state
   const [toast, setToast] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -34,9 +35,7 @@ function CategoryList() {
       const res = await getCategories();
       setCategories(res.data?.data || res.data || []);
     } catch (err) {
-      setFetchError(
-        err.response?.data?.message || "Failed to load categories."
-      );
+      setFetchError(err.response?.data?.message || "Failed to load categories.");
     } finally {
       setLoading(false);
     }
@@ -70,239 +69,212 @@ function CategoryList() {
     try {
       await deleteCategory(deleteModal.id);
       setDeleteModal({ open: false, id: null, name: "" });
-      showToast("Category deleted successfully!");
+      showToast("Category archived successfully!");
       fetchCategories();
     } catch (err) {
       setDeleteModal({ open: false, id: null, name: "" });
-      showToast(
-        err.response?.data?.message || "Failed to delete category.",
-        "error"
-      );
+      showToast(err.response?.data?.message || "Failed to delete category.", "error");
     } finally {
       setDeleteLoading(false);
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const filteredCategories = categories.filter(cat => 
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const handleFavorite = async (cat) => {
+    try {
+      if (cat.is_favorite) {
+        await removeFavorite(cat.favorite_id);
+        showToast("Removed from favorites");
+      } else {
+        await addFavorite({ target_type: 'category', target_id: cat.id });
+        showToast("Added to favorites");
+      }
+      fetchCategories();
+    } catch (err) {
+      showToast("Action failed", "error");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Toast */}
+    <div className="space-y-12 pb-20">
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
 
-      {/* Page Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Manage quiz categories and organize content by topic.
-            </p>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+        <div className="space-y-4">
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-violet-50 text-violet-600 text-[10px] font-black uppercase tracking-widest border border-violet-100">
+              <Grid2X2 size={14} />
+              {isAdmin ? "Global Taxonomy Management" : "Taxonomy Manager"}
+           </div>
+           <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none uppercase">
+             System <span className="text-violet-600">Categories.</span>
+           </h1>
+           <p className="text-slate-500 font-medium max-w-lg">
+             Managing global classification system for all quizzes and communities across the platform.
+           </p>
+        </div>
+        
+        <button 
+          onClick={handleOpenCreate}
+          className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-violet-600 transition-all shadow-xl active:scale-95 group"
+        >
+          <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
+            <Plus size={16} />
           </div>
-          <button
-            onClick={handleOpenCreate}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition shadow-sm"
-          >
-            <span className="text-base leading-none">+</span>
-            Create Category
-          </button>
+          New Category
+        </button>
+      </div>
+
+      {/* Grid Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+         <StatItem icon={<Hash size={24} />} label="Total Classes" value={categories.length} color="violet" />
+         <StatItem icon={<Layout size={24} />} label="Active Filters" value={filteredCategories.length} color="blue" />
+         <StatItem icon={<User size={24} />} label="Permissions" value={isAdmin ? "Full Access" : "Maker"} color="emerald" />
+      </div>
+
+      {/* Search & List */}
+      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
+           <div className="relative flex-1 max-w-md group w-full">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-600 transition-colors" size={20} />
+              <input 
+                type="text" 
+                placeholder="Search categories..." 
+                className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-violet-200 transition-all text-xs font-black uppercase tracking-widest"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+           </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-slate-50/50 text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] border-b border-slate-50">
+                <th className="px-10 py-6">Domain</th>
+                <th className="px-10 py-6">Description</th>
+                <th className="px-10 py-6">Creator</th>
+                <th className="px-10 py-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {loading ? (
+                [1,2,3].map(i => (
+                  <tr key={i} className="animate-pulse"><td colSpan="4" className="px-10 py-8"><div className="h-4 bg-slate-100 rounded w-full"></div></td></tr>
+                ))
+              ) : filteredCategories.length > 0 ? (
+                filteredCategories.map((cat) => {
+                  const canManage = cat.user_id === user?.id || isAdmin;
+                  const isGlobal = cat.user?.role?.name === "admin" || !cat.user;
+                  const isMine = cat.user_id === user?.id;
+                  
+                  return (
+                    <tr key={cat.id} className="hover:bg-slate-50/30 transition-all group">
+                      <td className="px-10 py-8">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-2xl ${cat.color || 'bg-violet-600 shadow-violet-600/20'} flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:rotate-6 transition-transform`}>
+                             {cat.name?.[0]?.toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{cat.name}</p>
+                              {isMine && (
+                                <span className="text-[8px] font-black bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded uppercase tracking-tighter">Own</span>
+                              )}
+                            </div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mt-1">
+                               <Calendar size={10} /> {new Date(cat.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-10 py-8 max-w-xs">
+                         <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                            {cat.description || "No description provided for this category domain."}
+                         </p>
+                      </td>
+                      <td className="px-10 py-8">
+                         <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2 text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                               <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+                                  <User size={12} />
+                                </div>
+                                {isMine ? "You" : (cat.user?.name || "System Admin")}
+                            </div>
+                            {isGlobal && (
+                               <span className="w-fit text-[7px] font-black bg-blue-50 text-blue-500 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-widest">Global Taxonomy</span>
+                            )}
+                         </div>
+                      </td>
+                      <td className="px-10 py-8 text-right">
+                          <div className="flex items-center justify-end gap-3">
+                             <button 
+                               onClick={() => handleFavorite(cat)}
+                               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-inner ${cat.is_favorite ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-300 hover:text-rose-500'}`}
+                             >
+                               <Heart size={18} fill={cat.is_favorite ? "currentColor" : "none"} />
+                             </button>
+                             
+                           {canManage ? (
+                             <>
+                               <button 
+                                 onClick={() => handleOpenEdit(cat)}
+                                 className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-all shadow-inner"
+                               >
+                                 <Settings size={18} />
+                               </button>
+                               <button 
+                                 onClick={() => handleDeleteClick(cat)}
+                                 className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-all shadow-inner"
+                               >
+                                 <Trash2 size={18} />
+                               </button>
+                             </>
+                           ) : (
+                             <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">Protected</span>
+                           )}
+                           <button className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 flex items-center justify-center transition-all">
+                              <ChevronRight size={18} />
+                           </button>
+                         </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr><td colSpan="4" className="px-10 py-20 text-center text-slate-300 font-black uppercase tracking-widest text-[10px]">No categories discovered</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Stats Card */}
-        <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl border border-gray-200 px-5 py-4 flex items-center gap-4">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-lg">
-              📂
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Categories</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {loading ? "—" : categories.length}
-              </p>
-            </div>
-          </div>
-        </div>
+      <CategoryFormModal isOpen={formModalOpen} onClose={() => setFormModalOpen(false)} onSuccess={handleFormSuccess} editData={editData} />
+      <ConfirmDeleteModal isOpen={deleteModal.open} categoryName={deleteModal.name} onConfirm={handleDeleteConfirm} onCancel={() => setDeleteModal({ open: false, id: null, name: "" })} loading={deleteLoading} />
+    </div>
+  );
+}
 
-        {/* Table Card */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-          {/* Fetch Error */}
-          {fetchError && (
-            <div className="px-6 py-4 bg-red-50 border-b border-red-200 text-red-600 text-sm">
-              ⚠ {fetchError}
-            </div>
-          )}
-
-          {/* Loading Skeleton */}
-          {loading ? (
-            <div className="p-6 space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="animate-pulse flex gap-4 items-center">
-                  <div className="h-4 bg-gray-200 rounded w-1/4" />
-                  <div className="h-4 bg-gray-200 rounded w-1/3" />
-                  <div className="h-4 bg-gray-200 rounded w-1/6" />
-                  <div className="h-4 bg-gray-200 rounded w-1/6" />
-                  <div className="h-4 bg-gray-200 rounded w-16 ml-auto" />
-                </div>
-              ))}
-            </div>
-          ) : categories.length === 0 ? (
-            /* Empty State */
-            <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-              <div className="text-5xl mb-4">📭</div>
-              <h3 className="text-gray-700 font-semibold text-lg mb-1">
-                No categories yet
-              </h3>
-              <p className="text-gray-400 text-sm mb-5">
-                Get started by creating your first category.
-              </p>
-              <button
-                onClick={handleOpenCreate}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
-              >
-                + Create Category
-              </button>
-            </div>
-          ) : (
-            /* Table */
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50">
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      #
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Category Name
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Description
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Created By
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Created Date
-                    </th>
-                    <th className="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                    {categories.map((cat, idx) => {
-                      const canManage = cat.user_id === user?.id || isAdmin;
-
-                      return (
-                        <tr
-                          key={cat.id}
-                          className="hover:bg-gray-50 transition-colors"
-                        >
-                          <td className="px-6 py-4 text-gray-400 font-medium">
-                            {idx + 1}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg ${cat.color || 'bg-blue-100'} ${cat.color ? 'text-white' : 'text-blue-600'} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
-                                {cat.name?.[0]?.toUpperCase() || "?"}
-                              </div>
-                              <span className="font-semibold text-gray-900">
-                                {cat.name}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-gray-500 max-w-xs">
-                            <span className="line-clamp-2">
-                              {cat.description || (
-                                <span className="italic text-gray-300">
-                                  No description
-                                </span>
-                              )}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center gap-1.5 text-gray-600">
-                              <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs flex items-center justify-center font-semibold leading-none">
-                                {(cat.user?.name || "A")?.[0]?.toUpperCase()}
-                              </span>
-                              {cat.user?.name || "Admin"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-gray-500">
-                            {formatDate(cat.created_at || cat.createdAt)}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-center gap-2">
-                              {canManage ? (
-                                <>
-                                  {/* Edit */}
-                                  <button
-                                    onClick={() => handleOpenEdit(cat)}
-                                    title="Edit"
-                                    className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.415.586H8v-2.414A2 2 0 018.586 12z" />
-                                    </svg>
-                                  </button>
-                                  {/* Delete */}
-                                  <button
-                                    onClick={() => handleDeleteClick(cat)}
-                                    title="Delete"
-                                    className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a1 1 0 00-1-1H9a1 1 0 00-1 1H5m14 0H5" />
-                                    </svg>
-                                  </button>
-                                </>
-                              ) : (
-                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-3 py-1 bg-slate-50 rounded-lg">
-                                  Read Only
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+function StatItem({ icon, label, value, color }) {
+  const colors = {
+    violet: "bg-violet-50 text-violet-600 border-violet-100",
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+  };
+  return (
+    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all duration-500">
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
+        {icon}
       </div>
-
-      {/* Modals */}
-      <CategoryFormModal
-        isOpen={formModalOpen}
-        onClose={() => setFormModalOpen(false)}
-        onSuccess={handleFormSuccess}
-        editData={editData}
-      />
-
-      <ConfirmDeleteModal
-        isOpen={deleteModal.open}
-        categoryName={deleteModal.name}
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeleteModal({ open: false, id: null, name: "" })}
-        loading={deleteLoading}
-      />
+      <div>
+        <p className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">{value}</p>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+      </div>
     </div>
   );
 }

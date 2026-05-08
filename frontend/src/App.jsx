@@ -9,12 +9,15 @@ import CategoryList from "./page/category/CategoryList";
 import Communities from "./page/community/Communities";
 import Leaderboard from "./page/Leaderboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ManualReviewList from "./page/dashboard/ManualReviewList";
+import ManualReviewDetail from "./page/dashboard/ManualReviewDetail";
 import Quizzes from "./page/quiz/Quizzes";
 import QuizDetail from "./page/quiz/QuizDetail";
 import QuizAttempt from "./page/quiz/QuizAttempt";
 import QuizReview from "./page/quiz/QuizReview";
 import QuestionList from "./page/quiz/QuestionList";
 import MyQuizzes from "./page/quiz/MyQuizzes";
+import MyActivity from "./page/quiz/MyActivity";
 import MainLayout from "./components/layouts/MainLayout";
 import Sidebar from "./components/layouts/SideBar";
 import CommunityDetail from "./page/community/CommunityDetail";
@@ -24,8 +27,11 @@ import AdminQuizzesPage from "./page/admin/AdminQuizzesPage";
 import AdminCommunitiesPage from "./page/admin/AdminCommunitiesPage";
 import MakerRequestsPage from "./page/admin/MakerRequestsPage";
 import FavoritesPage from "./page/FavoritesPage";
+import ProfilePage from "./page/ProfilePage";
+import MyCommunities from "./page/community/MyCommunities";
 
 import { AuthProvider } from "./context/AuthContext";
+
 
 function App() {
   return (
@@ -36,11 +42,17 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/social-login" element={<SocialLogin />} />
 
+          {/* GLOBAL PAGES - Always uses MainLayout (Header/Footer) */}
           <Route element={<MainLayout />}>               
             <Route path="/" element={<Home />} />
+            <Route path="/communities" element={<Communities />} />
+            <Route path="/communities/:id" element={<CommunityDetail />} />
+            <Route path="/quizzes" element={<Quizzes />} />
+            <Route path="/quizzes/:quizId" element={<QuizDetail />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Route>
 
-          {/* All Protected Routes under the Unified Sidebar Layout */}
+          {/* PROTECTED DASHBOARD - Always uses Sidebar */}
           <Route element={<Sidebar />}>
             <Route
               path="/dashboard"
@@ -51,7 +63,6 @@ function App() {
               }
             />
             
-            {/* Admin Management Routes - Now using the same Sidebar */}
             <Route
               path="/admin/users"
               element={
@@ -88,7 +99,7 @@ function App() {
             <Route
               path="/categories"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={["admin", "quiz_maker"]}>
                   <CategoryList />
                 </ProtectedRoute>
               }
@@ -101,22 +112,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/communities"
-              element={
-                <ProtectedRoute>
-                  <Communities />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/communities/:id"
-              element={
-                <ProtectedRoute>
-                  <CommunityDetail />
-                </ProtectedRoute>
-              }
-            />
+            
             <Route
               path="/communities/:id/requests"
               element={
@@ -126,18 +122,45 @@ function App() {
               }
             />
             <Route
-              path="/quizzes"
+              path="/communities/my"
               element={
-                <ProtectedRoute>
-                  <Quizzes />
+                <ProtectedRoute roles={["quiz_maker", "admin", "user"]}>
+                  <MyCommunities />
                 </ProtectedRoute>
               }
             />
+
+            {/* Manual Reviews */}
+            <Route
+              path="/reviews/pending"
+              element={
+                <ProtectedRoute roles={["quiz_maker", "admin"]}>
+                  <ManualReviewList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reviews/:attemptId"
+              element={
+                <ProtectedRoute roles={["quiz_maker", "admin"]}>
+                  <ManualReviewDetail />
+                </ProtectedRoute>
+              }
+            />
+            
             <Route
               path="/quizzes/my"
               element={
                 <ProtectedRoute roles={["quiz_maker"]}>
                   <MyQuizzes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quizzes/my-activity"
+              element={
+                <ProtectedRoute roles={["user"]}>
+                  <MyActivity />
                 </ProtectedRoute>
               }
             />
@@ -149,14 +172,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/quizzes/:quizId"
-              element={
-                <ProtectedRoute>
-                  <QuizDetail />
-                </ProtectedRoute>
-              }
-            />
+            
             <Route
               path="/attempts/:attemptId"
               element={
@@ -174,10 +190,10 @@ function App() {
               }
             />
             <Route
-              path="/leaderboard"
+              path="/profile"
               element={
                 <ProtectedRoute>
-                  <Leaderboard />
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />

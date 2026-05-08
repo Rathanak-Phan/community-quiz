@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles, HelpCircle } from "lucide-react";
 import { getQuizzes, deleteQuiz } from "../../services/quizService";
+import { addFavorite, removeFavorite } from "../../services/favoriteService";
 import Toast from "../../components/ui/Toast";
 import QuizFormModal from "../../components/quiz/QuizFormModal";
 import { STORAGE_URL } from "../../config/api";
@@ -64,8 +65,32 @@ export default function Quizzes() {
         quiz.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleFavorite = async (e, quiz) => {
+        e.stopPropagation();
+        if (isGuest) {
+            navigate("/");
+            return;
+        }
+
+        try {
+            if (quiz.is_favorite) {
+                // Find the favorite ID from the quiz object (needs backend to provide it)
+                // or use a toggle endpoint if available.
+                // Assuming backend provides favorite_id if favorited.
+                await removeFavorite(quiz.favorite_id);
+                setToast({ show: true, message: "Removed from favorites", type: "success" });
+            } else {
+                await addFavorite({ target_type: 'quiz', target_id: quiz.id });
+                setToast({ show: true, message: "Added to favorites", type: "success" });
+            }
+            loadQuizzes();
+        } catch (error) {
+            setToast({ show: true, message: "Action failed", type: "error" });
+        }
+    };
+
     return (
-        <div className="space-y-12">
+        <div className="max-w-7xl mx-auto px-6 space-y-12 pb-20">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                 <div className="space-y-2">
@@ -124,6 +149,7 @@ export default function Quizzes() {
                             userId={user?.id}
                             onEdit={handleEdit}
                             onDelete={handleDelete}
+                            onFavorite={handleFavorite}
                             onClick={() => navigate(`/quizzes/${quiz.id}`)}
                         />
                     ))}
@@ -158,14 +184,14 @@ export default function Quizzes() {
     );
 }
 
-function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
+function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onFavorite, onClick }) {
     const navigate = useNavigate();
     const isGuest = !localStorage.getItem("token");
     
     const handleAction = (e) => {
         if (isGuest) {
             e.stopPropagation();
-            window.location.href = '/login';
+            window.location.href = '/';
             return;
         }
         onClick();
@@ -198,8 +224,8 @@ function QuizCard({ quiz, isAdmin, userId, onEdit, onDelete, onClick }) {
 
                 <div className="absolute top-6 right-6 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     <button 
-                        onClick={(e) => { e.stopPropagation(); }}
-                        className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-lg"
+                        onClick={(e) => onFavorite(e, quiz)}
+                        className={`w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center transition shadow-lg ${quiz.is_favorite ? 'text-rose-500' : 'text-slate-400 hover:text-rose-500'}`}
                     >
                         <Heart size={16} fill={quiz.is_favorite ? "currentColor" : "none"} />
                     </button>

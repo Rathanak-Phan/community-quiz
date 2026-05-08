@@ -169,6 +169,13 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
                     <span className="px-4 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[10px] font-black text-slate-900 uppercase tracking-widest shadow-lg border border-white/50">
                         {quiz.category?.name || "General"}
                     </span>
+                    <span className={`px-4 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-black uppercase tracking-widest shadow-lg border ${
+                        quiz.status === 'draft' 
+                        ? 'bg-amber-500/90 text-white border-amber-400' 
+                        : 'bg-emerald-500/90 text-white border-emerald-400'
+                    }`}>
+                        {quiz.status || 'published'}
+                    </span>
                 </div>
 
                 <div className="absolute top-6 right-6 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">

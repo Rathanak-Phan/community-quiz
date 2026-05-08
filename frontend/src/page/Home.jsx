@@ -12,7 +12,7 @@ import Toast from '../components/ui/Toast';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user, token: authToken, refreshProfile } = useAuth();
+  const { user, token: authToken, refreshProfile, isAdmin } = useAuth();
   const [makerStatus, setMakerStatus] = useState(user?.maker_status || 'none');
   const [applying, setApplying] = useState(false);
   const [communities, setCommunities] = useState([]);
@@ -52,6 +52,10 @@ const LandingPage = () => {
   }, []);
 
   const handleApply = async () => {
+    if (!authToken) {
+      navigate("/");
+      return;
+    }
     setApplying(true);
     try {
       await api.post('/maker-request');
@@ -97,13 +101,14 @@ const LandingPage = () => {
                 <button 
                     onClick={() => {
                       if (!authToken) navigate("/register");
-                      else if (user?.role?.name === 'admin') navigate("/admin/dashboard");
+                      else if (isAdmin) navigate("/admin/dashboard");
                       else if (user?.role?.name === 'quiz_maker') navigate("/dashboard");
-                      else navigate("/"); 
+                      else navigate("/quizzes"); 
                     }}
-                    className="w-full sm:w-auto px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold text-base hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95"
+                    className="w-full sm:w-auto px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold text-base hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-3"
                 >
-                    Browse Quizzes
+                    {!authToken ? "Get Started" : (isAdmin || user?.role?.name === 'quiz_maker') ? "Go to Dashboard" : "Browse Quizzes"}
+                    <ArrowRight size={18} />
                 </button>
                 <button 
                     onClick={() => navigate("/communities")}

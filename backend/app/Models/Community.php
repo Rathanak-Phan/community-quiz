@@ -14,6 +14,19 @@ class Community extends Model
         'created_by'
     ];
 
+    protected $appends = ['is_member'];
+
+    public function getIsMemberAttribute()
+    {
+        $user = auth('sanctum')->user();
+        if (!$user) return false;
+
+        return $this->members()
+            ->where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->exists();
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

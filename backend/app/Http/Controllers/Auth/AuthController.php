@@ -211,6 +211,93 @@ class AuthController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/profile",
+     *     tags={"Auth"},
+     *     summary="Update the authenticated user profile",
+     *     operationId="authUpdateProfile",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", maxLength=255),
+     *             @OA\Property(property="headline", type="string", maxLength=255, nullable=true),
+     *             @OA\Property(property="bio", type="string", nullable=true),
+     *             @OA\Property(property="location", type="string", maxLength=255, nullable=true),
+     *             @OA\Property(property="website", type="string", format="url", nullable=true),
+     *             @OA\Property(property="github_handle", type="string", nullable=true),
+     *             @OA\Property(property="twitter_handle", type="string", nullable=true),
+     *             @OA\Property(property="linkedin_handle", type="string", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Profile updated successfully"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'headline' => 'nullable|string|max:255',
+            'bio' => 'nullable|string',
+            'location' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'github_handle' => 'nullable|string|max:255',
+            'twitter_handle' => 'nullable|string|max:255',
+            'linkedin_handle' => 'nullable|string|max:255',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user->load('role')
+        ]);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/profile/avatar",
+     *     tags={"Auth"},
+     *     summary="Update the authenticated user avatar",
+     *     operationId="authUpdateAvatar",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="avatar", type="string", format="binary")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Avatar updated successfully")
+     * )
+     */
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = $request->user();
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $path; // Store relative path
+            $user->save();
+        }
+
+        return response()->json([
+            'message' => 'Avatar updated successfully',
+            'avatar' => $user->avatar
+        ]);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/test",
      *     tags={"Auth"},

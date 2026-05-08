@@ -41,11 +41,17 @@ class DashboardController extends Controller
         // 1. Total categories created by user
         $totalCategories = Category::where('user_id', $userId)->count();
 
-        // 2. Total quizzes created
-        $totalQuizzes = Quiz::where('created_by', $userId)->count();
+        // 2. Total quizzes created (published)
+        $totalQuizzes = Quiz::where('created_by', $userId)->where('status', 'published')->count();
+
+        // 2b. Total draft quizzes
+        $draftQuizzesCount = Quiz::where('created_by', $userId)->where('status', 'draft')->count();
 
         // 3. Total communities owned
         $totalCommunities = Community::where('created_by', $userId)->count();
+
+        // 3b. Total communities joined (as member)
+        $joinedCommunitiesCount = \App\Models\CommunityMember::where('user_id', $userId)->count();
 
         // Get IDs of quizzes created by user for nested counts
         $quizIds = Quiz::where('created_by', $userId)->pluck('id');
@@ -63,9 +69,41 @@ class DashboardController extends Controller
         return response()->json([
             'total_categories' => $totalCategories,
             'total_quizzes' => $totalQuizzes,
+            'draft_quizzes_count' => $draftQuizzesCount,
             'total_communities' => $totalCommunities,
+            'joined_communities_count' => $joinedCommunitiesCount,
             'total_submissions' => $totalSubmissions,
             'pending_reviews' => $pendingReviews,
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/dashboard/student",
+     *     tags={"Dashboard"},
+     *     summary="Get statistics for Student dashboard",
+     *     operationId="dashboardStudent",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dashboard statistics retrieved successfully"
+     *     )
+     * )
+     */
+    public function studentDashboard()
+    {
+        $userId = auth()->id();
+
+        $totalJoinedCommunities = \App\Models\CommunityMember::where('user_id', $userId)->count();
+        $totalAttempts = QuizAttempt::where('user_id', $userId)->count();
+        $totalCompleted = QuizAttempt::where('user_id', $userId)->where('status', 'submitted')->count();
+        $totalFavorites = \App\Models\Favorite::where('user_id', $userId)->count();
+
+        return response()->json([
+            'joined_communities_count' => $totalJoinedCommunities,
+            'total_attempts' => $totalAttempts,
+            'total_completed' => $totalCompleted,
+            'total_favorites' => $totalFavorites,
         ]);
     }
     /**

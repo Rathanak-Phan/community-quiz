@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReview } from "../../services/attemptService";
+import { getReview, getShareResult } from "../../services/attemptService";
 import { CheckCircle2, XCircle, Clock, Trophy, ArrowRight, Home, LayoutDashboard, MessageSquare, AlertCircle, Sparkles } from "lucide-react";
 import Toast from "../../components/ui/Toast";
 
@@ -102,6 +102,44 @@ export default function QuizReview() {
                     Try Another Quiz <Sparkles size={18} />
                 </button>
             </div>
+
+            {/* Social Sharing */}
+            {isGraded && review.submission_id && (
+                <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="space-y-1">
+                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Share Your Victory</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Celebrate your score with your professional network</p>
+                    </div>
+                    <div className="flex gap-4">
+                        <button 
+                            onClick={async () => {
+                                try {
+                                    const res = await getShareResult(review.submission_id);
+                                    window.open(res.data.facebook_url, '_blank');
+                                } catch (e) {
+                                    setToast({ show: true, message: "Share failed", type: "error" });
+                                }
+                            }}
+                            className="bg-[#1877F2] text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2"
+                        >
+                            Facebook
+                        </button>
+                        <button 
+                            onClick={async () => {
+                                try {
+                                    const res = await getShareResult(review.submission_id);
+                                    window.open(res.data.linkedin_url, '_blank');
+                                } catch (e) {
+                                    setToast({ show: true, message: "Share failed", type: "error" });
+                                }
+                            }}
+                            className="bg-[#0A66C2] text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2"
+                        >
+                            LinkedIn
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Breakdown */}
             <div className="space-y-8">

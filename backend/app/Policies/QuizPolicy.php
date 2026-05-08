@@ -20,16 +20,28 @@ class QuizPolicy
         return in_array($user->role->name, ['admin', 'quiz_maker']);
     }
 
-    public function view(User $user, Quiz $quiz)
+    public function view(?User $user, Quiz $quiz)
     {
         $community = $quiz->community;
+
+        if (!$community) {
+            return true;
+        }
 
         // PUBLIC → allow all users
         if ($community->visibility === 'public') {
             return true;
         }
 
-        // PRIVATE → must be approved member
+        // PRIVATE → must be logged in AND an approved member (or admin)
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $community->members()
             ->where('user_id', $user->id)
             ->where('status', 'approved')

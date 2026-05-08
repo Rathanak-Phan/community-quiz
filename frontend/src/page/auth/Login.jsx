@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { 
   GraduationCap, 
@@ -18,6 +18,10 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const redirectPath = queryParams.get("redirect");
+
   const { login, token, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +31,10 @@ function Login() {
 
   useEffect(() => {
     if (token && !authLoading) {
+      if (redirectPath) {
+        navigate(redirectPath);
+        return;
+      }
       const userDataStr = localStorage.getItem("user");
       if (userDataStr) {
         const userData = JSON.parse(userDataStr);
@@ -42,7 +50,7 @@ function Login() {
         }
       }
     }
-  }, [token, authLoading, navigate]);
+  }, [token, authLoading, navigate, redirectPath]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -51,6 +59,10 @@ function Login() {
 
     try {
       const res = await login({ email, password });
+      if (redirectPath) {
+        navigate(redirectPath);
+        return;
+      }
       const userData = res.data.user;
       const isAdmin = (userData.role?.name === "admin" || Number(userData.role_id) === 1);
       

@@ -10,8 +10,11 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
+import { useAuth } from '../../context/AuthContext';
+
 const AdminSidebar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Overview', path: '/admin/dashboard' },
@@ -60,8 +63,7 @@ const AdminSidebar = () => {
       <div className="p-6 mt-auto border-t border-slate-50">
         <button 
           onClick={() => {
-            localStorage.removeItem('token');
-            navigate('/login');
+            logout();
           }}
           className="w-full flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all duration-300 font-black uppercase text-[10px] tracking-widest"
         >

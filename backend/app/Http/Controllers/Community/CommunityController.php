@@ -56,6 +56,22 @@ class CommunityController extends Controller
         return response()->json($communities);
     }
 
+    public function myCommunities()
+    {
+        $user = auth()->user();
+        
+        $communities = Community::whereHas('members', function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->where('status', 'approved');
+            })
+            ->withCount('members')
+            ->get();
+
+        return response()->json([
+            'data' => $communities
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -307,6 +323,35 @@ class CommunityController extends Controller
 
         return response()->json([
             'message' => $result['message']
+        ]);
+    }
+
+    public function leave(Community $community)
+    {
+        $user = auth()->user();
+
+        $member = CommunityMember::where([
+            'community_id' => $community->id,
+            'user_id' => $user->id
+        ])->first();
+
+        if (!$member) {
+            return response()->json([
+                'message' => 'Not a member of this community'
+            ], 400);
+        }
+
+        // Owner cannot leave, they must delete the community
+        if ($community->created_by === $user->id) {
+            return response()->json([
+                'message' => 'As the owner, you cannot leave. You must delete the community instead.'
+            ], 400);
+        }
+
+        $member->delete();
+
+        return response()->json([
+            'message' => 'Left community successfully'
         ]);
     }
 
