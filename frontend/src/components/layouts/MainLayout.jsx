@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User, Menu, X } from "lucide-react";
+import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
+import { getSettings } from "../../services/settingService";
+import { STORAGE_URL } from "../../config/api";
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -10,22 +12,34 @@ export default function MainLayout() {
   const { user, token, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    getSettings().then(res => setSettings(res.data)).catch(() => {});
+  }, []);
+
   const isActive = (path) => location.pathname === path;
+  const isHomePage = location.pathname === "/";
 
   return (
     <div className="min-h-screen bg-white">
       {/* Premium Glassmorphism Header */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:scale-110 transition duration-300">
-              < BookOpen size={20} />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 flex items-center justify-center group-hover:scale-110 transition duration-300">
+               <img 
+                 src={settings.logo ? `${STORAGE_URL}/${settings.logo}` : "/logo.png"} 
+                 alt={settings.site_name || "Quizly"} 
+                 className="w-full h-full object-contain drop-shadow-md"
+               />
             </div>
-            <span className="font-black text-xl tracking-tight text-slate-900 uppercase">Quizly</span>
+            <span className="font-black text-2xl tracking-tighter text-slate-900">{settings.site_name || "Quizly"}</span>
           </Link>
 
-          {/* Navigation */}
+          {/* Navigation - Desktop */}
           <div className="hidden md:flex items-center gap-10">
             <NavLink to="/" active={isActive("/")}>Home</NavLink>
             <NavLink to="/leaderboard" active={isActive("/leaderboard")}>Leaderboard</NavLink>
@@ -33,14 +47,14 @@ export default function MainLayout() {
             {token && <NavLink to="/dashboard" active={isActive("/dashboard")}>Dashboard</NavLink>}
           </div>
 
-          {/* Auth Actions */}
-          <div className="flex items-center gap-4">
+          {/* Auth Actions & Mobile Toggle */}
+          <div className="flex items-center gap-2 md:gap-4">
             {token ? (
-              <div className="relative flex items-center gap-4">
+              <div className="relative flex items-center gap-2 md:gap-4">
                 {user?.role?.name === 'user' && (
                   <button 
                     onClick={() => navigate("/dashboard")}
-                    className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                    className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                   >
                     <UserPlus size={16} />
                     Become a Creator
@@ -91,7 +105,7 @@ export default function MainLayout() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-3">
                 <Link 
                   to="/login" 
                   className="text-sm font-bold text-slate-600 hover:text-slate-900 px-4 py-2 flex items-center gap-2 transition"
@@ -108,8 +122,50 @@ export default function MainLayout() {
                 </Link>
               </div>
             )}
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl transition"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Drawer */}
+        {isMobileMenuOpen && (
+          <>
+            <div className="fixed inset-0 top-20 bg-slate-900/20 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>
+            <div className="fixed top-20 left-0 right-0 bg-white border-b border-slate-100 z-50 md:hidden animate-in slide-in-from-top duration-300">
+              <div className="p-6 flex flex-col gap-4">
+                <MobileNavLink to="/" active={isActive("/")} onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>
+                <MobileNavLink to="/leaderboard" active={isActive("/leaderboard")} onClick={() => setIsMobileMenuOpen(false)}>Leaderboard</MobileNavLink>
+                <MobileNavLink to="/communities" active={isActive("/communities")} onClick={() => setIsMobileMenuOpen(false)}>Communities</MobileNavLink>
+                {token && <MobileNavLink to="/dashboard" active={isActive("/dashboard")} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</MobileNavLink>}
+                
+                {!token && (
+                  <div className="flex flex-col gap-3 pt-4 border-t border-slate-50">
+                    <Link 
+                      to="/login" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full py-4 text-center font-black text-slate-900 uppercase tracking-widest text-xs"
+                    >
+                      Login
+                    </Link>
+                    <Link 
+                      to="/register" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full py-4 bg-blue-600 text-white rounded-2xl text-center font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-600/20"
+                    >
+                      Join Now
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </nav>
 
       {/* Main Content Padding for Fixed Header */}
@@ -118,14 +174,18 @@ export default function MainLayout() {
       </main>
 
       {/* Modern Footer */}
-      <footer className="bg-slate-50 border-t border-slate-100 py-16">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+      <footer className="bg-slate-50 border-t border-slate-100 py-10 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-12">
           <div className="space-y-6">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-                <BookOpen size={16} />
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
+                 <img 
+                   src={settings.logo ? `${STORAGE_URL}/${settings.logo}` : "/logo.png"} 
+                   alt={settings.site_name || "Quizly"} 
+                   className="w-full h-full object-contain"
+                 />
               </div>
-              <span className="font-black text-lg tracking-tight text-slate-900 uppercase">Quizly</span>
+              <span className="font-black text-xl tracking-tighter text-slate-900 uppercase">{settings.site_name || "Quizly"}</span>
             </Link>
             <p className="text-sm text-slate-500 leading-relaxed">
               Empowering communities through shared knowledge and competitive learning. Join thousands of creators worldwide.
@@ -170,12 +230,16 @@ export default function MainLayout() {
   );
 }
 
-function NavLink({ to, children, active }) {
+function NavLink({ to, children, active, dark }) {
   return (
     <Link 
       to={to} 
       className={`text-sm font-bold uppercase tracking-widest transition-all duration-300 relative py-2 ${
-        active ? 'text-blue-600' : 'text-slate-400 hover:text-slate-900'
+        active 
+          ? 'text-blue-600' 
+          : dark 
+            ? 'text-slate-400 hover:text-white' 
+            : 'text-slate-400 hover:text-slate-900'
       }`}
     >
       {children}
@@ -203,5 +267,21 @@ function DropdownItem({ icon, label, onClick, danger = false, highlight = false 
       </span>
       {label}
     </button>
+  );
+}
+
+function MobileNavLink({ to, children, active, onClick }) {
+  return (
+    <Link 
+      to={to} 
+      onClick={onClick}
+      className={`px-4 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+        active 
+          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
+          : 'text-slate-500 hover:bg-slate-50'
+      }`}
+    >
+      {children}
+    </Link>
   );
 }

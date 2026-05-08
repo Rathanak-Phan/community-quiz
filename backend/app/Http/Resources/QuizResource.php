@@ -41,6 +41,8 @@ class QuizResource extends JsonResource
             'time_limit' => $this->time_limit,
             'attempts_count' => $this->attempts()->count(),
             'questions_count' => $this->questions()->count(),
+            'is_favorite' => auth('sanctum')->check() && $this->favorites()->where('user_id', auth('sanctum')->id())->exists(),
+            'favorite_id' => auth('sanctum')->check() ? $this->favorites()->where('user_id', auth('sanctum')->id())->first()?->id : null,
             'questions' => QuestionResource::collection($this->whenLoaded('questions')),
         ];
     }

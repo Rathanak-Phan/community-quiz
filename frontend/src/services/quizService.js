@@ -39,3 +39,6 @@ export const deleteQuiz = (id) =>
 
 export const getQuizLeaderboard = (quizId) =>
   apiClient.get(`/quizzes/${quizId}/leaderboard`);
+
+export const getTrendingQuizzes = () =>
+  apiClient.get("/quizzes/trending");

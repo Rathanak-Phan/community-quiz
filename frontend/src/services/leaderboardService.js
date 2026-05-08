@@ -37,3 +37,10 @@ export const getTrendingQuizzes = (limit = 5) =>
  */
 export const getQuizLeaderboard = (quizId, params = {}) =>
   apiClient.get(`/quizzes/${quizId}/leaderboard`, { params });
+
+/**
+ * Get system-wide statistics
+ * @returns {Promise<AxiosResponse>} Response containing system stats
+ */
+export const getSystemStats = () =>
+  apiClient.get("/system-stats");
