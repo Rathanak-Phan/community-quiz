@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import UserAvatar from "../ui/UserAvatar";
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -36,12 +37,22 @@ export default function MainLayout() {
           <div className="flex items-center gap-4">
             {token ? (
               <div className="relative flex items-center gap-4">
+                {user?.role?.name === 'user' && (
+                  <button 
+                    onClick={() => navigate("/dashboard")}
+                    className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                  >
+                    <UserPlus size={16} />
+                    Become a Creator
+                  </button>
+                )}
+                
                 <div className="relative">
                   <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-black text-sm shadow-inner hover:bg-blue-100 transition cursor-pointer"
+                    className="p-0 border-none bg-transparent cursor-pointer"
                   >
-                    {user?.name?.charAt(0) || "U"}
+                    <UserAvatar user={user} size="sm" className="shadow-blue-600/20" />
                   </button>
                   
                   {isDropdownOpen && (
@@ -54,6 +65,7 @@ export default function MainLayout() {
                         </div>
                         
                         <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/dashboard"); }} icon={<LayoutDashboard size={16}/>} label="Dashboard" />
+                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/profile"); }} icon={<User size={16}/>} label="My Profile" />
                         <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/favorites"); }} icon={<Heart size={16}/>} label="My Favorites" />
                         
                         {user?.role?.name === 'user' && (

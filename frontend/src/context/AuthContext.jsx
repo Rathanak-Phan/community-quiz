@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { login as loginApi, register as registerApi, getProfile } from "../services/authService";
 import apiClient from "../config/api";
 
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -55,8 +57,12 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    // Optionally call backend logout
+    
+    // Call backend logout
     apiClient.post("/logout").catch(() => {});
+    
+    // Redirect to home
+    navigate("/");
   };
 
   const refreshProfile = async () => {

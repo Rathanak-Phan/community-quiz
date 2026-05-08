@@ -14,7 +14,7 @@ function ProtectedRoute({ children, roles = [] }) {
   }
 
   if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (roles.length > 0) {

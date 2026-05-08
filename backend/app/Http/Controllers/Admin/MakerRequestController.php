@@ -57,4 +57,13 @@ class MakerRequestController extends Controller
             'user' => $user->load('role')
         ]);
     }
+
+    /**
+     * Get the count of pending maker requests.
+     */
+    public function count(): JsonResponse
+    {
+        $count = User::where('maker_status', 'pending')->count();
+        return response()->json(['count' => $count]);
+    }
 }

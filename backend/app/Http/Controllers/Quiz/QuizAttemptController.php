@@ -59,6 +59,7 @@ class QuizAttemptController extends Controller
      */
     public function start(StartQuizAttemptRequest $request, Quiz $quiz)
     {
+        $this->authorize('view', $quiz);
         $user = auth()->user();
 
         // Prevent multiple active attempts
@@ -205,7 +206,12 @@ class QuizAttemptController extends Controller
      */
     public function show(QuizAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        $user = auth()->user();
+
+        // Authorization: Owner, Admin, or Quiz Creator
+        if ($attempt->user_id != $user->id && 
+            !$user->isAdmin() && 
+            $attempt->quiz->created_by != $user->id) {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
@@ -315,7 +321,12 @@ class QuizAttemptController extends Controller
      */
     public function review(QuizAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        $user = auth()->user();
+
+        // Authorization: Owner, Admin, or Quiz Creator
+        if ($attempt->user_id != $user->id && 
+            !$user->isAdmin() && 
+            $attempt->quiz->created_by != $user->id) {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 

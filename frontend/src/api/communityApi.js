@@ -9,7 +9,9 @@ export {
   updateCommunity,
   deleteCommunity,
   joinCommunity,
+  leaveCommunity,
   approveMember,
   rejectMember,
   getPendingMembers,
+  getMyCommunities,
 } from "../services/communityService";

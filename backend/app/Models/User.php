@@ -26,7 +26,15 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'maker_status'
+        'maker_status',
+        'avatar',
+        'headline',
+        'bio',
+        'location',
+        'website',
+        'github_handle',
+        'twitter_handle',
+        'linkedin_handle'
     ];
 
     protected $hidden = [
@@ -50,7 +58,7 @@ class User extends Authenticatable
 
     public function communities()
     {
-        return $this->belongsToMany(Community::class, 'community_user')
+        return $this->belongsToMany(Community::class, 'community_members')
             ->withPivot('status', 'role')
             ->withTimestamps();
     }
@@ -81,5 +89,12 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->role?->name === 'user';
+    }
+
+    public function getAvatarAttribute($value)
+    {
+        if (!$value) return null;
+        if (str_starts_with($value, 'http')) return $value;
+        return url('storage/' . $value);
     }
 }

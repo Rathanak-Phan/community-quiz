@@ -21,7 +21,10 @@ class QuizModerationController extends Controller
      */
     public function index()
     {
-        $quizzes = Quiz::with(['category', 'community', 'creator'])->latest()->get();
+        $quizzes = Quiz::with(['category', 'community', 'creator'])
+            ->withCount('favorites')
+            ->latest()
+            ->get();
         return QuizResource::collection($quizzes);
     }
 
@@ -46,6 +49,29 @@ class QuizModerationController extends Controller
 
         return response()->json([
             'message' => 'Quiz deleted successfully for moderation'
+        ]);
+    }
+
+    /**
+     * Get users who favorited a specific quiz.
+     */
+    public function quizFavorites($id)
+    {
+        $quiz = Quiz::findOrFail($id);
+        $favorites = $quiz->favorites()->with('user')->latest()->get();
+        
+        return response()->json([
+            'data' => $favorites->map(function($f) {
+                return [
+                    'id' => $f->id,
+                    'user' => [
+                        'id' => $f->user->id,
+                        'name' => $f->user->name,
+                        'email' => $f->user->email,
+                    ],
+                    'created_at' => $f->created_at
+                ];
+            })
         ]);
     }
 }

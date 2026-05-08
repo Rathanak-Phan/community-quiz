@@ -48,7 +48,7 @@ function Register() {
       await register(formData);
       setSuccess(true);
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Check your details.");
@@ -65,7 +65,7 @@ function Register() {
            </div>
            <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight mb-2">Account Created!</h2>
            <p className="text-slate-500 font-medium text-sm">Welcome to our global community.</p>
-           <p className="text-slate-400 text-xs mt-6">Redirecting to login...</p>
+           <p className="text-slate-400 text-xs mt-6">Redirecting to homepage...</p>
         </div>
       </div>
     );

@@ -15,7 +15,8 @@ class Quiz extends Model
         'category_id',
         'community_id',
         'cover_image',
-        'created_by'
+        'created_by',
+        'status'
     ];
 
     public function community()

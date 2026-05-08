@@ -12,7 +12,10 @@ import {
   Filter,
   BarChart3,
   Calendar,
-  MoreVertical
+  MoreVertical,
+  Heart,
+  X,
+  Mail
 } from 'lucide-react';
 import adminService from '../../services/adminService';
 import Toast from '../../components/ui/Toast';
@@ -23,6 +26,10 @@ const AdminQuizzesPage = () => {
   const [toast, setToast] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
+  const [showFansModal, setShowFansModal] = useState(false);
 
   useEffect(() => {
     fetchQuizzes();
@@ -37,6 +44,21 @@ const AdminQuizzesPage = () => {
       setToast({ message: 'Failed to fetch quizzes', type: 'error' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFavorites = async (quiz) => {
+    setSelectedQuiz(quiz);
+    setLoadingFavorites(true);
+    setShowFansModal(true);
+    try {
+      const res = await adminService.getQuizFavorites(quiz.id);
+      setFavorites(res.data.data || res.data);
+    } catch (err) {
+      setToast({ message: 'Failed to fetch fans', type: 'error' });
+      setShowFansModal(false);
+    } finally {
+      setLoadingFavorites(false);
     }
   };
 
@@ -154,6 +176,7 @@ const AdminQuizzesPage = () => {
               <tr className="bg-slate-50/50">
                 <th className="px-10 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">General Info</th>
                 <th className="px-10 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Category & Community</th>
+                <th className="px-10 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Engagement</th>
                 <th className="px-10 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Creation Date</th>
                 <th className="px-10 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
               </tr>
@@ -221,6 +244,17 @@ const AdminQuizzesPage = () => {
                     </div>
                   </td>
                   <td className="px-10 py-8 text-center">
+                    <button 
+                      onClick={() => fetchFavorites(quiz)}
+                      className="group/btn inline-flex flex-col items-center gap-1 px-5 py-3 bg-rose-50 border border-rose-100 rounded-2xl hover:bg-rose-600 transition-all shadow-sm"
+                    >
+                      <Heart size={14} className={`text-rose-500 group-hover/btn:text-white group-hover/btn:scale-110 transition-all ${quiz.favorites_count > 0 ? 'fill-rose-500 group-hover/btn:fill-white' : ''}`} />
+                      <span className="text-xs font-black text-rose-600 group-hover/btn:text-white uppercase tracking-widest">
+                        {quiz.favorites_count || 0} Fans
+                      </span>
+                    </button>
+                  </td>
+                  <td className="px-10 py-8 text-center">
                     <div className="inline-flex flex-col items-center gap-1 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
                       <Calendar size={14} className="text-slate-400" />
                       <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
@@ -248,6 +282,15 @@ const AdminQuizzesPage = () => {
         </div>
       </div>
 
+      {showFansModal && (
+        <FavoritesModal 
+          quiz={selectedQuiz} 
+          favorites={favorites} 
+          loading={loadingFavorites} 
+          onClose={() => setShowFansModal(false)} 
+        />
+      )}
+
       {toast && (
         <Toast
           message={toast.message}
@@ -255,6 +298,91 @@ const AdminQuizzesPage = () => {
           onClose={() => setToast(null)}
         />
       )}
+    </div>
+  );
+};
+
+const FavoritesModal = ({ quiz, favorites, loading, onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-300">
+        {/* Header */}
+        <div className="p-10 pb-6 border-b border-slate-50 relative">
+          <button 
+            onClick={onClose}
+            className="absolute top-8 right-8 p-3 hover:bg-slate-50 rounded-2xl text-slate-400 transition-colors"
+          >
+            <X size={20} />
+          </button>
+          
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-rose-50 text-rose-600 rounded-2xl">
+              <Heart size={24} fill="currentColor" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none uppercase">Quiz Fans</h3>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">Users who favorited "{quiz?.title}"</p>
+            </div>
+          </div>
+        </div>
+
+        {/* List Content */}
+        <div className="max-h-[400px] overflow-y-auto p-10 pt-6">
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-20 bg-slate-50 rounded-3xl animate-pulse"></div>
+              ))}
+            </div>
+          ) : favorites.length > 0 ? (
+            <div className="grid gap-4">
+              {favorites.map((fav) => (
+                <div key={fav.id} className="flex items-center justify-between p-5 bg-slate-50/50 hover:bg-white border border-slate-100 rounded-3xl transition-all group hover:shadow-xl hover:shadow-slate-200/40">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-lg">
+                      {fav.user?.name[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{fav.user?.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Mail size={10} className="text-slate-400" />
+                        <p className="text-[10px] font-bold text-slate-400 lowercase">{fav.user?.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Favorited On</p>
+                    <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
+                      {new Date(fav.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center flex flex-col items-center gap-4">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+                <Heart size={32} />
+              </div>
+              <div>
+                <p className="text-lg font-black text-slate-900 uppercase">No Fans Yet</p>
+                <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">This quiz hasn't been favorited by anyone</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-10 pt-0">
+          <button 
+            onClick={onClose}
+            className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]"
+          >
+            Close View
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

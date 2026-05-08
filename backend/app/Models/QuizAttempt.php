@@ -42,4 +42,9 @@ class QuizAttempt extends Model
     {
         return $this->hasMany(AttemptAnswer::class);
     }
+
+    public function submission()
+    {
+        return $this->hasOne(Submission::class);
+    }
 }

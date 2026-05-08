@@ -1,27 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   Search,
-  ChevronDown,
   Trophy,
-  TrendingUp,
-  Clock,
   Star,
-  Award,
-  Crown,
   Medal,
-  ChevronRight
+  Crown,
+  ChevronDown
 } from "lucide-react";
-import Toast from "../components/ui/Toast";
 import { getLeaderboard, getTopUsers, getTrendingQuizzes } from "../api/leaderboardApi";
 
 export default function Leaderboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterBy, setFilterBy] = useState("All Time");
-  const [sortBy, setSortBy] = useState("Score");
   const [leaderboard, setLeaderboard] = useState([]);
   const [topUsers, setTopUsers] = useState([]);
   const [trendingQuizzes, setTrendingQuizzes] = useState([]);
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +31,6 @@ export default function Leaderboard() {
         setTrendingQuizzes(trendsRes.data?.data ?? trendsRes.data ?? []);
       } catch (error) {
         console.error("Failed to load leaderboard:", error);
-        setToast({ show: true, message: "Failed to load dynamic rankings", type: "error" });
       } finally {
         setLoading(false);
       }
@@ -59,181 +50,206 @@ export default function Leaderboard() {
       );
     }
 
-    return [...filtered].sort((a, b) => (sortBy === "Score" ? b.score - a.score : a.rank - b.rank));
-  }, [searchQuery, sortBy, leaderboard]);
+    return [...filtered].sort((a, b) => b.score - a.score);
+  }, [searchQuery, leaderboard]);
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-slate-50/50 pb-20">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Header */}
-        <div className="mb-16 text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-black uppercase tracking-widest">
-            <Trophy size={14} />
-            Global Rankings
+        {/* Hero Section */}
+        <div className="relative mb-20 text-center space-y-6">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-full bg-blue-600/5 blur-[120px] rounded-full -z-10"></div>
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white shadow-xl shadow-blue-600/5 border border-slate-100 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em]">
+            <Trophy size={14} className="animate-bounce" />
+            Elite Performers
           </div>
-          <h1 className="text-5xl font-black text-slate-900 tracking-tight">Hall of <span className="text-blue-600 underline decoration-blue-200 underline-offset-8">Fame</span></h1>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto">Celebrating the top achievers and most dedicated learners in our global community.</p>
+          <h1 className="text-6xl font-black text-slate-900 tracking-tight leading-none uppercase">
+            Hall of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Fame.</span>
+          </h1>
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">
+            Celebrating the legends of our community. Compete with the best and earn your spot among the masters.
+          </p>
         </div>
 
         {/* Podium Section */}
-        <div className="mb-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end max-w-5xl mx-auto">
-            {topUsers.slice(0, 3).sort((a, b) => {
-              if (a.rank === 1) return 0;
-              if (b.rank === 1) return 1;
-              return a.rank - b.rank;
-            }).map((user, idx) => {
-              const isFirst = user.rank === 1;
-              const isSecond = user.rank === 2;
-              const isThird = user.rank === 3;
-              
-              return (
-                <div 
-                  key={user.id} 
-                  className={`relative flex flex-col items-center group transition-all duration-500 ${isFirst ? 'order-2 z-10 scale-110' : isSecond ? 'order-1' : 'order-3'}`}
-                >
-                  {isFirst && <Crown className="text-yellow-400 absolute -top-10 animate-bounce w-10 h-10" fill="currentColor" />}
-                  
-                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-xl relative mb-5 border-4 border-white ${
-                    isFirst ? 'bg-gradient-to-tr from-yellow-400 to-amber-600' : 
-                    isSecond ? 'bg-gradient-to-tr from-slate-300 to-slate-500' : 
-                    'bg-gradient-to-tr from-orange-400 to-orange-700'
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end max-w-5xl mx-auto mb-24 px-4">
+          {topUsers.slice(0, 3).sort((a, b) => {
+            if (a.rank === 1) return 0;
+            if (a.rank === 2) return -1;
+            return 1;
+          }).map((user) => {
+            const isFirst = user.rank === 1;
+            const isSecond = user.rank === 2;
+            const isThird = user.rank === 3;
+            
+            return (
+              <div 
+                key={user.id} 
+                className={`relative flex flex-col items-center group ${isFirst ? 'order-2 z-10' : isSecond ? 'order-1' : 'order-3'}`}
+              >
+                {isFirst && (
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-yellow-400/20 blur-3xl rounded-full"></div>
+                )}
+                
+                <div className={`relative mb-8 transition-all duration-500 group-hover:-translate-y-4`}>
+                  <div className={`w-28 h-28 rounded-[2rem] flex items-center justify-center text-white font-black text-3xl shadow-2xl relative border-4 border-white ${
+                    isFirst ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 scale-125' : 
+                    isSecond ? 'bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600 scale-110' : 
+                    'bg-gradient-to-br from-orange-300 via-orange-500 to-orange-700'
                   }`}>
                     {user.avatar || user.name?.[0]}
-                    <div className="absolute -bottom-1.5 -right-1.5 bg-white rounded-lg w-8 h-8 flex items-center justify-center text-slate-900 shadow-lg border border-slate-100">
-                      <span className="text-xs font-bold">#{user.rank}</span>
-                    </div>
+                    {isFirst && <Crown className="absolute -top-8 -right-4 w-10 h-10 text-yellow-400 drop-shadow-xl rotate-12" fill="currentColor" />}
                   </div>
-                  
-                  <div className="text-center mb-4">
-                    <h3 className="font-bold text-slate-900 uppercase tracking-tight text-base">{user.name}</h3>
-                    <p className="text-blue-600 font-bold text-xs tracking-widest">{user.score.toLocaleString()} PTS</p>
-                  </div>
-
-                  <div className={`w-full rounded-t-3xl bg-white border border-slate-100 shadow-lg flex flex-col items-center justify-center p-5 ${isFirst ? 'h-48' : isSecond ? 'h-36' : 'h-28'}`}>
-                     <div className={`w-10 h-1 bg-slate-100 rounded-full mb-3 ${isFirst ? 'bg-yellow-400' : ''}`}></div>
-                     <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Global Rank</span>
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white rounded-full shadow-lg border border-slate-50 whitespace-nowrap">
+                    <span className="text-xs font-black text-slate-900">RANK #{user.rank}</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+                
+                <div className="text-center mb-8">
+                  <h3 className="font-black text-slate-900 uppercase tracking-tight text-lg mb-1">{user.name}</h3>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-600/5 text-blue-600 text-[10px] font-black uppercase tracking-widest">
+                    <Star size={10} fill="currentColor" /> {user.score.toLocaleString()} Points
+                  </div>
+                </div>
+
+                <div className={`w-full rounded-t-[3rem] bg-white border border-slate-100 shadow-2xl flex flex-col items-center justify-start p-8 transition-all duration-500 group-hover:shadow-blue-600/5 ${isFirst ? 'h-64' : isSecond ? 'h-48' : 'h-36'}`}>
+                   <div className={`w-12 h-1.5 rounded-full mb-4 ${isFirst ? 'bg-yellow-400' : isSecond ? 'bg-slate-300' : 'bg-orange-400'}`}></div>
+                   <div className="flex flex-col items-center gap-2">
+                     <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Achievements</p>
+                     <div className="flex -space-x-1">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="w-6 h-6 rounded-full bg-slate-50 border border-white flex items-center justify-center">
+                            <Medal size={12} className={isFirst ? 'text-yellow-500' : 'text-slate-300'} />
+                          </div>
+                        ))}
+                     </div>
+                   </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Main List Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
-          <div className="lg:col-span-3 space-y-8">
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-               <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row items-center gap-5">
-                  <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-                    <input 
-                      type="text" 
-                      placeholder="Search performers..." 
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/30 transition-all text-sm font-medium"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-4">
-                    <Dropdown label={filterBy} options={["All Time", "This Month", "This Week"]} />
-                    <Dropdown label={sortBy} options={["Score", "Recent"]} />
-                  </div>
-               </div>
+        {/* Global List & Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+          <div className="lg:col-span-3">
+             <div className="bg-white rounded-[3rem] border border-slate-50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.04)] overflow-hidden">
+                <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
+                   <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                         <Search size={20} />
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder="Search legends..." 
+                        className="bg-transparent border-none outline-none font-bold text-slate-900 placeholder:text-slate-300 w-full md:w-64"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                   </div>
+                   <div className="flex gap-3">
+                     <TabFilter label="Global" active />
+                     <TabFilter label="Monthly" />
+                   </div>
+                </div>
 
-               <div className="overflow-x-auto">
-                 <table className="w-full">
-                    <thead>
-                      <tr className="bg-slate-50/50 border-b border-slate-100">
-                        <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Rank</th>
-                        <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Learner</th>
-                        <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Featured Quiz</th>
-                        <th className="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Achievement</th>
-                        <th className="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Recency</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {filteredLeaderboard.map((entry) => (
-                        <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors group">
-                          <td className="px-8 py-6">
-                            <span className={`font-black text-sm ${entry.rank <= 3 ? 'text-blue-600' : 'text-slate-300'}`}>#{entry.rank}</span>
-                          </td>
-                          <td className="px-8 py-6">
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs border border-slate-200 group-hover:scale-110 transition-transform">
-                                {entry.is_anonymous ? "?" : (entry.avatar || entry.name?.[0])}
-                              </div>
-                              <span className="font-black text-slate-900 tracking-tight">{entry.is_anonymous ? "Anonymous Learner" : entry.name}</span>
-                            </div>
-                          </td>
-                          <td className="px-8 py-6">
-                            <span className="text-sm font-bold text-slate-500">{entry.quizName || "General Knowledge"}</span>
-                          </td>
-                          <td className="px-8 py-6 text-right">
-                             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-black tracking-tight">
-                                {entry.score.toLocaleString()} PTS
-                             </div>
-                          </td>
-                          <td className="px-8 py-6 text-right text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                            {entry.time || "Recently"}
-                          </td>
+                <div className="overflow-x-auto">
+                   <table className="w-full">
+                      <thead>
+                        <tr className="text-left bg-slate-50/50">
+                          <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rank</th>
+                          <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Learner</th>
+                          <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Score</th>
+                          <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Activity</th>
                         </tr>
-                      ))}
-                    </tbody>
-                 </table>
-               </div>
-            </div>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {filteredLeaderboard.map((entry) => (
+                          <tr key={entry.id} className="hover:bg-slate-50/30 transition-all group">
+                            <td className="px-10 py-8">
+                               <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs ${
+                                 entry.rank === 1 ? 'bg-yellow-400 text-white' : 
+                                 entry.rank === 2 ? 'bg-slate-300 text-white' :
+                                 entry.rank === 3 ? 'bg-orange-400 text-white' :
+                                 'text-slate-300'
+                               }`}>
+                                 {entry.rank}
+                               </div>
+                            </td>
+                            <td className="px-10 py-8">
+                               <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 font-black text-sm shadow-inner group-hover:scale-110 transition-transform uppercase">
+                                     {entry.avatar || entry.name?.[0]}
+                                  </div>
+                                  <div>
+                                     <p className="font-black text-slate-900 uppercase tracking-tight">{entry.name}</p>
+                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{entry.quizName || 'Universal Learner'}</p>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="px-10 py-8 text-right font-black text-slate-900">{entry.score.toLocaleString()}</td>
+                            <td className="px-10 py-8 text-right">
+                               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{entry.time || 'Today'}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                   </table>
+                </div>
+             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-8">
-             <div className="bg-slate-900 rounded-3xl p-7 text-white relative overflow-hidden shadow-xl">
-                <Medal size={100} className="absolute -bottom-8 -right-8 text-white opacity-10 rotate-12" />
-                <h3 className="text-lg font-bold mb-6 leading-tight">Trending <br/><span className="text-blue-400">Knowledge</span></h3>
-                <div className="space-y-5">
-                   {trendingQuizzes.map((quiz, idx) => (
-                     <div key={quiz.id} className="flex gap-3 group cursor-pointer">
-                        <div className="text-xl shrink-0 group-hover:scale-125 transition-transform">{quiz.icon}</div>
+          <aside className="lg:col-span-1 space-y-8">
+             <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 blur-3xl rounded-full"></div>
+                <h3 className="text-2xl font-black mb-8 leading-none uppercase">Trending<br/><span className="text-blue-500">Topics.</span></h3>
+                <div className="space-y-6">
+                   {trendingQuizzes.map((quiz) => (
+                     <div key={quiz.id} className="flex items-center gap-4 group cursor-pointer">
+                        <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-blue-600 transition-colors">{quiz.icon}</div>
                         <div>
-                           <p className="text-sm font-bold group-hover:text-blue-400 transition-colors line-clamp-1">{quiz.title}</p>
-                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{quiz.attempts.toLocaleString()} Attempts</p>
+                           <p className="font-bold text-sm group-hover:text-blue-400 transition-colors">{quiz.title}</p>
+                           <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{quiz.attempts?.toLocaleString() || 0} Attempts</p>
                         </div>
                      </div>
                    ))}
                 </div>
-                <button className="w-full mt-8 py-3.5 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">View Trends</button>
+                <button className="w-full mt-10 py-4 bg-white/10 hover:bg-white text-white hover:text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Explore All</button>
              </div>
 
-             <div className="bg-white rounded-3xl border border-slate-100 p-7 shadow-sm">
-                <h3 className="font-bold text-slate-900 uppercase tracking-tight mb-5 text-sm">Hall of Fame</h3>
-                <p className="text-xs text-slate-500 leading-relaxed mb-6">
-                  The leaderboard reset occurs every Monday at 00:00 UTC. Top 3 performers receive exclusive profile badges.
+             <div className="bg-white rounded-[2.5rem] border border-slate-100 p-10 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 -translate-y-12 translate-x-12 rounded-full transition-transform group-hover:scale-150"></div>
+                <h3 className="font-black text-slate-900 uppercase tracking-widest text-[10px] mb-6 text-left">Pro Tips</h3>
+                <p className="text-xs text-slate-500 leading-relaxed font-medium mb-8 text-left">
+                   Consistency is key. Earn <span className="text-blue-600 font-bold">Bonus Multipliers</span> by completing quizzes daily.
                 </p>
                 <div className="space-y-4">
-                   <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg bg-yellow-50 flex items-center justify-center text-yellow-600"><Star size={14} fill="currentColor" /></div>
-                      <span className="text-[10px] font-bold text-slate-700">Gold Badge for Rank #1</span>
-                   </div>
-                   <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400"><Award size={14} fill="currentColor" /></div>
-                      <span className="text-[10px] font-bold text-slate-700">Silver Badge for Rank #2</span>
-                   </div>
+                   <BadgeItem icon={<Medal size={14} className="text-yellow-500" />} text="Weekly Champion Badge" />
+                   <BadgeItem icon={<Medal size={14} className="text-blue-500" />} text="Rapid Fire Achievement" />
                 </div>
              </div>
-          </div>
+          </aside>
         </div>
       </div>
     </div>
   );
 }
 
-function Dropdown({ label, options }) {
+function TabFilter({ label, active }) {
   return (
-    <div className="relative group">
-      <button className="flex items-center gap-3 bg-white border border-slate-200 px-5 py-3 rounded-2xl text-xs font-black text-slate-700 uppercase tracking-widest hover:border-blue-600 transition-all">
-        {label}
-        <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />
-      </button>
+    <button className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+      active ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
+    }`}>
+      {label}
+    </button>
+  );
+}
+
+function BadgeItem({ icon, text }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center shadow-inner">{icon}</div>
+      <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">{text}</span>
     </div>
   );
 }

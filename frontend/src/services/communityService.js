@@ -38,11 +38,17 @@ export const deleteCommunity = (id) =>
 export const joinCommunity = (id) =>
   apiClient.post(`/communities/${id}/join`);
 
+export const leaveCommunity = (id) =>
+  apiClient.post(`/communities/${id}/leave`);
+
 export const approveMember = (memberId) =>
   apiClient.post(`/community-members/${memberId}/approve`);
 
 export const rejectMember = (memberId) =>
   apiClient.post(`/community-members/${memberId}/reject`);
+
+export const getMyCommunities = () =>
+  apiClient.get("/my-communities");
 
 export const getPendingMembers = (communityId) =>
   apiClient.get(`/communities/${communityId}/pending-members`);

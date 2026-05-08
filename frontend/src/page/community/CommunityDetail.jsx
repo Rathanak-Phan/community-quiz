@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Users, BookOpen, Clock, Play, ArrowLeft, 
-  Globe, Lock, ShieldCheck, TrendingUp, Sparkles, AlertCircle, Settings
+  Globe, Lock, ShieldCheck, TrendingUp, Sparkles, AlertCircle, Settings, Plus
 } from 'lucide-react';
 import apiClient, { STORAGE_URL } from '../../config/api';
 import Toast from '../../components/ui/Toast';
 import CommunityFormModal from '../../components/community/CommunityFormModal';
+import QuizFormModal from '../../components/quiz/QuizFormModal';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -16,9 +17,12 @@ const CommunityDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role?.name === "admin" || Number(user?.role_id) === 1;
+  const isQuizMaker = user?.role?.name === "quiz_maker" || Number(user?.role_id) === 2;
   const isGuest = !localStorage.getItem("token");
 
   const fetchData = useCallback(async () => {
@@ -46,7 +50,7 @@ const CommunityDetail = () => {
 
   const handleJoin = async () => {
     if (isGuest) {
-      navigate("/login");
+      navigate("/");
       return;
     }
     try {
@@ -60,7 +64,7 @@ const CommunityDetail = () => {
 
   const handleAttemptQuiz = (quizId) => {
     if (isGuest) {
-      setToast({ show: true, message: "Please login to attempt this quiz", type: "warning" });
+      navigate("/");
       return;
     }
     navigate(`/quizzes/${quizId}`);
@@ -90,7 +94,7 @@ const CommunityDetail = () => {
   );
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="max-w-7xl mx-auto px-6 space-y-12 pb-20">
       {/* Hero Header */}
       <div className="relative h-[300px] rounded-[3rem] overflow-hidden shadow-2xl">
         {community.cover_image ? (
@@ -166,10 +170,21 @@ const CommunityDetail = () => {
               <BookOpen size={28} className="text-blue-600" />
               Community Quizzes
            </h2>
-           <div className="bg-slate-50 p-2 rounded-2xl flex gap-2">
-              <TabBtn label="All" active />
-              <TabBtn label="Newest" />
-           </div>
+            <div className="flex items-center gap-4">
+               {community.is_member && (isAdmin || isQuizMaker) && (
+                  <button 
+                    onClick={() => setIsQuizModalOpen(true)}
+                    className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-blue-600 transition-all shadow-lg active:scale-95 group"
+                  >
+                    <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+                    Add Quiz
+                  </button>
+               )}
+               <div className="bg-slate-50 p-2 rounded-2xl flex gap-2">
+                  <TabBtn label="All" active />
+                  <TabBtn label="Newest" />
+               </div>
+            </div>
         </div>
 
         {quizzes.length > 0 ? (
@@ -225,6 +240,15 @@ const CommunityDetail = () => {
              <div className="space-y-1">
                 <h3 className="text-xl font-black text-slate-900 uppercase">Empty Library</h3>
                 <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No quizzes have been shared here yet.</p>
+                {community.is_member && (isAdmin || isQuizMaker) && (
+                  <button 
+                    onClick={() => setIsQuizModalOpen(true)}
+                    className="mt-6 text-blue-600 font-black uppercase text-[10px] tracking-widest hover:underline flex items-center gap-2 mx-auto"
+                  >
+                    <Plus size={12} />
+                    Be the first to add a quiz
+                  </button>
+                )}
              </div>
           </div>
         )}
@@ -239,6 +263,16 @@ const CommunityDetail = () => {
           fetchData();
         }}
         editData={community}
+      />
+
+      <QuizFormModal 
+        isOpen={isQuizModalOpen}
+        onClose={() => setIsQuizModalOpen(false)}
+        onSuccess={(msg) => {
+          setToast({ show: true, message: msg, type: "success" });
+          fetchData();
+        }}
+        preselectedCommunityId={id}
       />
 
       {toast.show && (

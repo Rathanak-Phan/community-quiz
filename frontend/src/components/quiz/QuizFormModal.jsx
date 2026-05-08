@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { createQuiz, updateQuiz } from "../../services/quizService";
 import { getCategories } from "../../api/categoryApi";
-import { getCommunities } from "../../api/communityApi";
+import { getMyCommunities } from "../../api/communityApi";
 import { STORAGE_URL } from "../../config/api";
 import { Cloud, X, Loader2 } from "lucide-react";
 
-export default function QuizFormModal({ isOpen, onClose, onSuccess, editData }) {
+export default function QuizFormModal({ isOpen, onClose, onSuccess, editData, preselectedCommunityId }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [communityId, setCommunityId] = useState("");
+  const [communityId, setCommunityId] = useState(preselectedCommunityId || "");
   const [coverImage, setCoverImage] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   
@@ -29,7 +29,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData }) 
       setTitle(editData?.title || "");
       setDescription(editData?.description || "");
       setCategoryId(editData?.category_id || "");
-      setCommunityId(editData?.community_id || "");
+      setCommunityId(editData?.community_id || preselectedCommunityId || "");
       setCoverImage(null);
       setCoverImagePreview(editData?.cover_image ? `${STORAGE_URL}/${editData.cover_image}` : null);
       setErrors({});
@@ -44,7 +44,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData }) 
     try {
       const [catRes, commRes] = await Promise.all([
         getCategories(),
-        getCommunities()
+        getMyCommunities()
       ]);
       setCategories(catRes.data?.data || catRes.data || []);
       setCommunities(commRes.data?.data || commRes.data || []);

@@ -42,7 +42,11 @@ class QuizController extends Controller
      */
     public function show(Quiz $quiz)
     {
-        $this->authorize('view', $quiz);
+        $user = auth('sanctum')->user();
+
+        if (\Illuminate\Support\Facades\Gate::forUser($user)->denies('view', $quiz)) {
+            abort(403);
+        }
 
         return new QuizResource($quiz->loadMissing(['community', 'category', 'creator']));
     }

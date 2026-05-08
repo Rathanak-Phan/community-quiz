@@ -25,3 +25,5 @@ export const gradeAnswer = (answerId, data) =>
 
 export const getPendingReviews = () =>
   apiClient.get("/reviews/pending");
+export const getShareResult = (submissionId) =>
+  apiClient.get(`/submissions/${submissionId}/share`);

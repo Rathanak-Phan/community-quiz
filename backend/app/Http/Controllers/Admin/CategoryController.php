@@ -24,7 +24,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         return response()->json(
-            Category::with('user')->get()
+            Category::with('user.role')->get()
         );
     }
 

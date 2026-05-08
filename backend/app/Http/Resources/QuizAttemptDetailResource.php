@@ -32,10 +32,12 @@ class QuizAttemptDetailResource extends JsonResource
             'grading_status' => $this->grading_status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'expires_at' => $this->started_at?->addMinutes(30), // Default 30 mins for now
+            'submission_id' => $this->submission?->id,
 
             // Relations
             'quiz' => new QuizResource($this->whenLoaded('quiz')),
-            'questions' => QuestionResource::collection($this->quiz->questions),
+            'questions' => $this->quiz ? QuestionResource::collection($this->quiz->questions) : [],
             'answers' => AttemptAnswerResource::collection($this->whenLoaded('answers')),
 
             // Resume helper

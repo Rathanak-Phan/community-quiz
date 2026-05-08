@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
+            "url": "http://127.0.0.1:8000/api",
             "description": "Local Server"
         }
     ],
@@ -198,6 +198,102 @@
                     },
                     "404": {
                         "description": "Category not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/communities": {
+            "get": {
+                "tags": [
+                    "Admin Moderation"
+                ],
+                "summary": "List all communities for moderation",
+                "operationId": "640d4ad3ea86302e71ee4e2cce42273d",
+                "responses": {
+                    "200": {
+                        "description": "List of all communities"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/communities/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin Moderation"
+                ],
+                "summary": "Delete a community for moderation",
+                "operationId": "914771a50759ab3fffc2d9ee47d43e23",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Community deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/quizzes": {
+            "get": {
+                "tags": [
+                    "Admin Moderation"
+                ],
+                "summary": "List all quizzes for moderation",
+                "operationId": "9c0e850f4ce7824bf2f5bf79dc5becfd",
+                "responses": {
+                    "200": {
+                        "description": "List of all quizzes"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/quizzes/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin Moderation"
+                ],
+                "summary": "Delete a quiz for moderation",
+                "operationId": "fff1ebae4dae879e753fc2ae0919563d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz deleted"
                     }
                 },
                 "security": [
@@ -1836,29 +1932,6 @@
             }
         },
         "/api/quizzes": {
-            "get": {
-                "tags": [
-                    "Quiz"
-                ],
-                "summary": "Get quizzes visible to the authenticated user",
-                "operationId": "quizIndex",
-                "responses": {
-                    "200": {
-                        "description": "Quizzes retrieved successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
             "post": {
                 "tags": [
                     "Quiz"
@@ -2543,6 +2616,10 @@
         {
             "name": "Category",
             "description": "Category"
+        },
+        {
+            "name": "Admin Moderation",
+            "description": "Admin Moderation"
         },
         {
             "name": "Admin User Management",

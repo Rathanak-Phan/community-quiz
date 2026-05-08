@@ -9,7 +9,7 @@ const AdminLayout = () => {
   if (loading) return null;
 
   if (!user || user.role?.name !== 'admin') {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (

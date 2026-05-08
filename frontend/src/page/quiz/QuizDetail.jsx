@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getQuizById } from "../../services/quizService";
 import { startAttempt } from "../../services/attemptService";
 import { Clock, Users, BookOpen, Play, ChevronLeft, Calendar, User, Layers, ShieldCheck, Sparkles, AlertCircle } from "lucide-react";
 import { STORAGE_URL } from "../../config/api";
+import { useAuth } from "../../context/AuthContext";
 import Toast from "../../components/ui/Toast";
 
 export default function QuizDetail() {
     const { quizId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [quiz, setQuiz] = useState(null);
     const [loading, setLoading] = useState(true);
     const [starting, setStarting] = useState(false);
+    const [mode, setMode] = useState("scored");
+    const [isAnonymous, setIsAnonymous] = useState(false);
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
     useEffect(() => {
@@ -28,10 +32,16 @@ export default function QuizDetail() {
         fetchQuiz();
     }, [quizId]);
 
+    const { token } = useAuth();
+
     const handleStart = async () => {
+        if (!token) {
+            navigate("/");
+            return;
+        }
         setStarting(true);
         try {
-            const res = await startAttempt(quizId);
+            const res = await startAttempt(quizId, { mode, is_anonymous: isAnonymous });
             const attemptId = res.data.data?.id || res.data.id;
             navigate(`/attempts/${attemptId}`);
         } catch (error) {
@@ -67,7 +77,7 @@ export default function QuizDetail() {
     );
 
     return (
-        <div className="space-y-12 pb-20">
+        <div className="max-w-7xl mx-auto px-6 space-y-12 pb-20">
             {/* Breadcrumb & Action */}
             <div className="flex items-center justify-between">
                 <button 
@@ -96,18 +106,45 @@ export default function QuizDetail() {
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
 
-                    <button 
-                        onClick={handleStart}
-                        disabled={starting}
-                        className="w-full py-4.5 bg-slate-900 text-white rounded-2xl font-bold text-base flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50"
-                    >
-                        {starting ? "PREPARING..." : "START QUIZ NOW"}
-                        <Play size={20} fill="currentColor" />
-                    </button>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-3 bg-slate-100 p-2 rounded-[2rem]">
+                            <button 
+                                onClick={() => setMode('scored')}
+                                className={`flex-1 py-3 px-6 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'scored' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Scored Mode
+                            </button>
+                            <button 
+                                onClick={() => setMode('practice')}
+                                className={`flex-1 py-3 px-6 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'practice' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                Try Out
+                            </button>
+                        </div>
+
+                        <button 
+                            onClick={handleStart}
+                            disabled={starting}
+                            className="w-full py-4.5 bg-slate-900 text-white rounded-2xl font-bold text-base flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50"
+                        >
+                            {starting ? "PREPARING..." : mode === 'practice' ? "START PRACTICE" : "START SCORED QUIZ"}
+                            <Play size={20} fill="currentColor" />
+                        </button>
+                    </div>
                     
-                    <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                        Auto-saves progress to cloud
-                    </p>
+                    <div className="flex items-center justify-center gap-6">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                            Auto-saves to cloud
+                        </p>
+                        <div className="w-1 h-1 rounded-full bg-slate-200"></div>
+                        <button 
+                            onClick={() => setIsAnonymous(!isAnonymous)}
+                            className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${isAnonymous ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            {isAnonymous ? <ShieldCheck size={14} /> : <Users size={14} />}
+                            {isAnonymous ? "Anonymous Entry" : "Public Entry"}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Right Column: Info */}
