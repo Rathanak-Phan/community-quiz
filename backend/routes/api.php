@@ -11,6 +11,7 @@ use App\Http\Controllers\Quiz\QuizAttemptController;
 use App\Http\Controllers\Quiz\ShareController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\User\FavoriteController;
+use App\Http\Controllers\SiteSettingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,8 +41,10 @@ Route::get('/communities/{community}', [CommunityController::class, 'show']);
 Route::get('/communities/{community}/quizzes', [CommunityController::class, 'quizzes']);
 Route::get('/quizzes', [QuizController::class, 'index']);
 Route::get('/quizzes/trending', [\App\Http\Controllers\LeaderboardController::class, 'trendingQuizzes']);
+Route::get('/system-stats', [\App\Http\Controllers\LeaderboardController::class, 'systemStats']);
 Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index']);
 Route::get('/leaderboard/top-users', [\App\Http\Controllers\LeaderboardController::class, 'topUsers']);
+Route::get('/settings', [SiteSettingController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------
@@ -162,5 +165,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/maker-requests/count', [\App\Http\Controllers\Admin\MakerRequestController::class, 'count']);
     Route::post('/maker-requests/{id}/approve', [\App\Http\Controllers\Admin\MakerRequestController::class, 'approve']);
     Route::post('/maker-requests/{id}/reject', [\App\Http\Controllers\Admin\MakerRequestController::class, 'reject']);
+    Route::post('/settings', [SiteSettingController::class, 'update']);
 });
 

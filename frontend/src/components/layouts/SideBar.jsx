@@ -5,9 +5,11 @@ import {
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
     Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
 import adminService from "../../services/adminService";
+import { getSettings } from "../../services/settingService";
+import { STORAGE_URL } from "../../config/api";
 
 const navItems = [
   // Shared Top Links
@@ -21,6 +23,7 @@ const navItems = [
   { to: "/admin/moderation/quizzes", label: "Moderate Quizzes", icon: AlertTriangle, roles: ["admin"] },
   { to: "/admin/moderation/communities", label: "Moderate Communities", icon: Users, roles: ["admin"] },
   { to: "/admin/maker-requests", label: "Maker Requests", icon: ShieldCheck, roles: ["admin"] },
+  { to: "/admin/settings", label: "Site Settings", icon: Settings, roles: ["admin"] },
   
   // Workspace / Quiz Maker Specific
   { to: "/quizzes/my", label: "My Quizzes", icon: BookOpen, roles: ["quiz_maker"] },
@@ -39,6 +42,11 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    getSettings().then(res => setSettings(res.data)).catch(() => {});
+  }, []);
 
   const isAdmin = user?.role?.name === "admin" || Number(user?.role_id) === 1;
   const isQuizMaker = user?.role?.name === "quiz_maker" || Number(user?.role_id) === 2;
@@ -87,10 +95,14 @@ export default function Sidebar() {
       `}>
         <div className="p-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
-              <BookOpen size={20} />
+            <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
+               <img 
+                 src={settings.logo ? `${STORAGE_URL}/${settings.logo}` : "/logo.png"} 
+                 alt={settings.site_name || "Quizly"} 
+                 className="w-full h-full object-contain drop-shadow-md"
+               />
             </div>
-            <span className="font-black text-xl tracking-tight text-slate-900 uppercase">Quizly</span>
+            <span className="font-black text-2xl tracking-tighter text-slate-900 uppercase">{settings.site_name || "Quizly"}</span>
           </div>
           <button 
             className="lg:hidden p-2 text-slate-400 hover:text-slate-600"

@@ -139,7 +139,7 @@ class QuizAttemptController extends Controller
      *     @OA\Response(response=200, description="Attempt submitted")
      * )
      */
-    public function submit(QuizAttempt $attempt)
+    public function submit(Request $request, QuizAttempt $attempt)
     {
         if ($attempt->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
@@ -149,18 +149,25 @@ class QuizAttemptController extends Controller
             return response()->json(['message' => 'This attempt is already submitted.'], Response::HTTP_FORBIDDEN);
         }
 
-        return DB::transaction(function () use ($attempt) {
+        return DB::transaction(function () use ($attempt, $request) {
             // 1. Calculate score
             $results = $this->scoringService->calculateScore($attempt);
 
             // 2. Update attempt status
-            $attempt->update([
+            $updateData = [
                 'status' => 'submitted',
                 'score' => $results['total_score'],
                 'max_score' => $results['max_score'],
                 'grading_status' => $results['grading_status'],
                 'completed_at' => now(),
-            ]);
+            ];
+
+            if ($request->has('is_anonymous')) {
+                $updateData['is_anonymous'] = $request->boolean('is_anonymous');
+                $attempt->is_anonymous = $updateData['is_anonymous']; // For immediate use below
+            }
+
+            $attempt->update($updateData);
 
             // 3. Create permanent Submission record if in scored mode
             if ($attempt->mode === 'scored') {
