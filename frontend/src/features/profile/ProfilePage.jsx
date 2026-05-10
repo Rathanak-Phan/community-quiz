@@ -7,9 +7,10 @@ import { useAuth } from "../../providers/AuthContext";
 import api, { STORAGE_URL } from "../../config/api";
 import Toast from "../../components/ui/Toast";
 import UserAvatar from "../../components/ui/UserAvatar";
+import RoleBadge from "../../components/ui/RoleBadge";
 
 export default function ProfilePage() {
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, role } = useAuth();
   
   const getAvatarUrl = (path) => {
     if (!path) return null;
@@ -148,6 +149,14 @@ export default function ProfilePage() {
 
               {/* Basic Info */}
               <div className="flex-1 space-y-6 w-full">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900">{user?.name}</h2>
+                    <p className="text-slate-500 text-sm">{user?.email}</p>
+                  </div>
+                  <RoleBadge role={role} className="self-start md:self-center" />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 text-left">
                     <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>

@@ -30,6 +30,7 @@ import FavoritesPage from "../features/favorites/FavoritesPage";
 import ProfilePage from "../features/profile/ProfilePage";
 import MyCommunities from "../features/communities/MyCommunities";
 import SettingsPage from "../page/admin/SettingsPage";
+import HelpCenter from "../page/HelpCenter";
 
 import { AuthProvider } from "../providers/AuthContext";
 
@@ -160,7 +161,7 @@ function App() {
             <Route
               path="/quizzes/my"
               element={
-                <ProtectedRoute roles={["quiz_maker"]}>
+                <ProtectedRoute roles={["quiz_maker", "admin"]}>
                   <MyQuizzes />
                 </ProtectedRoute>
               }
@@ -168,7 +169,7 @@ function App() {
             <Route
               path="/quizzes/my-activity"
               element={
-                <ProtectedRoute roles={["user"]}>
+                <ProtectedRoute roles={["user", "quiz_maker", "admin"]}>
                   <MyActivity />
                 </ProtectedRoute>
               }
@@ -203,6 +204,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/help"
+              element={
+                <ProtectedRoute>
+                  <HelpCenter />
                 </ProtectedRoute>
               }
             />

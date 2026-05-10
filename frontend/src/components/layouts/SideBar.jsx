@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
+import RoleBadge from "../ui/RoleBadge";
+import RoleNavigator from "../ui/RoleNavigator";
 import adminService from "../../services/adminService";
 import { getSettings } from "../../services/settingService";
 import { STORAGE_URL } from "../../config/api";
@@ -34,7 +36,6 @@ const navItems = [
 
   // User Settings/Profile
   { to: "/favorites", label: "Favorites", icon: Heart, roles: ["user", "quiz_maker", "admin"] },
-  { to: "/profile", label: "My Profile", icon: User, roles: ["admin", "quiz_maker", "user"] },
 ];
 
 export default function Sidebar() {
@@ -51,6 +52,40 @@ export default function Sidebar() {
   const isAdmin = user?.role?.name === "admin" || Number(user?.role_id) === 1;
   const isQuizMaker = user?.role?.name === "quiz_maker" || Number(user?.role_id) === 2;
   const roleName = isAdmin ? "admin" : isQuizMaker ? "quiz_maker" : "user";
+
+  const getTheme = () => {
+    switch (roleName) {
+      case "admin":
+        return {
+          primary: "blue-600",
+          accent: "rose-500",
+          bg: "bg-slate-50/50",
+          sidebar: "bg-white",
+          text: "text-slate-900",
+          gradient: "from-indigo-50/50 via-white to-rose-50/20"
+        };
+      case "quiz_maker":
+        return {
+          primary: "indigo-600",
+          accent: "violet-500",
+          bg: "bg-blue-50/30",
+          sidebar: "bg-white",
+          text: "text-slate-900",
+          gradient: "from-blue-50/50 via-white to-violet-50/20"
+        };
+      default:
+        return {
+          primary: "emerald-600",
+          accent: "teal-500",
+          bg: "bg-emerald-50/20",
+          sidebar: "bg-white",
+          text: "text-slate-900",
+          gradient: "from-emerald-50/50 via-white to-teal-50/20"
+        };
+    }
+  };
+
+  const theme = getTheme();
 
   useEffect(() => {
     if (isAdmin) {
@@ -76,10 +111,10 @@ export default function Sidebar() {
     logout();
   };
 
-  const roleLabel = roleName === "admin" ? "Admin" : roleName === "quiz_maker" ? "Creator" : "Student";
-
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-700">
+    <div className={`flex min-h-screen ${theme.bg} font-sans selection:bg-blue-100 selection:text-blue-700 transition-colors duration-700`}>
+      {/* Background decoration */}
+      <div className={`fixed inset-0 bg-gradient-to-br ${theme.gradient} pointer-events-none z-0`}></div>
       {/* Mobile Backdrop */}
       {isMobileMenuOpen && (
         <div 
@@ -93,7 +128,7 @@ export default function Sidebar() {
         fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
-        <div className="p-8 flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between border-b border-slate-50">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
                <img 
@@ -110,6 +145,17 @@ export default function Sidebar() {
           >
             <X size={24} />
           </button>
+        </div>
+
+        {/* User Profile in Sidebar (especially for mobile) */}
+        <div className="px-8 py-6 bg-slate-50/50 lg:hidden">
+          <div className="flex items-center gap-4">
+            <UserAvatar user={user} size="md" className="border-2 border-white shadow-sm" />
+            <div>
+              <p className="text-sm font-black text-slate-900">{user?.name || "Guest"}</p>
+              <RoleBadge role={roleName} className="mt-1" />
+            </div>
+          </div>
         </div>
 
         <div className="px-6 py-4 flex-1 overflow-y-auto">
@@ -145,7 +191,7 @@ export default function Sidebar() {
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Support</p>
           <nav className="space-y-1">
             <SideLink to="/profile" icon={<Settings size={18}/>} label="Settings" onClick={() => setIsMobileMenuOpen(false)} />
-            <SideLink to="/" icon={<HelpCircle size={18}/>} label="Help Center" onClick={() => setIsMobileMenuOpen(false)} />
+            <SideLink to="/help" icon={<HelpCircle size={18}/>} label="Help Center" onClick={() => setIsMobileMenuOpen(false)} />
           </nav>
           
           <div className="mt-8 pt-6 border-t border-slate-100">
@@ -161,7 +207,7 @@ export default function Sidebar() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
         {/* Top Header */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-4">
@@ -192,12 +238,7 @@ export default function Sidebar() {
             <div className="flex items-center gap-3 lg:gap-4 lg:pl-8 lg:border-l lg:border-slate-100">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-black text-slate-900 tracking-tight">{user?.name || "Anonymous"}</p>
-                <div className="flex items-center justify-end gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">
-                    {roleLabel}
-                  </p>
-                </div>
+                <RoleBadge role={roleName} />
               </div>
               <UserAvatar user={user} size="md" className="lg:w-12 lg:h-12 border-2 border-white" />
             </div>
@@ -210,6 +251,9 @@ export default function Sidebar() {
             <Outlet />
           </div>
         </main>
+        
+        {/* Role Navigator for Demo Context */}
+        <RoleNavigator role={roleName} />
       </div>
     </div>
   );

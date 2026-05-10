@@ -7,4 +7,5 @@ export {
   getLeaderboard,
   getTopUsers,
   getTrendingQuizzes,
+  getMyRank,
 } from "../services/leaderboardService";

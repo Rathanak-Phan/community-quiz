@@ -44,6 +44,7 @@ Route::get('/quizzes/trending', [\App\Http\Controllers\LeaderboardController::cl
 Route::get('/system-stats', [\App\Http\Controllers\LeaderboardController::class, 'systemStats']);
 Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index']);
 Route::get('/leaderboard/top-users', [\App\Http\Controllers\LeaderboardController::class, 'topUsers']);
+Route::get('/leaderboard/my-rank', [\App\Http\Controllers\LeaderboardController::class, 'myRank'])->middleware('auth:sanctum');
 Route::get('/settings', [SiteSettingController::class, 'index']);
 
 /*

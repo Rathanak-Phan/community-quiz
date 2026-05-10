@@ -7,19 +7,29 @@ import apiClient from "../config/api";
 
 /**
  * Get global leaderboard across all quizzes
+ * @param {string} period - week, month, or all
  * @param {Object} params - Optional query parameters
  * @returns {Promise<AxiosResponse>} Response containing leaderboard entries
  */
-export const getLeaderboard = (params = {}) =>
-  apiClient.get("/leaderboard", { params });
+export const getLeaderboard = (period = 'all', params = {}) =>
+  apiClient.get("/leaderboard", { params: { ...params, period } });
 
 /**
  * Get top users globally (all-time best)
  * @param {number} limit - Number of top users to fetch
+ * @param {string} period - week, month, or all
  * @returns {Promise<AxiosResponse>} Response containing top users
  */
-export const getTopUsers = (limit = 3) =>
-  apiClient.get("/leaderboard/top-users", { params: { limit } });
+export const getTopUsers = (limit = 3, period = 'all') =>
+  apiClient.get("/leaderboard/top-users", { params: { limit, period } });
+
+/**
+ * Get current user's rank
+ * @param {string} period - week, month, or all
+ * @returns {Promise<AxiosResponse>} Response containing user's rank
+ */
+export const getMyRank = (period = 'all') =>
+  apiClient.get("/leaderboard/my-rank", { params: { period } });
 
 /**
  * Get trending quizzes

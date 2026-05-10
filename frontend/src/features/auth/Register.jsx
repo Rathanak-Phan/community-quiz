@@ -11,13 +11,15 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   Loader2,
-  CheckCircle
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
+import { useEffect } from "react";
 
 import googleLogo from "../../assets/images/google_logo.png";
 import githubLogo from "../../assets/images/github_logo.png";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function Register() {
   const navigate = useNavigate();
@@ -32,6 +34,13 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    import('../../services/settingService').then(m => m.getSettings()).then(res => setSettings(res.data)).catch(() => {});
+  }, []);
+
+  const isRegistrationDisabled = settings.allow_registration === "0";
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -75,13 +84,13 @@ function Register() {
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 font-sans">
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -right-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60"></div>
-        <div className="absolute -bottom-[10%] -left-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60"></div>
+        <div className="absolute -top-[10%] -right-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>
+        <div className="absolute -bottom-[10%] -left-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-float" style={{ animationDelay: '-1.5s' }}></div>
       </div>
 
-      <div className="w-full max-w-[540px] relative z-10 py-8">
+      <div className="w-full max-w-[540px] relative z-10 py-8 animate-slide-up">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="flex items-center justify-center gap-3 mb-8 hover:scale-105 transition-transform cursor-pointer">
           <div className="w-10 h-10 bg-[#2563EB] rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
             <GraduationCap size={24} />
           </div>
@@ -89,7 +98,7 @@ function Register() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 md:p-12 text-center">
+        <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100 p-8 md:p-12 text-center">
           <h1 className="text-3xl font-bold text-[#0F172A] tracking-tight mb-2">Create your account</h1>
           <p className="text-slate-500 text-sm font-medium mb-8">Join the global community of learners and educators.</p>
 
@@ -171,10 +180,10 @@ function Register() {
                 <button
                   type="button"
                   onClick={() => setFormData({...formData, role: 'user'})}
-                  className={`relative px-4 py-4 rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 ${
+                  className={`relative px-4 py-4 rounded-xl border transition-all duration-300 flex flex-col items-center justify-center gap-1.5 active:scale-95 ${
                     formData.role === 'user' 
-                    ? 'border-blue-600 bg-white ring-2 ring-blue-600/5' 
-                    : 'border-slate-100 bg-[#F8FAFC] text-slate-400 grayscale'
+                    ? 'border-blue-600 bg-white ring-4 ring-blue-600/5' 
+                    : 'border-slate-100 bg-[#F8FAFC] text-slate-400 grayscale hover:grayscale-0 hover:border-blue-200'
                   }`}
                 >
                   <div className={`transition-colors ${formData.role === 'user' ? 'text-blue-600' : 'text-slate-400'}`}>
@@ -182,7 +191,7 @@ function Register() {
                   </div>
                   <span className={`text-[9px] font-bold uppercase tracking-widest ${formData.role === 'user' ? 'text-blue-900' : 'text-slate-400'}`}>Learner</span>
                   {formData.role === 'user' && (
-                    <div className="absolute top-1.5 right-1.5 text-blue-600">
+                    <div className="absolute top-1.5 right-1.5 text-blue-600 animate-fade-in">
                       <CheckCircle2 size={14} fill="currentColor" className="text-white" />
                     </div>
                   )}
@@ -191,10 +200,10 @@ function Register() {
                 <button
                   type="button"
                   onClick={() => setFormData({...formData, role: 'quiz_maker'})}
-                  className={`relative px-4 py-4 rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 ${
+                  className={`relative px-4 py-4 rounded-xl border transition-all duration-300 flex flex-col items-center justify-center gap-1.5 active:scale-95 ${
                     formData.role === 'quiz_maker' 
-                    ? 'border-blue-600 bg-white ring-2 ring-blue-600/5' 
-                    : 'border-slate-100 bg-[#F8FAFC] text-slate-400 grayscale'
+                    ? 'border-blue-600 bg-white ring-4 ring-blue-600/5' 
+                    : 'border-slate-100 bg-[#F8FAFC] text-slate-400 grayscale hover:grayscale-0 hover:border-blue-200'
                   }`}
                 >
                   <div className={`transition-colors ${formData.role === 'quiz_maker' ? 'text-blue-600' : 'text-slate-400'}`}>
@@ -202,7 +211,7 @@ function Register() {
                   </div>
                   <span className={`text-[9px] font-bold uppercase tracking-widest ${formData.role === 'quiz_maker' ? 'text-blue-900' : 'text-slate-400'}`}>Quiz Maker</span>
                   {formData.role === 'quiz_maker' && (
-                    <div className="absolute top-1.5 right-1.5 text-blue-600">
+                    <div className="absolute top-1.5 right-1.5 text-blue-600 animate-fade-in">
                       <CheckCircle2 size={14} fill="currentColor" className="text-white" />
                     </div>
                   )}
@@ -214,23 +223,32 @@ function Register() {
             <div className="flex items-start gap-3 pt-1">
               <input type="checkbox" className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" required />
               <p className="text-[10px] font-medium text-slate-500 leading-normal">
-                I agree to the <Link to="#" className="text-blue-600 font-bold hover:underline">Terms of Service</Link> and <Link to="#" className="text-blue-600 font-bold hover:underline">Privacy Policy</Link>.
+                I agree to the <Link to="/terms" className="text-blue-600 font-bold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-blue-600 font-bold hover:underline">Privacy Policy</Link>.
               </p>
             </div>
 
             {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#2563EB] text-white py-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-600/10 active:scale-[0.98] disabled:opacity-50 mt-4"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" size={18} />
-                  Creating Account...
-                </div>
-              ) : "Create Account"}
-            </button>
+            {isRegistrationDisabled ? (
+              <div className="bg-amber-50 border border-amber-100 p-8 rounded-3xl text-center space-y-4">
+                <AlertCircle className="mx-auto text-amber-500" size={32} />
+                <p className="text-sm font-bold text-amber-900 uppercase tracking-tight">Registrations are currently closed</p>
+                <p className="text-xs font-medium text-amber-600">Please check back later or contact support if you believe this is an error.</p>
+                <Link to="/help" className="inline-block text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Help Center</Link>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#2563EB] text-white py-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-blue-600/10 active:scale-[0.98] disabled:opacity-50 mt-4"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" size={18} />
+                    Creating Account...
+                  </div>
+                ) : "Create Account"}
+              </button>
+            )}
           </form>
 
           {/* Social Register */}
@@ -245,15 +263,15 @@ function Register() {
 
           <div className="grid grid-cols-2 gap-4">
             <button 
-              onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/google/redirect`)}
-              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155]"
+              onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/google/redirect?role=${formData.role}`)}
+              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155] active:scale-[0.98]"
             >
               <img src={googleLogo} alt="Google" className="w-5 h-5" />
               Google
             </button>
             <button 
-              onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/github/redirect`)}
-              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155]"
+              onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/github/redirect?role=${formData.role}`)}
+              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155] active:scale-[0.98]"
             >
               <img src={githubLogo} alt="GitHub" className="w-5 h-5" />
               GitHub
