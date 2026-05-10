@@ -49,6 +49,12 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (data) => {
     const res = await registerApi(data);
+    const { token: newToken, user: newUser } = res.data;
+    
+    setToken(newToken);
+    setUser(newUser);
+    localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(newUser));
     return res;
   };
 
@@ -90,6 +96,12 @@ export const AuthProvider = ({ children }) => {
     refreshProfile,
     isAdmin: user?.role?.name === "admin" || Number(user?.role_id) === 1, 
     isQuizMaker: user?.role?.name === "quiz_maker" || Number(user?.role_id) === 2,
+    isUser: user?.role?.name === "user" || Number(user?.role_id) === 3,
+    role: user?.role?.name || (Number(user?.role_id) === 1 ? "admin" : Number(user?.role_id) === 2 ? "quiz_maker" : "user"),
+    hasRole: (roles) => {
+      const currentRole = user?.role?.name || (Number(user?.role_id) === 1 ? "admin" : Number(user?.role_id) === 2 ? "quiz_maker" : "user");
+      return Array.isArray(roles) ? roles.includes(currentRole) : roles === currentRole;
+    }
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

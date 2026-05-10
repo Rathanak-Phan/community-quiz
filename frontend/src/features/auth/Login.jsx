@@ -14,7 +14,7 @@ import {
 import googleLogo from "../../assets/images/google_logo.png";
 import githubLogo from "../../assets/images/github_logo.png";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function Login() {
   const navigate = useNavigate();
@@ -82,14 +82,14 @@ function Login() {
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 font-sans">
       {/* Background blobs for depth */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60"></div>
-        <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60"></div>
+        <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>
+        <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-float" style={{ animationDelay: '-1.5s' }}></div>
       </div>
 
-      <div className="w-full max-w-[480px] relative z-10">
+      <div className="w-full max-w-[480px] relative z-10 animate-slide-up">
         {/* Logo Section */}
-        <div className="flex flex-col items-center mb-10">
-          <div className="w-14 h-14 bg-[#2563EB] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 mb-6">
+        <div className="flex flex-col items-center mb-10 group cursor-pointer">
+          <div className="w-14 h-14 bg-[#2563EB] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 mb-6 group-hover:scale-110 transition-transform duration-500">
             <GraduationCap size={32} />
           </div>
           <h1 className="text-3xl font-bold text-[#0F172A] tracking-tight mb-2">Quiz Community</h1>
@@ -99,7 +99,7 @@ function Login() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-10 md:p-12">
+        <div className="bg-white rounded-[2rem] shadow-premium border border-slate-100 p-10 md:p-12">
           {error && (
             <div className="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-xs font-semibold mb-6 animate-shake">
               {error}
@@ -186,14 +186,14 @@ function Login() {
           <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/google/redirect`)}
-              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155]"
+              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155] active:scale-[0.98]"
             >
               <img src={googleLogo} alt="Google" className="w-5 h-5" />
               Google
             </button>
             <button 
               onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/github/redirect`)}
-              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155]"
+              className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155] active:scale-[0.98]"
             >
               <img src={githubLogo} alt="GitHub" className="w-5 h-5" />
               GitHub

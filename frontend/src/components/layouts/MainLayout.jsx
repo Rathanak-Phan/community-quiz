@@ -204,7 +204,7 @@ export default function MainLayout() {
           <div>
             <h4 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs text-left">Resources</h4>
             <ul className="space-y-4 text-sm text-slate-500 text-left">
-              <li><Link to="#" className="hover:text-blue-600 transition">Help Center</Link></li>
+              <li><Link to="/help" className="hover:text-blue-600 transition">Help Center</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition">API Documentation</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition">Community Guidelines</Link></li>
             </ul>

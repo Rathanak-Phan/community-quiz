@@ -9,8 +9,12 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import api from '../../config/api';
+import ActionHub from '../dashboard/components/ActionHub';
+import { useAuth } from '../../providers/AuthContext';
+import RoleBadge from '../../components/ui/RoleBadge';
 
 const AdminDashboard = () => {
+  const { role } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,16 +50,20 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-12">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tight">System <span className="text-blue-600">Overview</span></h2>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 flex items-center gap-2">
-            <Clock size={12} className="text-blue-500" /> Real-time Platform Analytics
+          <div className="flex items-center gap-4">
+            <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase">
+              System <span className="text-blue-600">Studio</span>
+            </h1>
+            <RoleBadge role="admin" className="hidden sm:inline-flex" />
+          </div>
+          <p className="text-slate-500 font-bold text-lg mt-2">
+            Welcome back, Commander. Platform systems are operating within normal parameters.
           </p>
         </div>
-        <div className="flex gap-4">
-            <button className="px-6 py-3 bg-white border border-slate-100 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition shadow-sm">Export Data</button>
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition">Update Reports</button>
+        <div className="flex-1 lg:max-w-md">
+            <ActionHub role="admin" />
         </div>
       </div>
 

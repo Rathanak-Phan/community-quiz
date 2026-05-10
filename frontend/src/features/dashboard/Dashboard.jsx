@@ -9,6 +9,8 @@ import { getQuizMakerDashboard, getStudentDashboard } from "../../services/dashb
 import api from "../../config/api";
 import { useAuth } from "../../providers/AuthContext";
 import AdminDashboard from "./AdminDashboard";
+import RoleBadge from "../../components/ui/RoleBadge";
+import ActionHub from "./components/ActionHub";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -75,13 +77,25 @@ const Dashboard = () => {
              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
              System Online
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none uppercase">
-            Good Day, <span className="text-blue-600">{user?.name?.split(' ')[0]}!</span>
-          </h1>
-          <p className="text-slate-500 font-medium">Here's an overview of your knowledge progress today.</p>
+          <div className="flex items-center gap-4">
+            <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase">
+              {role === 'admin' ? "System" : role === 'quiz_maker' ? "Creator" : "Learning"}{" "}
+              <span className="text-blue-600">Studio</span>
+            </h1>
+            <RoleBadge role={role} className="hidden sm:inline-flex" />
+          </div>
+          <p className="text-slate-500 font-bold text-lg">
+            {role === 'admin' 
+              ? "Welcome back, Commander. All systems are operational." 
+              : role === 'quiz_maker' 
+                ? `Welcome back, ${user?.name?.split(' ')[0]}. Ready to inspire?`
+                : `Hello ${user?.name?.split(' ')[0]}, your knowledge journey continues.`}
+          </p>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex-1 lg:max-w-xl">
+           <ActionHub role={role} />
+        </div>
            <button 
              onClick={() => navigate("/")}
              className="hidden sm:flex items-center gap-3 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-slate-600 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm active:scale-95"
@@ -93,7 +107,6 @@ const Dashboard = () => {
              <BarChart2 size={20} />
            </button>
         </div>
-      </div>
 
       {/* Grid Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
