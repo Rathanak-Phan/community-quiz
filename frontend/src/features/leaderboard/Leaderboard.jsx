@@ -96,7 +96,7 @@ export default function Leaderboard() {
         </div>
 
         {/* Period Selector & User Rank */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-16 bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-16 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
            <div className="flex bg-slate-50 p-1.5 rounded-2xl w-full lg:w-auto">
              <PeriodButton active={period === 'all'} onClick={() => setPeriod('all')} label="All Time" />
              <PeriodButton active={period === 'month'} onClick={() => setPeriod('month')} label="This Month" />
@@ -138,7 +138,7 @@ export default function Leaderboard() {
                   )}
                   
                   <div className="relative mb-10 transition-transform duration-500 group-hover:-translate-y-4">
-                    <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] flex items-center justify-center text-white font-black text-3xl shadow-2xl relative border-4 border-white overflow-hidden ${
+                    <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-2xl relative border-4 border-white overflow-hidden ${
                       isFirst ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600' : 
                       isSecond ? 'bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600' : 
                       'bg-gradient-to-br from-orange-300 via-orange-500 to-orange-700'
@@ -159,7 +159,7 @@ export default function Leaderboard() {
                     </div>
                   </div>
 
-                  <div className={`w-full rounded-t-[3rem] bg-white border border-slate-100 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.03)] flex flex-col items-center justify-start p-8 transition-all duration-500 group-hover:shadow-blue-200/20 ${isFirst ? 'h-64' : isSecond ? 'h-52' : 'h-40'}`}>
+                  <div className={`w-full rounded-t-3xl bg-white border border-slate-100 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.03)] flex flex-col items-center justify-start p-8 transition-all duration-500 group-hover:shadow-blue-200/20 ${isFirst ? 'h-64' : isSecond ? 'h-52' : 'h-40'}`}>
                      <div className={`w-12 h-1.5 rounded-full mb-6 ${isFirst ? 'bg-yellow-400' : isSecond ? 'bg-slate-300' : 'bg-orange-400'}`}></div>
                      <div className="flex flex-col items-center gap-4">
                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Collector Stats</p>
@@ -176,7 +176,7 @@ export default function Leaderboard() {
               );
             })
           ) : (
-            <div className="col-span-3 text-center py-20 bg-white rounded-[3rem] border border-slate-100">
+            <div className="col-span-3 text-center py-20 bg-white rounded-3xl border border-slate-100">
                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
                   <UserIcon size={32} />
                </div>
@@ -188,7 +188,7 @@ export default function Leaderboard() {
         {/* Main List & Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8">
-             <div className="bg-white rounded-[3rem] border border-slate-100 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.04)] overflow-hidden">
+             <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.04)] overflow-hidden">
                 <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
                    <div className="flex items-center gap-4 bg-slate-50 px-6 py-3 rounded-2xl w-full md:w-auto focus-within:ring-2 ring-blue-500/20 transition-all">
                       <Search size={18} className="text-slate-400" />
@@ -270,7 +270,7 @@ export default function Leaderboard() {
 
           <aside className="lg:col-span-4 space-y-8">
              {/* Trending Section */}
-             <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-slate-900/20 group">
+             <div className="bg-slate-900 rounded-3xl p-10 text-white relative overflow-hidden shadow-2xl shadow-slate-900/20 group">
                 <div className="absolute -top-10 -right-10 w-48 h-48 bg-blue-600/20 blur-[80px] rounded-full group-hover:bg-blue-600/30 transition-all duration-700"></div>
                 
                 <div className="flex items-center justify-between mb-10">
@@ -305,14 +305,14 @@ export default function Leaderboard() {
                 
                 <button 
                   onClick={() => navigate('/quizzes')}
-                  className="w-full mt-10 py-5 bg-white/10 hover:bg-white text-white hover:text-slate-900 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-black/20"
+                  className="w-full mt-10 py-5 bg-white/10 hover:bg-white text-white hover:text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-black/20"
                 >
                   Discover More
                 </button>
              </div>
 
              {/* Tips Card */}
-             <div className="bg-white rounded-[3rem] border border-slate-100 p-10 shadow-sm relative overflow-hidden group">
+             <div className="bg-white rounded-3xl border border-slate-100 p-10 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 -translate-y-16 translate-x-16 rounded-full transition-transform group-hover:scale-150 duration-700"></div>
                 <h3 className="font-black text-slate-900 uppercase tracking-[0.2em] text-[10px] mb-8">Master's Guide</h3>
                 <div className="space-y-8">

@@ -121,7 +121,7 @@ function CategoryList() {
         
         <button 
           onClick={handleOpenCreate}
-          className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-violet-600 transition-all shadow-xl active:scale-95 group"
+          className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-violet-600 transition-all shadow-xl active:scale-95 group"
         >
           <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
             <Plus size={16} />
@@ -138,7 +138,7 @@ function CategoryList() {
       </div>
 
       {/* Search & List */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
         <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
            <div className="relative flex-1 max-w-md group w-full">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-600 transition-colors" size={20} />
@@ -267,7 +267,7 @@ function StatItem({ icon, label, value, color }) {
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
   };
   return (
-    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all duration-500">
+    <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all duration-500">
       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
         {icon}
       </div>

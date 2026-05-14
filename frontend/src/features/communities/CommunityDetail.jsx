@@ -2,12 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Users, BookOpen, Clock, Play, ArrowLeft, 
-  Globe, Lock, ShieldCheck, TrendingUp, Sparkles, AlertCircle, Settings, Plus
+  Globe, Lock, ShieldCheck, TrendingUp, Sparkles, AlertCircle, Settings, Plus, Share2, Hash, LogOut
 } from 'lucide-react';
+import { joinByCode } from '../../services/communityService';
+import InviteModal from './components/InviteModal';
 import apiClient, { STORAGE_URL } from '../../config/api';
 import Toast from '../../components/ui/Toast';
 import CommunityFormModal from './components/CommunityFormModal';
 import QuizFormModal from '../quizzes/components/QuizFormModal';
+import JoinModal from './components/JoinModal';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -18,6 +21,8 @@ const CommunityDetail = () => {
   const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -45,8 +50,10 @@ const CommunityDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (id && id !== 'undefined') {
+      fetchData();
+    }
+  }, [id, fetchData]);
 
   const handleJoin = async () => {
     if (isGuest) {
@@ -59,6 +66,21 @@ const CommunityDetail = () => {
       fetchData();
     } catch (err) {
       setToast({ show: true, message: err.response?.data?.message || "Failed to join", type: "error" });
+    }
+  };
+
+  const handleJoinByCode = async (code) => {
+    try {
+      const res = await joinByCode(code);
+      setToast({ show: true, message: res.data.message, type: "success" });
+      if (res.data.community_id === Number(id)) {
+        fetchData();
+      } else {
+        navigate(`/communities/${res.data.community_id}`);
+      }
+    } catch (err) {
+      setToast({ show: true, message: err.response?.data?.message || "Invalid code", type: "error" });
+      throw err;
     }
   };
 
@@ -96,7 +118,7 @@ const CommunityDetail = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 space-y-8 md:space-y-12 pb-20">
       {/* Hero Header */}
-      <div className="relative min-h-[300px] md:h-[350px] rounded-[2.5rem] md:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col justify-end pt-20">
+      <div className="relative min-h-[300px] md:h-[350px] rounded-2xl md:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col justify-end pt-20">
         {community.cover_image ? (
           <img src={`${STORAGE_URL}/${community.cover_image}`} className="absolute inset-0 w-full h-full object-cover" alt={community.name} />
         ) : (
@@ -121,6 +143,11 @@ const CommunityDetail = () => {
                   {community.visibility === 'public' ? <Globe size={12} className="inline mr-2" /> : <Lock size={12} className="inline mr-2" />}
                   {community.visibility} Community
                 </span>
+                {community.status === 'draft' && (
+                  <span className="px-4 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-widest shadow-lg border border-white/10">
+                    Draft Mode
+                  </span>
+                )}
                 <span className="px-4 py-1.5 rounded-xl bg-white/20 backdrop-blur-md text-[10px] font-black text-white uppercase tracking-widest shadow-lg border border-white/10">
                   <Users size={12} className="inline mr-2" />
                   {community.members?.length || 0} Members
@@ -132,11 +159,47 @@ const CommunityDetail = () => {
 
             <div className="flex flex-wrap gap-4 w-full lg:w-auto">
               {!community.is_member && (
+                <div className="flex gap-4 w-full sm:w-auto">
+                  <button 
+                    onClick={handleJoin}
+                    disabled={community.join_status === 'pending'}
+                    className={`flex-1 sm:flex-none px-10 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-widest transition-all shadow-2xl active:scale-95 ${
+                      community.join_status === 'pending' 
+                        ? 'bg-orange-500 text-white cursor-not-allowed' 
+                        : 'bg-white text-slate-900 hover:bg-blue-600 hover:text-white'
+                    }`}
+                  >
+                    {isGuest ? "Login to Join" : community.join_status === 'pending' ? "Pending Approval" : "Request Access"}
+                  </button>
+                  {!isGuest && community.status !== 'draft' && (
+                    <button 
+                      onClick={() => setIsJoinModalOpen(true)}
+                      className="flex-1 sm:flex-none bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-widest hover:bg-white hover:text-slate-900 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <Hash size={18} />
+                      Code
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {community.is_member && user?.id !== community.created_by && (
                 <button 
-                  onClick={handleJoin}
-                  className="w-full sm:w-auto bg-white text-slate-900 px-10 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-2xl active:scale-95"
+                  onClick={async () => {
+                    if (window.confirm(`Are you sure you want to leave ${community.name}?`)) {
+                      try {
+                        await apiClient.post(`/communities/${id}/leave`);
+                        setToast({ show: true, message: "You have left the community.", type: "success" });
+                        fetchData();
+                      } catch (err) {
+                        setToast({ show: true, message: err.response?.data?.message || "Failed to leave", type: "error" });
+                      }
+                    }
+                  }}
+                  className="flex-1 sm:flex-none bg-rose-50 text-rose-500 px-8 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-widest hover:bg-rose-100 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
                 >
-                  {isGuest ? "Login to Join" : "Request Access"}
+                  <LogOut size={18} />
+                  Leave Community
                 </button>
               )}
 
@@ -156,6 +219,15 @@ const CommunityDetail = () => {
                     <Settings size={18} />
                     Edit
                   </button>
+                  {community.status !== 'draft' && (
+                    <button 
+                      onClick={() => setIsInviteModalOpen(true)}
+                      className="flex-1 sm:flex-none bg-slate-900 text-white px-8 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <Share2 size={18} />
+                      Invite
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -199,9 +271,16 @@ const CommunityDetail = () => {
                     <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500 shadow-inner">
                       <BookOpen size={24} />
                     </div>
-                    <span className="px-3 py-1 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      {quiz.category?.name}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className="px-3 py-1 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {quiz.category?.name}
+                      </span>
+                      {quiz.status === 'draft' && (
+                        <span className="px-3 py-1 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">
+                          Draft
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
                   <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 uppercase tracking-tight">
@@ -220,7 +299,7 @@ const CommunityDetail = () => {
                   </div>
                 </div>
 
-                <div className="mt-10 pt-8 border-t border-slate-50">
+                <div className="mt-10 pt-8 border-t border-slate-50 flex flex-col gap-3">
                   <button 
                     onClick={() => handleAttemptQuiz(quiz.id)}
                     className="w-full bg-slate-900 text-white py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-blue-600 transition shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95"
@@ -228,6 +307,16 @@ const CommunityDetail = () => {
                     <Play size={16} />
                     {isGuest ? "Login to Attempt" : "Attempt Quiz"}
                   </button>
+
+                  {(isAdmin || user?.id === quiz.created_by) && (
+                    <button 
+                      onClick={() => navigate(`/quizzes/${quiz.id}/questions`)}
+                      className="w-full bg-white text-slate-900 border border-slate-100 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-50 transition shadow-sm active:scale-95"
+                    >
+                      <Settings size={16} />
+                      Update Questions
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -273,6 +362,22 @@ const CommunityDetail = () => {
           fetchData();
         }}
         preselectedCommunityId={id}
+      />
+
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        community={community}
+        onRegenerate={(newCode) => {
+          setCommunity({ ...community, invite_code: newCode });
+          setToast({ show: true, message: "Invite code regenerated!", type: "success" });
+        }}
+      />
+
+      <JoinModal 
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onJoin={handleJoinByCode}
       />
 
       {toast.show && (

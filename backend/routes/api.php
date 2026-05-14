@@ -34,6 +34,7 @@ Route::post('/login-token', [AuthController::class, 'loginToken']);
 Route::get('/quizzes/{id}/share', [ShareController::class, 'shareQuiz']);
 Route::get('/submissions/{id}/share', [ShareController::class, 'shareResult']);
 Route::get('/share/result/{id}', [ShareController::class, 'showSharePreview'])->name('share.result.preview');
+Route::get('/share/quiz/{id}', [ShareController::class, 'showQuizPreview'])->name('share.quiz.preview');
 
 // Public Browsing
 Route::get('/communities', [CommunityController::class, 'index']);
@@ -61,8 +62,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/avatar', [AuthController::class, 'updateAvatar']);
 
     // Community Join & Leave
+    Route::post('/communities/join-by-code', [CommunityController::class, 'joinByCode']);
     Route::post('/communities/{community}/join', [CommunityController::class, 'join']);
     Route::post('/communities/{community}/leave', [CommunityController::class, 'leave']);
+    Route::post('/communities/{community}/regenerate-invite-code', [CommunityController::class, 'regenerateInviteCode']);
 
     // User's own attempts & submissions
     Route::get('/my-attempts', [QuizAttemptController::class, 'myAttempts']);
@@ -134,6 +137,8 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update']);
     Route::post('/quizzes/{quiz}', [QuizController::class, 'update']); // multipart support
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']);
+    Route::post('/quizzes/{quiz}/apply-default-timer', [QuizController::class, 'applyDefaultTimer']);
+    Route::get('/quizzes/{quiz}/attempts', [QuizAttemptController::class, 'indexByQuiz']);
 
     // Questions & Options
     Route::get('/quizzes/{quiz}/questions', [QuestionController::class, 'index']);
@@ -141,6 +146,7 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::post('/questions/true-false', [QuestionController::class, 'storeTrueFalse']);
     Route::post('/questions/short-answer', [QuestionController::class, 'storeShortAnswer']);
     Route::put('/questions/{question}', [QuestionController::class, 'update']);
+    Route::post('/questions/{question}', [QuestionController::class, 'update']); // multipart support
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy']);
     Route::post('/options', [QuestionOptionController::class, 'store']);
     Route::put('/options/{option}', [QuestionOptionController::class, 'update']);
@@ -155,6 +161,7 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
+    Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store']);
     Route::put('/users/{id}/role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole']);
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);
     Route::get('/quizzes', [\App\Http\Controllers\Admin\QuizModerationController::class, 'index']);

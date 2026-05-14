@@ -59,14 +59,14 @@ const MakerRequestsPage = () => {
                     <input 
                         type="text" 
                         placeholder="Search applicants..." 
-                        className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-[2rem] text-sm focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all shadow-sm"
+                        className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all shadow-sm"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
 
-            <div className="bg-white rounded-[3rem] border border-slate-50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.04)] overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.04)] overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>

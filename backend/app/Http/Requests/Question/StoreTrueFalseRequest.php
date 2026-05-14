@@ -25,6 +25,7 @@ class StoreTrueFalseRequest extends FormRequest
             'quiz_id' => 'required|integer|exists:quizzes,id',
             'question_text' => 'required|string',
             'correct_answer' => 'required|boolean',
+            'time_limit' => 'required|integer|min:5',
         ];
     }
 }

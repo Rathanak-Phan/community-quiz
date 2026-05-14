@@ -10,6 +10,7 @@ use App\Models\Question;
 use App\Models\Quiz;
 use App\Http\Resources\QuestionResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
@@ -52,12 +53,19 @@ class QuestionController extends Controller
                 'quiz_id' => $quiz->id,
                 'question_type' => 'multiple_choice',
                 'question_text' => $request->question_text,
+                'points' => $request->points ?? 1,
+                'time_limit' => $request->time_limit ?? 30,
+                'allow_multiple' => $request->boolean('allow_multiple', false),
             ]);
+
+            $correctOptions = $request->has('correct_options') 
+                ? (array) $request->correct_options 
+                : [$request->correct_option];
 
             foreach ($request->options as $index => $optionText) {
                 $question->options()->create([
                     'option_text' => $optionText,
-                    'is_correct' => $index === (int)$request->correct_option,
+                    'is_correct' => in_array($index, $correctOptions),
                 ]);
             }
 
@@ -109,6 +117,8 @@ class QuestionController extends Controller
             'quiz_id' => $quiz->id,
             'question_type' => 'true_false',
             'question_text' => $request->question_text,
+            'points' => $request->points ?? 1,
+            'time_limit' => $request->time_limit ?? 30,
             'correct_answer' => $request->correct_answer ? 'true' : 'false',
         ]);
 
@@ -153,6 +163,8 @@ class QuestionController extends Controller
                 'quiz_id' => $quiz->id,
                 'question_type' => 'short_answer',
                 'question_text' => $request->question_text,
+                'points' => $request->points ?? 1,
+                'time_limit' => $request->time_limit ?? 30,
             ]);
 
             $question->shortAnswer()->create([
@@ -203,13 +215,19 @@ class QuestionController extends Controller
             'question_text' => 'required|string',
             'points' => 'nullable|integer',
             'image' => 'nullable|image|max:2048',
+            'is_manual_grading' => 'nullable|boolean',
+            'correct_answer' => 'required_if:is_manual_grading,0,false|nullable|string',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $data = $request->only(['question_text', 'points']);
+            $data = $request->only(['question_text', 'points', 'time_limit']);
             
+            if ($request->has('allow_multiple')) {
+                $data['allow_multiple'] = $request->boolean('allow_multiple');
+            }
+
             if ($request->hasFile('image')) {
                 $data['image'] = $request->file('image')->store('questions', 'public');
             }
@@ -219,15 +237,19 @@ class QuestionController extends Controller
             // Handle type-specific updates
             if ($question->question_type === 'multiple_choice' && $request->has('options')) {
                 $question->options()->delete();
+                $correctOptions = $request->has('correct_options') 
+                    ? (array) $request->correct_options 
+                    : [$request->correct_option];
+
                 foreach ($request->options as $index => $optionText) {
                     $question->options()->create([
                         'option_text' => $optionText,
-                        'is_correct' => $index === (int)$request->correct_option,
+                        'is_correct' => in_array($index, $correctOptions),
                     ]);
                 }
             } elseif ($question->question_type === 'true_false' && $request->has('correct_answer')) {
                 $question->update(['correct_answer' => $request->correct_answer ? 'true' : 'false']);
-            } elseif ($question->question_type === 'short_answer' && $request->has('correct_answer')) {
+            } elseif ($question->question_type === 'short_answer') {
                 $question->shortAnswer()->updateOrCreate(
                     ['question_id' => $question->id],
                     [

@@ -148,14 +148,14 @@ const Home = () => {
                       else if (user?.role?.name === 'quiz_maker') navigate("/dashboard");
                       else navigate("/quizzes"); 
                     }}
-                    className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white rounded-2xl font-black text-lg hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white rounded-xl font-black text-lg hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-3"
                 >
                     {!authToken ? "Get Started" : "Go to Dashboard"}
                     <ArrowRight size={20} />
                 </button>
                 <button 
                     onClick={() => navigate("/communities")}
-                    className="w-full sm:w-auto px-10 py-5 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-black text-lg hover:bg-slate-50 transition-all duration-300 active:scale-95"
+                    className="w-full sm:w-auto px-10 py-5 bg-white text-slate-900 border-2 border-slate-100 rounded-xl font-black text-lg hover:bg-slate-50 transition-all duration-300 active:scale-95"
                 >
                     Join Community
                 </button>
@@ -164,7 +164,7 @@ const Home = () => {
             <div className="flex items-center gap-6 pt-8 flex-wrap justify-center lg:justify-start">
               <div className="flex -space-x-3">
                 {[1, 2, 3, 4].map(i => (
-                  <img key={i} src={`https://i.pravatar.cc/100?img=${i + 10}`} className="w-12 h-12 rounded-2xl border-4 border-white shadow-sm" alt="User" />
+                  <img key={i} src={`https://i.pravatar.cc/100?img=${i + 10}`} className="w-12 h-12 rounded-full border-4 border-white shadow-sm" alt="User" />
                 ))}
               </div>
               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
@@ -174,10 +174,10 @@ const Home = () => {
           </div>
 
           <div className="relative lg:block hidden">
-            <div className="relative z-10 bg-white/80 backdrop-blur-xl rounded-[3rem] p-10 shadow-2xl border border-white/50 rotate-2 hover:rotate-0 transition-transform duration-700">
+            <div className="relative z-10 bg-white/80 backdrop-blur-xl rounded-3xl p-10 shadow-2xl border border-white/50 rotate-2 hover:rotate-0 transition-transform duration-700">
                <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                    <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
                       <Star size={24} fill="white" />
                     </div>
                     <div>
@@ -192,21 +192,21 @@ const Home = () => {
                </div>
                
                <div className="space-y-4">
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white transition-colors cursor-default">
+                  <div className="p-5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:bg-white transition-colors cursor-default">
                     <div className="flex items-center gap-4">
                       <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 font-black text-xs">1</div>
                       <span className="font-bold text-slate-700">Newtonian Physics</span>
                     </div>
                     <CheckCircle2 size={20} className="text-emerald-500" />
                   </div>
-                  <div className="p-5 rounded-2xl bg-blue-600 border border-blue-500 flex items-center justify-between shadow-xl shadow-blue-600/20 scale-105">
+                  <div className="p-5 rounded-xl bg-blue-600 border border-blue-500 flex items-center justify-between shadow-xl shadow-blue-600/20 scale-105">
                     <div className="flex items-center gap-4">
                       <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-black text-xs">2</div>
                       <span className="font-bold text-white">String Theory</span>
                     </div>
                     <div className="w-5 h-5 rounded-full border-2 border-white/30"></div>
                   </div>
-                  <div className="p-5 rounded-2xl bg-white border border-slate-100 flex items-center justify-between opacity-50">
+                  <div className="p-5 rounded-xl bg-white border border-slate-100 flex items-center justify-between opacity-50">
                     <div className="flex items-center gap-4">
                       <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300 font-black text-xs">3</div>
                       <span className="font-bold text-slate-400">Black Hole Dynamics</span>
@@ -255,7 +255,7 @@ const Home = () => {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {loading ? (
-              [1, 2, 3].map(i => <div key={i} className="h-[400px] bg-white rounded-[2.5rem] border border-slate-100 animate-pulse"></div>)
+              [1, 2, 3].map(i => <div key={i} className="h-[400px] bg-white rounded-2xl border border-slate-100 animate-pulse"></div>)
             ) : trendingQuizzes.map((quiz) => (
               <QuizCard key={quiz.id} quiz={quiz} navigate={navigate} />
             ))}
@@ -287,7 +287,7 @@ const Home = () => {
               <div className="pt-6">
                 <button 
                   onClick={() => navigate("/communities")}
-                  className="px-10 py-5 bg-slate-900 text-white rounded-2xl font-black text-lg hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+                  className="px-10 py-5 bg-slate-900 text-white rounded-xl font-black text-lg hover:bg-blue-600 transition-all shadow-xl active:scale-95"
                 >
                   Join the Network
                 </button>
@@ -295,7 +295,7 @@ const Home = () => {
             </div>
 
             <div className="relative order-1 lg:order-2">
-               <div className="relative rounded-[3.5rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] border-8 border-white">
+               <div className="relative rounded-3xl overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] border-8 border-white">
                 <img 
                   src="/assets/community.png" 
                   alt="Community Learning" 
@@ -360,7 +360,7 @@ const Home = () => {
       {authToken && user?.role?.name === 'user' && (
         <section className="py-32">
           <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-24 relative overflow-hidden flex flex-col md:flex-row items-center gap-12 md:gap-16 shadow-2xl shadow-blue-600/20">
+            <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 rounded-2xl md:rounded-[4rem] p-8 md:p-24 relative overflow-hidden flex flex-col md:flex-row items-center gap-12 md:gap-16 shadow-2xl shadow-blue-600/20">
               <div className="flex-1 space-y-8 relative z-10 text-center md:text-left text-white">
                 <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
                   Ready to share <br /> your wisdom?
@@ -380,7 +380,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="w-full md:w-[400px] bg-white p-12 rounded-[3rem] shadow-2xl relative z-10">
+              <div className="w-full md:w-[400px] bg-white p-12 rounded-3xl shadow-2xl relative z-10">
                  {makerStatus === 'pending' ? (
                   <div className="text-center space-y-6">
                     <Clock size={48} className="text-amber-500 mx-auto animate-pulse" />
@@ -394,7 +394,7 @@ const Home = () => {
                     <button 
                       onClick={handleApply}
                       disabled={applying}
-                      className="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-xl hover:bg-slate-900 transition-all shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50"
+                      className="w-full py-6 bg-blue-600 text-white rounded-xl font-black text-xl hover:bg-slate-900 transition-all shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50"
                     >
                       {applying ? "Applying..." : "Apply Now"}
                     </button>
@@ -474,7 +474,7 @@ const Home = () => {
       {/* 9. FINAL CTA (Light Version) */}
       <section className="py-32 bg-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 md:px-6 text-center space-y-8 md:space-y-12 relative z-10">
-          <div className="w-24 h-24 bg-blue-50 rounded-[2.5rem] flex items-center justify-center text-blue-600 mx-auto border border-blue-100 shadow-inner">
+          <div className="w-24 h-24 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto border border-blue-100 shadow-inner">
             <Sparkles size={40} />
           </div>
           <h2 className="text-6xl md:text-8xl font-black leading-none tracking-tighter text-slate-900">Ready to level up?</h2>
@@ -482,7 +482,7 @@ const Home = () => {
           <div className="flex flex-wrap justify-center gap-6">
             <button 
                onClick={() => navigate("/register")}
-               className="px-12 py-6 bg-blue-600 text-white rounded-[2rem] font-black text-2xl hover:bg-slate-900 transition-all shadow-2xl shadow-blue-600/30"
+               className="px-12 py-6 bg-blue-600 text-white rounded-xl font-black text-2xl hover:bg-slate-900 transition-all shadow-2xl shadow-blue-600/30"
             >
               Get Started for Free
             </button>
@@ -508,7 +508,7 @@ const Home = () => {
 
 const StatItem = ({ icon, value, label, light = false }) => (
   <div className="flex items-center gap-6 group">
-    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl border transition-transform duration-500 group-hover:scale-110 ${
+    <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-2xl border transition-transform duration-500 group-hover:scale-110 ${
         light ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-100'
     }`}>
       {icon}
@@ -523,7 +523,7 @@ const StatItem = ({ icon, value, label, light = false }) => (
 const QuizCard = ({ quiz, navigate }) => (
   <div 
     onClick={() => navigate(`/quizzes/${quiz.id}`)}
-    className="group bg-white hover:shadow-2xl hover:-translate-y-2 border border-slate-100 rounded-[2.5rem] p-8 transition-all duration-500 cursor-pointer flex flex-col h-full"
+    className="group bg-white hover:shadow-2xl hover:-translate-y-2 border border-slate-100 rounded-2xl p-8 transition-all duration-500 cursor-pointer flex flex-col h-full"
   >
     <div className="mb-8 relative rounded-3xl overflow-hidden aspect-video bg-slate-50 border border-slate-100">
       {quiz.image_url ? (
@@ -564,8 +564,8 @@ const FeatureItem = ({ icon, title, desc }) => (
 );
 
 const BentoCard = ({ icon, title, desc, className }) => (
-  <div className={`p-10 rounded-[3rem] border transition-all duration-500 hover:shadow-2xl group ${className}`}>
-    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border group-hover:scale-110 transition-transform ${
+  <div className={`p-10 rounded-3xl border transition-all duration-500 hover:shadow-2xl group ${className}`}>
+    <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-8 border group-hover:scale-110 transition-transform ${
         className.includes('bg-white') ? 'bg-slate-50 border-slate-100 text-slate-900' : 'bg-white/20 border-white/20 text-white'
     }`}>
       {icon}
@@ -576,10 +576,10 @@ const BentoCard = ({ icon, title, desc, className }) => (
 );
 
 const TestimonialCard = ({ name, role, text, avatar }) => (
-  <div className="p-10 bg-white border border-slate-100 rounded-[3rem] space-y-10 hover:shadow-2xl transition-all duration-500 group">
+  <div className="p-10 bg-white border border-slate-100 rounded-3xl space-y-10 hover:shadow-2xl transition-all duration-500 group">
     <p className="text-lg text-slate-600 font-medium leading-relaxed italic">"{text}"</p>
     <div className="flex items-center gap-5">
-      <img src={`https://i.pravatar.cc/100?img=${avatar}`} className="w-12 h-12 rounded-2xl grayscale group-hover:grayscale-0 transition-all duration-500" alt={name} />
+      <img src={`https://i.pravatar.cc/100?img=${avatar}`} className="w-12 h-12 rounded-xl grayscale group-hover:grayscale-0 transition-all duration-500" alt={name} />
       <div className="text-left">
         <p className="font-black text-sm text-slate-900">{name}</p>
         <p className="text-[10px] font-bold text-blue-600 uppercase tracking-[0.2em]">{role}</p>

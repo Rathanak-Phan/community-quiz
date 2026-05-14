@@ -16,12 +16,16 @@ import QuizDetail from "../features/quizzes/QuizDetail";
 import QuizAttempt from "../features/quizzes/QuizAttempt";
 import QuizReview from "../features/quizzes/QuizReview";
 import QuestionList from "../features/quizzes/QuestionList";
+import QuizCreate from "../features/quizzes/QuizCreate";
 import MyQuizzes from "../features/quizzes/MyQuizzes";
 import MyActivity from "../features/quizzes/MyActivity";
+import QuizAttempts from "../features/quizzes/QuizAttempts";
+import SharedResult from "../features/quizzes/SharedResult";
 import MainLayout from "../components/layouts/MainLayout";
 import Sidebar from "../components/layouts/SideBar";
 import CommunityDetail from "../features/communities/CommunityDetail";
 import CommunityRequests from "../features/communities/CommunityRequests";
+import JoinByLink from "../features/communities/JoinByLink";
 import UserManagement from "../features/admin/UserManagement";
 import AdminQuizzesPage from "../features/admin/AdminQuizzesPage";
 import AdminCommunitiesPage from "../features/admin/AdminCommunitiesPage";
@@ -48,9 +52,12 @@ function App() {
           <Route element={<MainLayout />}>               
             <Route path="/" element={<Home />} />
             <Route path="/communities" element={<Communities />} />
+            <Route path="/communities/join" element={<JoinByLink />} />
             <Route path="/communities/:id" element={<CommunityDetail />} />
             <Route path="/quizzes" element={<Quizzes />} />
             <Route path="/quizzes/:quizId" element={<QuizDetail />} />
+            <Route path="/quiz/:quizId" element={<QuizDetail />} /> {/* Alias for share links */}
+            <Route path="/result/:submissionId" element={<SharedResult />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
           </Route>
 
@@ -159,6 +166,14 @@ function App() {
             />
             
             <Route
+              path="/quizzes/create"
+              element={
+                <ProtectedRoute roles={["quiz_maker", "admin"]}>
+                  <QuizCreate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/quizzes/my"
               element={
                 <ProtectedRoute roles={["quiz_maker", "admin"]}>
@@ -179,6 +194,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <QuestionList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quizzes/:quizId/attempts"
+              element={
+                <ProtectedRoute roles={["quiz_maker", "admin"]}>
+                  <QuizAttempts />
                 </ProtectedRoute>
               }
             />

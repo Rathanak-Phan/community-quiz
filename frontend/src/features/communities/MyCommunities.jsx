@@ -4,6 +4,7 @@ import { Plus, Users, Layout, Settings, Trash2, ArrowRight } from "lucide-react"
 import api from "../../config/api";
 import CommunityCard from "./components/CommunityCard";
 import CommunityFormModal from "./components/CommunityFormModal";
+import JoinModal from "./components/JoinModal";
 import Toast from "../../components/ui/Toast";
 import { deleteCommunity } from "../../api/communityApi";
 import { useAuth } from "../../providers/AuthContext";
@@ -14,6 +15,7 @@ export default function MyCommunities() {
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
@@ -43,6 +45,21 @@ export default function MyCommunities() {
     loadMyCommunities();
   };
 
+  const handleJoinByCode = async (code) => {
+    try {
+      const res = await api.post(`/communities/join-by-code`, { invite_code: code });
+      const communityId = res.data?.community_id || res.data?.community?.id;
+      setToast({ show: true, message: res.data?.message || "Joined successfully", type: "success" });
+      if (communityId) {
+          loadMyCommunities();
+          navigate(`/communities/${communityId}`);
+      }
+    } catch (err) {
+      setToast({ show: true, message: err.response?.data?.message || "Invalid code", type: "error" });
+      throw err;
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
       await deleteCommunity(id);
@@ -68,17 +85,25 @@ export default function MyCommunities() {
            <p className="text-slate-500 font-medium max-w-lg">The hubs you've joined or created. Stay connected and keep learning with your peers.</p>
         </div>
         
-        {(user?.role?.name === 'admin' || user?.role?.name === 'quiz_maker') && (
+        <div className="flex gap-4 w-full md:w-auto">
           <button 
-            onClick={() => { setEditData(null); setIsModalOpen(true); }}
-            className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl active:scale-95 group"
+            onClick={() => setIsJoinModalOpen(true)}
+            className="flex-1 md:flex-none bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:border-blue-600 transition-all shadow-sm active:scale-95"
           >
-            <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
-              <Plus size={16} />
-            </div>
-            New Community
+            Join with Code
           </button>
-        )}
+          {(user?.role?.name === 'admin' || user?.role?.name === 'quiz_maker') && (
+            <button 
+              onClick={() => { setEditData(null); setIsModalOpen(true); }}
+              className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl active:scale-95 group"
+            >
+              <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
+                <Plus size={16} />
+              </div>
+              New Community
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Grid */}
@@ -91,7 +116,7 @@ export default function MyCommunities() {
       ) : communities.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
            {communities.map(community => (
-             <div key={community.id} className="bg-white rounded-[3rem] border border-slate-100 p-8 hover:shadow-2xl transition-all duration-500 group relative overflow-hidden">
+             <div key={community.id} className="bg-white rounded-2xl border border-slate-100 p-8 hover:shadow-2xl transition-all duration-500 group relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 -translate-y-16 translate-x-16 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
                 
                 <div className="flex items-start justify-between relative z-10 mb-8">
@@ -175,6 +200,12 @@ export default function MyCommunities() {
         onClose={() => setIsModalOpen(false)} 
         onSuccess={handleSuccess} 
         editData={editData}
+      />
+
+      <JoinModal 
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onJoin={handleJoinByCode}
       />
 
       {toast.show && (

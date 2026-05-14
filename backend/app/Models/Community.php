@@ -11,10 +11,12 @@ class Community extends Model
         'description',
         'visibility',
         'cover_image',
-        'created_by'
+        'created_by',
+        'status',
+        'invite_code'
     ];
 
-    protected $appends = ['is_member'];
+    protected $appends = ['is_member', 'join_status'];
 
     public function getIsMemberAttribute()
     {
@@ -25,6 +27,18 @@ class Community extends Model
             ->where('user_id', $user->id)
             ->where('status', 'approved')
             ->exists();
+    }
+
+    public function getJoinStatusAttribute()
+    {
+        $user = auth('sanctum')->user();
+        if (!$user) return null;
+
+        $member = $this->members()
+            ->where('user_id', $user->id)
+            ->first();
+
+        return $member ? $member->status : null;
     }
 
     public function creator()

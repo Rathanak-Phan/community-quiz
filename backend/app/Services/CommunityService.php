@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Community;
 use App\Models\CommunityMember;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CommunityService
 {
@@ -22,8 +23,10 @@ class CommunityService
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'visibility' => $data['visibility'],
+            'status' => $data['status'] ?? 'published',
             'created_by' => $userId,
-            'cover_image' => $path
+            'cover_image' => $path,
+            'invite_code' => Str::random(8)
         ]);
 
         // Attach owner

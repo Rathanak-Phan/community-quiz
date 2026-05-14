@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAttempt, submitAnswer, submitAttempt } from "../../services/attemptService";
-import { Clock, ChevronRight, ChevronLeft, Send, Save, ShieldCheck, Users, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
+import { Clock, ChevronRight, ChevronLeft, Send, Save, ShieldCheck, Users, AlertCircle, CheckCircle2, XCircle, CheckSquare, Circle, Square } from "lucide-react";
 import Toast from "../../components/ui/Toast";
 import { STORAGE_URL } from "../../config/api";
 
@@ -19,6 +19,7 @@ export default function QuizAttempt() {
 
     useEffect(() => {
         const fetchAttempt = async () => {
+            if (!attemptId || attemptId === 'undefined') return;
             try {
                 const res = await getAttempt(attemptId);
                 const data = res.data.data || res.data;
@@ -26,7 +27,15 @@ export default function QuizAttempt() {
                 setIsAnonymous(data.is_anonymous || false);
                 const initialAnswers = {};
                 data.answers?.forEach(ans => {
-                    initialAnswers[ans.question_id] = ans.answer_text;
+                    if (ans.answer_boolean !== null) {
+                        initialAnswers[ans.question_id] = ans.answer_boolean ? 'True' : 'False';
+                    } else if (Array.isArray(ans.selected_options) && ans.selected_options.length > 0) {
+                        initialAnswers[ans.question_id] = ans.selected_options;
+                    } else if (ans.selected_option_id) {
+                        initialAnswers[ans.question_id] = ans.selected_option_id;
+                    } else {
+                        initialAnswers[ans.question_id] = ans.answer_text;
+                    }
                 });
                 setAnswers(initialAnswers);
                 
@@ -34,6 +43,13 @@ export default function QuizAttempt() {
                     const expiry = new Date(res.data.expires_at);
                     const now = new Date();
                     setTimeLeft(Math.max(0, Math.floor((expiry - now) / 1000)));
+                } else {
+                    const defaultLimit = data.quiz?.has_timer ? (data.quiz?.default_time_limit || 30) : 0;
+                    const totalSeconds = data.quiz?.questions?.reduce((sum, q) => {
+                        const limit = parseInt(q.time_limit) > 0 ? parseInt(q.time_limit) : defaultLimit;
+                        return sum + limit;
+                    }, 0) || 0;
+                    setTimeLeft(totalSeconds > 0 ? totalSeconds : null);
                 }
             } catch (error) {
                 setToast({ show: true, message: "Failed to load dynamic session", type: "error" });
@@ -45,8 +61,10 @@ export default function QuizAttempt() {
     }, [attemptId]);
 
     useEffect(() => {
-        if (timeLeft <= 0 && attempt) {
-             // Handle timeout automatically if needed
+        if (timeLeft === null) return;
+        if (timeLeft <= 0 && attempt && !submitting) {
+             setToast({ show: true, message: "Time is up! Submitting automatically...", type: "warning" });
+             handleSubmit(true);
              return;
         };
         const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
@@ -59,17 +77,52 @@ export default function QuizAttempt() {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
-    const handleAnswerChange = async (questionId, value) => {
-        setAnswers(prev => ({ ...prev, [questionId]: value }));
+    const handleAnswerChange = async (questionId, value, isMultiple = false) => {
+        let newValue = value;
+        
+        if (isMultiple) {
+            const currentAnswers = Array.isArray(answers[questionId]) ? answers[questionId] : [];
+            newValue = currentAnswers.includes(value)
+                ? currentAnswers.filter(v => v !== value)
+                : [...currentAnswers, value];
+        }
+
+        setAnswers(prev => ({ ...prev, [questionId]: newValue }));
+        
         try {
-            await submitAnswer(attemptId, { question_id: questionId, answer_text: value });
+            const payload = { 
+                question_id: questionId,
+                selected_option_id: null,
+                selected_options: null,
+                answer_boolean: null,
+                answer_text: null
+            };
+
+            if (isMultiple) {
+                payload.selected_options = newValue;
+                // Keep answer_text for fallback/human readable logs
+                payload.answer_text = currentQuestion.options
+                    .filter(opt => newValue.includes(opt.id))
+                    .map(opt => opt.option_text)
+                    .join(', ');
+            } else if (currentQuestion?.question_type === 'multiple_choice') {
+                payload.selected_option_id = value; // value is the ID here
+                payload.answer_text = currentQuestion.options.find(o => o.id === value)?.option_text;
+            } else if (currentQuestion?.question_type === 'true_false') {
+                payload.answer_boolean = value === 'True' || value === true;
+                payload.answer_text = value.toString();
+            } else {
+                payload.answer_text = value;
+            }
+            
+            await submitAnswer(attemptId, payload);
         } catch (error) {
             console.error("Cloud sync failed");
         }
     };
 
-    const handleSubmit = async () => {
-        if (!window.confirm("Ready to finalize your attempt?")) return;
+    const handleSubmit = async (isAuto = false) => {
+        if (!isAuto && !window.confirm("Ready to finalize your attempt?")) return;
         setSubmitting(true);
         try {
             await submitAttempt(attemptId, { is_anonymous: isAnonymous });
@@ -105,7 +158,7 @@ export default function QuizAttempt() {
     if (questions.length === 0) return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
             <div className="space-y-6">
-                <div className="w-20 h-20 bg-amber-50 rounded-[2rem] flex items-center justify-center text-amber-500 mx-auto">
+                <div className="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mx-auto">
                     <AlertCircle size={32} />
                 </div>
                 <div className="space-y-2">
@@ -154,10 +207,12 @@ export default function QuizAttempt() {
                             {isAnonymous ? "Stay Anonymous" : "Public Answer"}
                         </button>
                         
-                        <div className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-colors ${timeLeft < 60 ? 'bg-rose-50 text-rose-600 animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
-                            <Clock size={16} className="animate-spin-slow" />
-                            <span className="font-mono text-base font-bold tracking-tighter">{formatTime(timeLeft)}</span>
-                        </div>
+                        {timeLeft !== null && (
+                            <div className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-colors ${timeLeft < 60 ? 'bg-rose-50 text-rose-600 animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
+                                <Clock size={16} className="animate-spin-slow" />
+                                <span className="font-mono text-base font-bold tracking-tighter">{formatTime(timeLeft)}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
                 
@@ -188,15 +243,23 @@ export default function QuizAttempt() {
                         )}
 
                         <div className="grid grid-cols-1 gap-5">
-                            {currentQuestion?.question_type === 'multiple_choice' && currentQuestion.options?.map((opt, idx) => (
-                                <OptionBtn 
-                                    key={opt.id}
-                                    label={opt.option_text}
-                                    letter={String.fromCharCode(65 + idx)}
-                                    active={answers[currentQuestion.id] === opt.option_text}
-                                    onClick={() => handleAnswerChange(currentQuestion.id, opt.option_text)}
-                                />
-                            ))}
+                            {currentQuestion?.question_type === 'multiple_choice' && (() => {
+                                const correctCount = currentQuestion.options?.filter(o => o.is_correct).length || 0;
+                                const isMultiple = currentQuestion.allow_multiple || correctCount > 1;
+                                return currentQuestion.options?.map((opt, idx) => (
+                                    <OptionBtn 
+                                        key={opt.id}
+                                        label={opt.option_text}
+                                        letter={String.fromCharCode(65 + idx)}
+                                        active={isMultiple 
+                                            ? Array.isArray(answers[currentQuestion.id]) && answers[currentQuestion.id].includes(opt.id)
+                                            : answers[currentQuestion.id] === opt.id
+                                        }
+                                        onClick={() => handleAnswerChange(currentQuestion.id, opt.id, isMultiple)}
+                                        isMultiple={isMultiple}
+                                    />
+                                ));
+                            })()}
 
                             {currentQuestion?.question_type === 'true_false' && (
                                 <div className="grid grid-cols-2 gap-6">
@@ -204,7 +267,7 @@ export default function QuizAttempt() {
                                         <button 
                                             key={val}
                                             onClick={() => handleAnswerChange(currentQuestion.id, val)}
-                                            className={`py-12 rounded-[2.5rem] border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
+                                            className={`py-12 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
                                                 answers[currentQuestion.id] === val
                                                 ? 'border-blue-600 bg-blue-50/50 text-blue-700 shadow-xl shadow-blue-600/10'
                                                 : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 text-slate-600'
@@ -222,7 +285,7 @@ export default function QuizAttempt() {
                             {currentQuestion?.question_type === 'short_answer' && (
                                 <div className="space-y-4">
                                     <textarea 
-                                        className="w-full p-10 bg-slate-50 border-2 border-slate-50 rounded-[2.5rem] focus:bg-white focus:border-blue-600 transition-all duration-500 outline-none min-h-[250px] text-lg font-bold placeholder:text-slate-200"
+                                        className="w-full p-10 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-blue-600 transition-all duration-500 outline-none min-h-[250px] text-lg font-bold placeholder:text-slate-200"
                                         placeholder="Type your structured response here..."
                                         value={answers[currentQuestion.id] || ""}
                                         onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
@@ -251,7 +314,7 @@ export default function QuizAttempt() {
 
                     {currentQuestionIdx === questions.length - 1 ? (
                         <button 
-                            onClick={handleSubmit}
+                            onClick={() => handleSubmit()}
                             disabled={submitting}
                             className="bg-blue-600 text-white px-10 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all duration-300 active:scale-95 disabled:opacity-50"
                         >
@@ -277,25 +340,33 @@ export default function QuizAttempt() {
     );
 }
 
-function OptionBtn({ label, letter, active, onClick }) {
+function OptionBtn({ label, letter, active, onClick, isMultiple }) {
     return (
         <button 
             onClick={onClick}
             className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group ${
                 active 
                 ? 'border-blue-600 bg-blue-50/20 text-blue-700 shadow-sm' 
-                : 'border-slate-50 bg-slate-50 hover:border-slate-200 text-slate-600'
+                : 'border-slate-100 bg-white hover:border-blue-200 hover:bg-slate-50/50 text-slate-600'
             }`}
         >
             <div className="flex items-center gap-5">
-                <div className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center font-bold text-xs transition-all ${
-                    active ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-100 text-slate-300 group-hover:border-blue-200 group-hover:text-blue-500'
+                <div className={`w-9 h-9 border-2 flex items-center justify-center font-bold text-xs transition-all ${
+                    isMultiple ? 'rounded-md' : 'rounded-full'
+                } ${
+                    active ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-white border-slate-200 text-slate-400 group-hover:border-blue-400 group-hover:text-blue-600'
                 }`}>
                     {letter}
                 </div>
                 <span className="font-bold text-base tracking-tight">{label}</span>
             </div>
-            {active && <CheckCircle2 size={20} className="text-blue-600" />}
+            <div className="flex items-center">
+                {isMultiple ? (
+                    active ? <CheckSquare size={22} className="text-blue-600" /> : <Square size={22} className="text-slate-200 group-hover:text-blue-200" />
+                ) : (
+                    active ? <CheckCircle2 size={22} className="text-blue-600" /> : <Circle size={22} className="text-slate-200 group-hover:text-blue-200" />
+                )}
+            </div>
         </button>
     );
 }

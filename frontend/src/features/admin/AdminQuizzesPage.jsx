@@ -109,7 +109,7 @@ const AdminQuizzesPage = () => {
         <div className="flex items-center gap-3">
            <button 
              onClick={fetchQuizzes}
-             className="px-6 py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition shadow-sm"
+             className="px-6 py-4 bg-white border border-slate-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition shadow-sm"
            >
              Refresh Data
            </button>
@@ -119,7 +119,7 @@ const AdminQuizzesPage = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-md transition-all group">
+          <div key={i} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-start justify-between">
               <div className={`p-4 ${stat.bg} ${stat.color} rounded-2xl transition-transform group-hover:scale-110`}>
                 <stat.icon size={24} />
@@ -135,7 +135,7 @@ const AdminQuizzesPage = () => {
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white p-6 rounded-[2.5rem] border border-slate-50 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="relative flex-1 max-w-xl group">
           <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-rose-600 transition-colors" />
           <input 
@@ -169,7 +169,7 @@ const AdminQuizzesPage = () => {
       </div>
 
       {/* Content Table */}
-      <div className="bg-white rounded-[3rem] border border-slate-50 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
@@ -307,7 +307,7 @@ const FavoritesModal = ({ quiz, favorites, loading, onClose }) => {
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
       <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-300">
         {/* Header */}
-        <div className="p-10 pb-6 border-b border-slate-50 relative">
+        <div className="p-10 pb-6 border-b border-slate-200 relative">
           <button 
             onClick={onClose}
             className="absolute top-8 right-8 p-3 hover:bg-slate-50 rounded-2xl text-slate-400 transition-colors"

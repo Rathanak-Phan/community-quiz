@@ -24,6 +24,8 @@ class SubmitAnswerRequest extends FormRequest
         return [
             'question_id' => 'required|exists:questions,id',
             'selected_option_id' => 'nullable|exists:question_options,id',
+            'selected_options' => 'nullable|array',
+            'selected_options.*' => 'exists:question_options,id',
             'answer_boolean' => 'nullable|boolean',
             'answer_text' => 'nullable|string',
         ];

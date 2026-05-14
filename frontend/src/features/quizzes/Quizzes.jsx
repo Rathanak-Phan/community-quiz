@@ -103,9 +103,9 @@ export default function Quizzes() {
                         setEditData(null);
                         setIsModalOpen(true);
                     }}
-                    className="w-full md:w-auto bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-900/10 active:scale-95 group"
+                    className="w-full md:w-auto bg-slate-900 text-white px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-900/10 active:scale-95 group"
                 >
-                    <div className="w-5 h-5 bg-white/20 rounded-md flex items-center justify-center transition-colors group-hover:bg-white/40">
+                    <div className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/40">
                       <Plus size={14} />
                     </div>
                     CREATE QUIZ
@@ -136,7 +136,7 @@ export default function Quizzes() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {[1, 2, 3, 4, 5, 6].map(i => (
-                        <div key={i} className="h-[420px] bg-white rounded-[3rem] animate-pulse border border-slate-100"></div>
+                        <div key={i} className="h-[420px] bg-white rounded-2xl animate-pulse border border-slate-100"></div>
                     ))}
                 </div>
             ) : filteredQuizzes.length > 0 ? (
@@ -156,7 +156,7 @@ export default function Quizzes() {
                 </div>
             ) : (
                 <div className="py-32 flex flex-col items-center text-center space-y-6">
-                   <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
+                   <div className="w-24 h-24 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-300">
                       <Search size={40} />
                    </div>
                    <div className="space-y-2">

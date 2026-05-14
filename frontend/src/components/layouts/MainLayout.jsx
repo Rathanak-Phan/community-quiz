@@ -54,7 +54,7 @@ export default function MainLayout() {
                 {user?.role?.name === 'user' && (
                   <button 
                     onClick={() => navigate("/dashboard")}
-                    className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                    className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                   >
                     <UserPlus size={16} />
                     Become a Creator
@@ -115,7 +115,7 @@ export default function MainLayout() {
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-blue-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 flex items-center gap-2"
+                  className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 flex items-center gap-2"
                 >
                   <UserPlus size={16} />
                   Join Now
@@ -156,7 +156,7 @@ export default function MainLayout() {
                     <Link 
                       to="/register" 
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 bg-blue-600 text-white rounded-2xl text-center font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-600/20"
+                      className="w-full py-4 bg-blue-600 text-white rounded-xl text-center font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-600/20"
                     >
                       Join Now
                     </Link>
@@ -275,7 +275,7 @@ function MobileNavLink({ to, children, active, onClick }) {
     <Link 
       to={to} 
       onClick={onClick}
-      className={`px-4 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+      className={`px-4 py-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${
         active 
           ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
           : 'text-slate-500 hover:bg-slate-50'

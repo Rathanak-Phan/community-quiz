@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getQuizById } from "../../services/quizService";
 import { startAttempt } from "../../services/attemptService";
 import { addFavorite, removeFavorite } from "../../services/favoriteService";
-import { Clock, Users, BookOpen, Play, ChevronLeft, Calendar, User, Layers, ShieldCheck, Sparkles, AlertCircle, Heart, Bookmark } from "lucide-react";
+import { Clock, Users, BookOpen, Play, ChevronLeft, Calendar, User, Layers, ShieldCheck, Sparkles, AlertCircle, Heart, Bookmark, Settings } from "lucide-react";
 import { STORAGE_URL } from "../../config/api";
 import { useAuth } from "../../providers/AuthContext";
 import Toast from "../../components/ui/Toast";
@@ -31,10 +31,12 @@ export default function QuizDetail() {
     };
 
     useEffect(() => {
-        fetchQuiz();
+        if (quizId && quizId !== 'undefined') {
+            fetchQuiz();
+        }
     }, [quizId]);
 
-    const { token } = useAuth();
+    const { token, user, isAdmin } = useAuth();
 
     const handleStart = async () => {
         if (!token) {
@@ -120,6 +122,15 @@ export default function QuizDetail() {
                         <ShieldCheck size={14} className="text-blue-600" />
                         <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Verified Content</span>
                     </div>
+                    {(isAdmin || user?.id === quiz.created_by) && (
+                        <button 
+                            onClick={() => navigate(`/quizzes/${quizId}/questions`)}
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10"
+                        >
+                            <Settings size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Manage Questions</span>
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -138,10 +149,10 @@ export default function QuizDetail() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-3 bg-slate-100 p-2 rounded-[2rem]">
+                        <div className="flex items-center gap-3 bg-slate-100 p-2 rounded-2xl">
                             <button 
                                 onClick={() => setMode('scored')}
-                                className={`flex-1 py-3 px-6 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'scored' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`flex-1 py-3 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'scored' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Scored Mode
                             </button>
@@ -199,7 +210,13 @@ export default function QuizDetail() {
                     </p>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-                        <InfoBox icon={<Clock size={18}/>} label="Duration" value={`${quiz.time_limit || 30}m`} />
+                        <InfoBox 
+                            icon={<Clock size={18}/>} 
+                            label="Duration" 
+                            value={quiz.total_time > 0 ? (
+                                quiz.total_time < 60 ? `${quiz.total_time}s` : `${Math.floor(quiz.total_time / 60)}m ${quiz.total_time % 60 > 0 ? (quiz.total_time % 60) + 's' : ''}`
+                            ) : "No Limit"} 
+                        />
                         <InfoBox icon={<BookOpen size={18}/>} label="Questions" value={quiz.questions_count || 10} />
                         <InfoBox icon={<Users size={18}/>} label="Attempts" value={quiz.attempts_count || 0} />
                         <InfoBox icon={<Calendar size={18}/>} label="Published" value={new Date(quiz.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })} />

@@ -85,7 +85,7 @@ const AdminCommunitiesPage = () => {
         <div className="flex items-center gap-3">
            <button 
              onClick={fetchCommunities}
-             className="px-6 py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition shadow-sm"
+             className="px-6 py-4 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition shadow-sm"
            >
              Sync Communities
            </button>
@@ -95,7 +95,7 @@ const AdminCommunitiesPage = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-md transition-all group">
+          <div key={i} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-start justify-between">
               <div className={`p-4 ${stat.bg} ${stat.color} rounded-2xl transition-transform group-hover:scale-110`}>
                 <stat.icon size={24} />
@@ -111,7 +111,7 @@ const AdminCommunitiesPage = () => {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white p-6 rounded-[2.5rem] border border-slate-50 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-white p-6 rounded-2xl border border-slate-50 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="relative flex-1 max-w-xl group">
           <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
           <input 
@@ -119,7 +119,7 @@ const AdminCommunitiesPage = () => {
             placeholder="Search by community name or owner..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-14 pr-8 py-4 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-bold"
+            className="w-full pl-14 pr-8 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-bold"
           />
         </div>
 
@@ -141,7 +141,7 @@ const AdminCommunitiesPage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-white rounded-[3rem] border border-slate-50 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
@@ -175,7 +175,7 @@ const AdminCommunitiesPage = () => {
                 <tr key={c.id} className="group hover:bg-slate-50/30 transition-colors">
                   <td className="px-10 py-8">
                     <div className="flex items-center gap-6">
-                      <div className="w-20 h-20 bg-slate-100 rounded-3xl overflow-hidden relative group-hover:shadow-xl transition-all border border-transparent group-hover:border-indigo-100">
+                      <div className="w-20 h-20 bg-slate-100 rounded-md overflow-hidden relative group-hover:shadow-xl transition-all border border-transparent group-hover:border-indigo-100">
                         {c.cover_image ? (
                           <img 
                             src={c.cover_image.startsWith('http') ? c.cover_image : `http://localhost:8000/storage/${c.cover_image}`} 
@@ -192,7 +192,7 @@ const AdminCommunitiesPage = () => {
                       <div>
                         <p className="text-2xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">{c.name}</p>
                         <div className="flex items-center gap-3 mt-2">
-                           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-100 rounded-lg">
+                           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg">
                               <Calendar size={12} className="text-slate-400" />
                               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                                 Established {new Date(c.created_at).toLocaleDateString()}
@@ -218,7 +218,7 @@ const AdminCommunitiesPage = () => {
                     </div>
                   </td>
                   <td className="px-10 py-8 text-center">
-                    <div className="inline-flex items-center gap-3 px-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                    <div className="inline-flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm">
                        <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-500">
                           <OwnerIcon size={16} />
                        </div>
@@ -236,7 +236,7 @@ const AdminCommunitiesPage = () => {
                       >
                         <Trash2 size={14} /> Terminate Hub
                       </button>
-                      <button className="p-4 bg-white border border-slate-100 text-slate-400 rounded-2xl hover:bg-slate-50 transition shadow-sm">
+                      <button className="p-4 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-slate-50 transition shadow-sm">
                         <MoreVertical size={18} />
                       </button>
                     </div>

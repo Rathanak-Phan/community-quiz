@@ -168,7 +168,7 @@ export default function Sidebar() {
                 end={to === "/"}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
+                  `flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all duration-300 group ${
                     isActive
                       ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
                       : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

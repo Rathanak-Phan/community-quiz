@@ -146,7 +146,7 @@ export default function SettingsPage() {
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
+      className={`flex items-center gap-2 px-6 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
         activeTab === id 
         ? "bg-slate-900 text-white shadow-xl shadow-slate-900/20" 
         : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -181,7 +181,7 @@ export default function SettingsPage() {
                 type="text"
                 value={siteName}
                 onChange={(e) => setSiteName(e.target.value)}
-                className="w-full px-8 py-5 bg-slate-50 border border-transparent rounded-[2rem] outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-lg"
+                className="w-full px-8 py-5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-lg"
                 placeholder="e.g. QuizSphere"
               />
             </div>
@@ -190,7 +190,7 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Platform Logo</label>
                 <div 
-                  className="relative h-56 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden group"
+                  className="relative h-56 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden group"
                   onClick={() => document.getElementById('logo-upload').click()}
                 >
                   {logoPreview ? (
@@ -208,7 +208,7 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Hero Background</label>
                 <div 
-                  className="relative h-56 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden group"
+                  className="relative h-56 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden group"
                   onClick={() => document.getElementById('bg-upload').click()}
                 >
                   {heroBgPreview ? (
@@ -237,7 +237,7 @@ export default function SettingsPage() {
             ].map((feat) => (
               <div 
                 key={feat.id}
-                className="flex items-center justify-between p-6 rounded-[2rem] hover:bg-slate-50 transition-colors cursor-pointer group"
+                className="flex items-center justify-between p-6 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group"
                 onClick={() => toggleFeature(feat.id)}
               >
                 <div className="space-y-1">
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                     name={platform}
                     value={socials[platform]}
                     onChange={handleSocialChange}
-                    className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-transparent rounded-[2rem] outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-sm"
+                    className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-sm"
                     placeholder={`https://${platform}.com/yourpage`}
                   />
                 </div>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-slate-900 text-white px-12 py-6 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.2em] hover:bg-blue-600 hover:-translate-y-1 transition-all shadow-2xl shadow-blue-600/20 active:scale-95 flex items-center gap-3 disabled:opacity-50"
+            className="bg-slate-900 text-white px-12 py-6 rounded-xl font-black text-sm uppercase tracking-[0.2em] hover:bg-blue-600 hover:-translate-y-1 transition-all shadow-2xl shadow-blue-600/20 active:scale-95 flex items-center gap-3 disabled:opacity-50"
           >
             {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
             Save Site Configuration

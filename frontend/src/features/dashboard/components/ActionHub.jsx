@@ -47,7 +47,7 @@ export default function ActionHub({ role }) {
           <button
             key={i}
             onClick={() => navigate(action.path)}
-            className={`flex items-center gap-3 px-6 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.15em] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 active:scale-95 ${
+            className={`flex items-center gap-3 px-6 py-4 rounded-xl font-black text-xs uppercase tracking-[0.15em] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 active:scale-95 ${
               action.primary 
                 ? `${action.color} text-white` 
                 : "bg-white text-slate-600 border border-slate-100 hover:border-transparent"

@@ -18,6 +18,7 @@ class SubmissionResource extends JsonResource
             'score' => $this->score,
             'max_score' => $this->max_score,
             'percentage' => round(($this->score / max($this->max_score, 1)) * 100, 2),
+            'grading_status' => $this->grading_status,
             'submitted_at' => $this->submitted_at,
             'share_url' => config('app.frontend_url', 'http://localhost:5173') . "/result/{$this->id}",
         ];

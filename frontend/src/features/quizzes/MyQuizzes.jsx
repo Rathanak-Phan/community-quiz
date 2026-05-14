@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles, HelpCircle } from "lucide-react";
+import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles, HelpCircle, BarChart2, MoreVertical, Eye } from "lucide-react";
 import { getMyQuizzes, deleteQuiz } from "../../services/quizService";
 import Toast from "../../components/ui/Toast";
 import QuizFormModal from "./components/QuizFormModal";
@@ -76,7 +76,7 @@ export default function MyQuizzes() {
                         setEditData(null);
                         setIsModalOpen(true);
                     }}
-                    className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                    className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
                 >
                     <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/40">
                       <Plus size={16} />
@@ -86,7 +86,7 @@ export default function MyQuizzes() {
             </div>
 
             {/* Search */}
-            <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100">
+            <div className="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200/40 border border-slate-100">
                 <div className="relative group w-full">
                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
                     <input 
@@ -103,7 +103,7 @@ export default function MyQuizzes() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-[420px] bg-white rounded-[3rem] animate-pulse border border-slate-100"></div>
+                        <div key={i} className="h-[420px] bg-white rounded-3xl animate-pulse border border-slate-100"></div>
                     ))}
                 </div>
             ) : filteredQuizzes.length > 0 ? (
@@ -122,7 +122,7 @@ export default function MyQuizzes() {
                 </div>
             ) : (
                 <div className="py-32 flex flex-col items-center text-center space-y-6">
-                   <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
+                   <div className="w-24 h-24 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-300">
                       <BookOpen size={40} />
                    </div>
                    <div className="space-y-2">
@@ -151,88 +151,164 @@ export default function MyQuizzes() {
 }
 
 function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
+    const navigate = useNavigate();
+    const [showMenu, setShowMenu] = useState(false);
+
+    useEffect(() => {
+        if (!showMenu) return;
+        const closeMenu = () => setShowMenu(false);
+        window.addEventListener('click', closeMenu);
+        return () => window.removeEventListener('click', closeMenu);
+    }, [showMenu]);
+
     return (
         <div 
             onClick={onClick}
-            className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group cursor-pointer relative flex flex-col"
+            className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-blue-100 transition-all duration-500 cursor-pointer hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]"
         >
-            <div className="h-48 relative bg-slate-50 overflow-hidden">
-                {quiz.cover_image ? (
-                    <img src={`${STORAGE_URL}/${quiz.cover_image}`} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={quiz.title} />
-                ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center">
-                        <Sparkles size={48} className="text-blue-200" />
+            {/* Action Menu - Positioned at top level of card to avoid clipping */}
+            <div className="absolute top-6 right-6 z-50">
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(!showMenu);
+                    }}
+                    className={`w-12 h-12 rounded-xl backdrop-blur-xl flex items-center justify-center transition-all duration-500 shadow-2xl ${
+                        showMenu 
+                        ? 'bg-blue-600 text-white rotate-90 scale-110' 
+                        : 'bg-white/80 text-slate-900 hover:bg-white border border-white/40'
+                    }`}
+                >
+                    <MoreVertical size={24} strokeWidth={2.5} />
+                </button>
+
+                {showMenu && (
+                    <div 
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-white/50 p-3 animate-in fade-in zoom-in slide-in-from-top-4 duration-300 overflow-hidden"
+                    >
+                        <div className="px-5 py-3 mb-2">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Management</p>
+                        </div>
+                        
+                        <MenuBtn 
+                            icon={<Eye size={18} />} 
+                            label="Preview Quiz" 
+                            color="text-slate-400"
+                            hoverColor="group-hover/btn:text-blue-600"
+                            onClick={onClick} 
+                        />
+                        <MenuBtn 
+                            icon={<BarChart2 size={18} />} 
+                            label="Analytics & Attempts" 
+                            color="text-slate-400"
+                            hoverColor="group-hover/btn:text-indigo-600"
+                            onClick={() => navigate(`/quizzes/${quiz.id}/attempts`)} 
+                        />
+                        <MenuBtn 
+                            icon={<HelpCircle size={18} />} 
+                            label="Edit Questions" 
+                            color="text-slate-400"
+                            hoverColor="group-hover/btn:text-amber-600"
+                            onClick={onManage} 
+                        />
+                        <MenuBtn 
+                            icon={<Edit3 size={18} />} 
+                            label="Quiz Settings" 
+                            color="text-slate-400"
+                            hoverColor="group-hover/btn:text-indigo-600"
+                            onClick={(e) => onEdit(e, quiz)} 
+                        />
+                        
+                        <div className="mx-4 my-2 h-px bg-slate-100" />
+                        
+                        <MenuBtn 
+                            icon={<Trash2 size={18} />} 
+                            label="Delete Forever" 
+                            color="text-slate-400"
+                            hoverColor="group-hover/btn:text-rose-600"
+                            isDestructive
+                            onClick={(e) => onDelete(e, quiz.id)} 
+                        />
                     </div>
                 )}
-                
-                <div className="absolute top-6 left-6 flex flex-col gap-2">
-                    <span className="px-4 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[10px] font-black text-slate-900 uppercase tracking-widest shadow-lg border border-white/50">
-                        {quiz.category?.name || "General"}
-                    </span>
-                    <span className={`px-4 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-black uppercase tracking-widest shadow-lg border ${
-                        quiz.status === 'draft' 
-                        ? 'bg-amber-500/90 text-white border-amber-400' 
-                        : 'bg-emerald-500/90 text-white border-emerald-400'
-                    }`}>
-                        {quiz.status || 'published'}
-                    </span>
-                </div>
+            </div>
 
-                <div className="absolute top-6 right-6 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onManage();
-                        }}
-                        title="Manage Questions"
-                        className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-amber-600 hover:bg-amber-600 hover:text-white transition shadow-lg"
-                    >
-                        <HelpCircle size={16} />
-                    </button>
-                    <button 
-                        onClick={(e) => onEdit(e, quiz)}
-                        className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-blue-600 hover:bg-blue-600 hover:text-white transition shadow-lg"
-                    >
-                        <Edit3 size={16} />
-                    </button>
-                    <button 
-                        onClick={(e) => onDelete(e, quiz.id)}
-                        className="w-10 h-10 rounded-xl bg-white/90 backdrop-blur-md flex items-center justify-center text-rose-600 hover:bg-rose-600 hover:text-white transition shadow-lg"
-                    >
-                        <Trash2 size={16} />
-                    </button>
+            <div className="relative h-48 w-full overflow-hidden shadow-inner bg-slate-50">
+                {/* Visual Polish Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                {quiz.cover_image ? (
+                    <img 
+                        src={`${STORAGE_URL}/${quiz.cover_image}`} 
+                        className="w-full h-full object-cover transition duration-1000 group-hover:scale-105" 
+                        alt={quiz.title} 
+                    />
+                ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500/5 to-indigo-500/5 flex items-center justify-center">
+                        <Sparkles size={64} className="text-blue-200 animate-pulse" />
+                    </div>
+                )}
+
+                {/* Glassmorphism Badges */}
+                <div className="absolute top-5 left-5 z-20 flex flex-col gap-2">
+                    <div className="px-4 py-2 rounded-xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl shadow-slate-900/5">
+                        <p className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{quiz.category?.name || "General"}</p>
+                    </div>
+                    <div className={`px-4 py-2 rounded-xl backdrop-blur-xl border shadow-xl shadow-slate-900/5 ${
+                        quiz.status === 'draft' 
+                        ? 'bg-amber-500/20 text-amber-700 border-amber-200/50' 
+                        : 'bg-emerald-500/20 text-emerald-700 border-emerald-200/50'
+                    }`}>
+                        <p className="text-[10px] font-black uppercase tracking-tighter">{quiz.status || 'published'}</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="p-8 flex flex-col flex-1">
-                <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-3">
-                    {quiz.title}
-                </h3>
-                <p className="text-slate-500 text-sm font-medium line-clamp-2 min-h-[40px] leading-relaxed mb-8">
-                    {quiz.description || "No description provided."}
-                </p>
-                
-                <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                                <Clock size={14} />
-                            </div>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{quiz.time_limit || 30}M</span>
+            {/* Content Section */}
+            <div className="px-4 pt-8 pb-4">
+                <div className="mb-8">
+                    <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors duration-300 leading-tight mb-3">
+                        {quiz.title}
+                    </h3>
+                    <p className="text-slate-500 text-sm font-medium line-clamp-2 leading-relaxed h-[3rem]">
+                        {quiz.description || "No description provided."}
+                    </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-8 border-t border-slate-50">
+                    <div className="flex items-center gap-3">
+                        <div className="px-4 py-2.5 bg-slate-50 rounded-xl flex items-center gap-2.5 border border-slate-100 group-hover:bg-blue-50/50 group-hover:border-blue-100 transition-colors">
+                             <Clock size={16} className="text-blue-500" />
+                             <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{quiz.time_limit || 30}M</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                <Users size={14} />
-                            </div>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{quiz.attempts_count || 0} ATTEMPTS</span>
+                        <div className="px-4 py-2.5 bg-slate-50 rounded-xl flex items-center gap-2.5 border border-slate-100 group-hover:bg-emerald-50/50 group-hover:border-emerald-100 transition-colors">
+                             <Users size={16} className="text-emerald-500" />
+                             <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{quiz.attempts_count || 0} ATTEMPTS</span>
                         </div>
                     </div>
                     
-                    <button className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center group-hover:bg-blue-600 transition-all duration-300 shadow-lg shadow-slate-900/10 group-hover:shadow-blue-600/20 active:scale-90">
-                        <ChevronRight size={20} />
-                    </button>
+                    <div className="w-14 h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/20 group-hover:shadow-blue-600/40 active:scale-90 group-hover:translate-x-1">
+                        <ChevronRight size={28} />
+                    </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+function MenuBtn({ icon, label, onClick, color, hoverColor, isDestructive }) {
+    return (
+        <button 
+            onClick={(e) => { e.stopPropagation(); onClick(e); }}
+            className={`w-full px-5 py-3.5 flex items-center gap-4 rounded-xl transition-all duration-300 group/btn text-left ${isDestructive ? 'hover:bg-rose-50' : 'hover:bg-slate-50'}`}
+        >
+            <div className={`${color} ${hoverColor} transition-all duration-300 group-hover/btn:scale-110`}>
+                {icon}
+            </div>
+            <span className={`text-sm font-bold transition-colors ${isDestructive ? 'text-rose-500 group-hover/btn:text-rose-600' : 'text-slate-600 group-hover/btn:text-slate-900'}`}>
+                {label}
+            </span>
+        </button>
     );
 }

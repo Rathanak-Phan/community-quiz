@@ -7,6 +7,7 @@ use App\Models\Community;
 use App\Models\CommunityMember;
 use App\Services\CommunityService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CommunityController extends Controller
 {
@@ -36,19 +37,29 @@ class CommunityController extends Controller
 
         $communities = Community::with('creator:id,name,email')
             ->when(!$user, function ($query) {
-                return $query->where('visibility', 'public');
+                return $query->where('status', 'published')
+                             ->where('visibility', 'public');
             })
             ->when($user, function ($query) use ($user) {
-                if ($user->isAdmin()) return $query;
+                if ($user->isAdmin()) {
+                    return $query; // Admin sees everything (all status, all visibility)
+                }
                 
-                return $query->where('visibility', 'public')
-                    ->orWhere(function ($q) use ($user) {
-                        $q->where('visibility', 'private')
-                          ->whereHas('members', function ($m) use ($user) {
-                              $m->where('user_id', $user->id)
-                                ->where('status', 'approved');
-                          });
-                    });
+                return $query->where(function ($q) use ($user) {
+                    // Published public communities
+                    $q->where('status', 'published')->where('visibility', 'public')
+                      // OR Private communities where user is a member
+                      ->orWhere(function ($sq) use ($user) {
+                          $sq->where('status', 'published')
+                            ->where('visibility', 'private')
+                            ->whereHas('members', function ($m) use ($user) {
+                                $m->where('user_id', $user->id)
+                                  ->where('status', 'approved');
+                            });
+                      })
+                      // OR User's own communities (even if draft or private)
+                      ->orWhere('created_by', $user->id);
+                });
             })
             ->withCount('members')
             ->get();
@@ -112,6 +123,7 @@ class CommunityController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'visibility' => 'required|in:public,private',
+            'status' => 'required|in:draft,published',
             'cover_image' => 'nullable|mimes:jpg,jpeg,png|max:2048'
         ]);
 
@@ -130,6 +142,13 @@ class CommunityController extends Controller
     {
         $user = auth('sanctum')->user();
 
+        // Draft check
+        if ($community->status === 'draft') {
+            if (!$user || ($community->created_by !== $user->id && !$user->isAdmin())) {
+                return response()->json(['message' => 'Community is in draft mode'], 403);
+            }
+        }
+
         // Guest check
         if (!$user && $community->visibility === 'private') {
             return response()->json(['message' => 'Unauthenticated or Private Community'], 401);
@@ -142,7 +161,7 @@ class CommunityController extends Controller
                 ->where('status', 'approved')
                 ->exists();
 
-            if (!$isMember && !$user->isAdmin()) {
+            if (!$isMember && !$user->isAdmin() && $community->created_by !== $user->id) {
                 return response()->json(['message' => 'Access Denied'], 403);
             }
         }
@@ -228,6 +247,7 @@ class CommunityController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'visibility' => 'required|in:public,private',
+            'status' => 'required|in:draft,published',
             'cover_image' => 'nullable|mimes:jpg,jpeg,png|max:2048'
         ]);
 
@@ -235,6 +255,7 @@ class CommunityController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'visibility' => $request->visibility,
+            'status' => $request->status,
         ];
 
         // Handle image
@@ -322,7 +343,69 @@ class CommunityController extends Controller
         $result = $this->communityService->joinCommunity($community, $user->id);
 
         return response()->json([
-            'message' => $result['message']
+            'message' => $result['message'],
+            'status' => $result['status']
+        ]);
+    }
+
+    public function joinByCode(Request $request)
+    {
+        $request->validate([
+            'invite_code' => 'required|string'
+        ]);
+
+        $community = Community::where('invite_code', $request->invite_code)->first();
+
+        if (!$community) {
+            return response()->json(['message' => 'Invalid invite code'], 404);
+        }
+
+        if ($community->status === 'draft') {
+            return response()->json(['message' => 'This community is currently in draft mode and cannot be joined via invite code.'], 403);
+        }
+
+        $user = auth()->user();
+
+        // check already joined/requested
+        $exits = CommunityMember::where([
+            'community_id' => $community->id,
+            'user_id' => $user->id
+        ])->first();
+
+        if ($exits) {
+            return response()->json([
+                'message' => 'Already joined or requested'
+            ], 400);
+        }
+
+        // When joining by code, it's always approved instantly (since it's an invite)
+        CommunityMember::create([
+            'community_id' => $community->id,
+            'user_id' => $user->id,
+            'role' => 'member',
+            'status' => 'approved'
+        ]);
+
+        return response()->json([
+            'message' => 'Joined community successfully via invite code',
+            'status' => 'approved',
+            'community_id' => $community->id
+        ]);
+    }
+
+    public function regenerateInviteCode(Community $community)
+    {
+        if ($community->created_by !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $community->update([
+            'invite_code' => Str::random(8)
+        ]);
+
+        return response()->json([
+            'message' => 'Invite code regenerated',
+            'invite_code' => $community->invite_code
         ]);
     }
 

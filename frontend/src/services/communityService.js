@@ -52,3 +52,9 @@ export const getMyCommunities = () =>
 
 export const getPendingMembers = (communityId) =>
   apiClient.get(`/communities/${communityId}/pending-members`);
+
+export const joinByCode = (invite_code) =>
+  apiClient.post("/communities/join-by-code", { invite_code });
+
+export const regenerateInviteCode = (communityId) =>
+  apiClient.post(`/communities/${communityId}/regenerate-invite-code`);

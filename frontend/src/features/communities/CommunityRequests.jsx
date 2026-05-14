@@ -47,8 +47,10 @@ export default function CommunityRequests() {
   }, [id, user?.id, user?.role, navigate]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (id && id !== 'undefined') {
+      fetchData();
+    }
+  }, [id, fetchData]);
 
   const handleAction = async (requestId, action) => {
     setActionLoading(requestId);
@@ -104,7 +106,7 @@ export default function CommunityRequests() {
       <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
         {requests.length === 0 ? (
           <div className="py-32 flex flex-col items-center text-center space-y-6">
-            <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center text-slate-200">
+            <div className="w-24 h-24 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
               <ShieldCheck size={48} />
             </div>
             <div className="space-y-2">

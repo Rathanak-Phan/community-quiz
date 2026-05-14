@@ -32,7 +32,10 @@ class QuizAttemptDetailResource extends JsonResource
             'grading_status' => $this->grading_status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'expires_at' => $this->started_at?->addMinutes(30), // Default 30 mins for now
+            'expires_at' => $this->started_at ? $this->started_at->addSeconds($this->quiz->questions->sum(function($q) {
+                if ($q->time_limit > 0) return $q->time_limit;
+                return $this->quiz->has_timer ? ($this->quiz->default_time_limit ?: 30) : 3600; // Default 1 hour if no timer
+            })) : null,
             'submission_id' => $this->submission?->id,
 
             // Relations
