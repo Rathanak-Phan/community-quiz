@@ -94,7 +94,7 @@ export default function HelpCenter() {
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {categories.map((cat, idx) => (
           <div key={idx} className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-blue-600/10 transition-all duration-500 hover:-translate-y-2">
-            <div className={`w-14 h-14 ${cat.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+            <div className={`w-14 h-14 ${cat.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
               {cat.icon}
             </div>
             <h3 className="text-xl font-black text-slate-900 mb-4">{cat.title}</h3>
@@ -146,11 +146,11 @@ export default function HelpCenter() {
             <p className="text-blue-100 font-medium">Our team is available 24/7 to help you with any issues you might be facing.</p>
             
             <div className="space-y-3">
-              <button className="w-full bg-white text-blue-600 p-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-3">
+              <button className="w-full bg-white text-blue-600 p-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-3">
                 <Mail size={18} />
                 Email Support
               </button>
-              <button className="w-full bg-blue-700/50 text-white p-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-3">
+              <button className="w-full bg-blue-700/50 text-white p-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center justify-center gap-3">
                 <MessageCircle size={18} />
                 Live Chat
               </button>

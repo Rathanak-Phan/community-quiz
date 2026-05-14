@@ -31,8 +31,9 @@ function Login() {
 
   useEffect(() => {
     if (token && !authLoading) {
-      if (redirectPath) {
-        navigate(redirectPath);
+      const from = location.state?.from || redirectPath;
+      if (from) {
+        navigate(from);
         return;
       }
       const userDataStr = localStorage.getItem("user");
@@ -59,10 +60,13 @@ function Login() {
 
     try {
       const res = await login({ email, password });
-      if (redirectPath) {
-        navigate(redirectPath);
+      const from = location.state?.from || redirectPath;
+      
+      if (from) {
+        navigate(from);
         return;
       }
+      
       const userData = res.data.user;
       const isAdmin = (userData.role?.name === "admin" || Number(userData.role_id) === 1);
       

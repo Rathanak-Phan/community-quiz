@@ -48,11 +48,11 @@ const FavoritesPage = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-64 bg-white rounded-[2.5rem] animate-pulse border border-slate-100"></div>
+            <div key={i} className="h-64 bg-white rounded-2xl animate-pulse border border-slate-100"></div>
           ))}
         </div>
       ) : favorites.length === 0 ? (
-        <div className="bg-white rounded-[3rem] p-20 border border-slate-100 text-center flex flex-col items-center">
+        <div className="bg-white rounded-3xl p-20 border border-slate-100 text-center flex flex-col items-center">
           <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center text-rose-200 mb-6">
             <Heart size={40} />
           </div>
@@ -67,32 +67,47 @@ const FavoritesPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {favorites.map((fav) => (
-            <div key={fav.id} className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all duration-500 group relative">
-              <button 
-                onClick={() => removeFavorite(fav.id)}
-                className="absolute top-6 right-6 w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500 hover:text-white"
-              >
-                <Trash2 size={18} />
-              </button>
-
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                <BookOpen size={24} />
+          {favorites.map((fav) => {
+            const isQuiz = fav.target_type === 'quiz';
+            const details = fav.details;
+            
+            return (
+              <div key={fav.id} className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all duration-500 group relative">
+                <button 
+                  onClick={() => removeFavorite(fav.id)}
+                  className="absolute top-6 right-6 w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500 hover:text-white"
+                >
+                  <Trash2 size={18} />
+                </button>
+  
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:text-white transition-colors ${
+                  isQuiz ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600' : 'bg-violet-50 text-violet-600 group-hover:bg-violet-600'
+                }`}>
+                  <BookOpen size={24} />
+                </div>
+  
+                <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 line-clamp-1">
+                  {isQuiz ? details?.title : details?.name}
+                </h3>
+                
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">
+                  {isQuiz ? (
+                    <>Category: <span className="text-blue-600">{details?.category?.name || 'General'}</span></>
+                  ) : (
+                    <><span className="text-violet-600">Category Domain</span></>
+                  )}
+                </p>
+  
+                <button 
+                  onClick={() => navigate(isQuiz ? `/quizzes/${fav.target_id}` : `/communities?category=${fav.target_id}`)}
+                  className="w-full flex items-center justify-center gap-3 py-4 bg-slate-50 text-slate-900 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all group/btn"
+                >
+                  {isQuiz ? 'Start Quiz' : 'Explore Category'} 
+                  <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                </button>
               </div>
-
-              <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 line-clamp-1">{fav.quiz?.title}</h3>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">
-                Category: <span className="text-blue-600">{fav.quiz?.category?.name || 'General'}</span>
-              </p>
-
-              <button 
-                onClick={() => navigate(`/quizzes/${fav.quiz_id}`)}
-                className="w-full flex items-center justify-center gap-3 py-4 bg-slate-50 text-slate-900 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all group/btn"
-              >
-                Start Quiz <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

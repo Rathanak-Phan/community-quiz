@@ -20,6 +20,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Update 'submitted' status to 'completed' before reverting the ENUM
+        DB::table('quiz_attempts')->where('status', 'submitted')->update(['status' => 'completed']);
+
         DB::statement("ALTER TABLE quiz_attempts MODIFY COLUMN status ENUM('in_progress', 'completed') DEFAULT 'in_progress'");
     }
 };

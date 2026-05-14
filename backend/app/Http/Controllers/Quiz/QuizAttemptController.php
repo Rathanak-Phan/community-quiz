@@ -188,6 +188,7 @@ class QuizAttemptController extends Controller
                         'submission_id' => $submission->id,
                         'question_id' => $attemptAnswer->question_id,
                         'selected_option_id' => $attemptAnswer->selected_option_id,
+                        'selected_options' => $attemptAnswer->selected_options,
                         'answer_boolean' => $attemptAnswer->answer_boolean,
                         'answer_text' => $attemptAnswer->answer_text,
                         'is_correct' => $attemptAnswer->is_correct,
@@ -250,6 +251,7 @@ class QuizAttemptController extends Controller
         $user = auth()->user();
         $request->validate([
             'score' => 'required|integer|min:0',
+            'is_correct' => 'nullable|boolean',
             'feedback' => 'nullable|string',
         ]);
 
@@ -262,7 +264,11 @@ class QuizAttemptController extends Controller
         }
 
         $question = $attemptAnswer->question;
-        $isCorrect = $request->score >= ($question->points / 2);
+        
+        // Use provided is_correct or calculate based on score (>= 50% is correct)
+        $isCorrect = $request->has('is_correct') 
+            ? $request->boolean('is_correct') 
+            : ($request->score >= ($question->points / 2));
 
         $attemptAnswer->update([
             'score' => $request->score,
@@ -337,7 +343,7 @@ class QuizAttemptController extends Controller
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
-        $attempt->load(['quiz.questions.options', 'answers.question']);
+        $attempt->load(['quiz.questions.options', 'answers.question.options', 'answers.question.shortAnswer']);
         return new QuizAttemptDetailResource($attempt);
     }
 
@@ -383,6 +389,35 @@ class QuizAttemptController extends Controller
         return response()->json([
             'data' => $submissions
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/quizzes/{quiz}/attempts",
+     *     tags={"Quiz Attempt"},
+     *     summary="List all attempts for a specific quiz (for Quiz Maker/Admin)",
+     *     operationId="quizAttemptIndexByQuiz",
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(name="quiz", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Quiz attempts")
+     * )
+     */
+    public function indexByQuiz(Quiz $quiz)
+    {
+        $user = auth()->user();
+
+        // Authorization: Admin or Quiz Creator
+        if (!$user->isAdmin() && $quiz->created_by !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        $attempts = QuizAttempt::where('quiz_id', $quiz->id)
+            ->where('status', 'submitted')
+            ->with(['user'])
+            ->latest('completed_at')
+            ->get();
+
+        return QuizAttemptResource::collection($attempts);
     }
 }
 

@@ -46,7 +46,7 @@ export default function ManualReviewList() {
             {loading ? (
                 <div className="space-y-6">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-32 bg-white rounded-[2.5rem] animate-pulse border border-slate-100"></div>
+                        <div key={i} className="h-32 bg-white rounded-2xl animate-pulse border border-slate-100"></div>
                     ))}
                 </div>
             ) : reviews.length > 0 ? (
@@ -55,7 +55,7 @@ export default function ManualReviewList() {
                         <div 
                             key={review.attempt_id}
                             onClick={() => navigate(`/reviews/${review.attempt_id}`)}
-                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500 group cursor-pointer flex flex-col md:flex-row items-center justify-between gap-8"
+                            className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500 group cursor-pointer flex flex-col md:flex-row items-center justify-between gap-8"
                         >
                             <div className="flex items-center gap-8 w-full">
                                 <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-500 shrink-0">
@@ -89,7 +89,7 @@ export default function ManualReviewList() {
                 </div>
             ) : (
                 <div className="py-32 flex flex-col items-center text-center space-y-6">
-                    <div className="w-24 h-24 bg-slate-50 rounded-[3rem] flex items-center justify-center text-slate-200">
+                    <div className="w-24 h-24 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
                         <AlertCircle size={40} />
                     </div>
                     <div className="space-y-2">

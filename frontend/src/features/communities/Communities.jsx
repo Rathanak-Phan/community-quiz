@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ChevronDown, Plus, Users, Globe, TrendingUp, Sparkles } from "lucide-react";
+import { Search, ChevronDown, Plus, Users, Globe, TrendingUp, Sparkles, Hash } from "lucide-react";
+import { joinByCode } from "../../services/communityService";
 import CommunityCard from "./components/CommunityCard";
 import CommunityFormModal from "./components/CommunityFormModal";
+import JoinModal from "./components/JoinModal";
 import Toast from "../../components/ui/Toast";
 import { getCommunities, joinCommunity, leaveCommunity, deleteCommunity } from "../../api/communityApi";
 import { useAuth } from "../../providers/AuthContext";
@@ -20,6 +22,7 @@ export default function Communities() {
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
@@ -34,8 +37,10 @@ export default function Communities() {
         list.map((c) => ({
           ...c,
           members: c.members_count ?? c.members ?? 0,
-          status: c.status ?? "public",
+          status: c.status ?? "published",
+          visibility: c.visibility ?? "public",
           isMember: c.is_member ?? false,
+          joinStatus: c.join_status ?? null,
           memberAvatars: c.recent_members ?? [],
         }))
       );
@@ -68,9 +73,9 @@ export default function Communities() {
     }
 
     if (filter === "Public") {
-      filtered = filtered.filter((c) => c.status === "public");
+      filtered = filtered.filter((c) => c.visibility === "public");
     } else if (filter === "Private") {
-      filtered = filtered.filter((c) => c.status === "private");
+      filtered = filtered.filter((c) => c.visibility === "private");
     }
 
     const sorted = [...filtered].sort((a, b) => {
@@ -106,6 +111,24 @@ export default function Communities() {
     }
   };
 
+  const [joinCodeLoading, setJoinCodeLoading] = useState(false);
+
+  const handleJoinByCode = async (code) => {
+    if (!token) {
+      navigate("/");
+      return;
+    }
+    try {
+      const res = await joinByCode(code);
+      const communityId = res.data?.community_id || res.data?.community?.id;
+      setToast({ show: true, message: res.data?.message || "Joined successfully", type: "success" });
+      if (communityId) navigate(`/communities/${communityId}`);
+    } catch (err) {
+      setToast({ show: true, message: err.response?.data?.message || "Invalid code", type: "error" });
+      throw err;
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-10 md:space-y-20 pb-32">
       {/* Hero Section */}
@@ -123,18 +146,27 @@ export default function Communities() {
             </div>
           </div>
           {canCreate && (
-              <button 
-                onClick={() => {
-                  setEditData(null);
-                  setIsModalOpen(true);
-                }}
-                className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 rounded-[2.5rem] font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group mx-auto md:mx-0"
-              >
-                  <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center transition-all group-hover:rotate-90 group-hover:bg-white/20">
-                    <Plus size={20} />
-                  </div>
-                  Launch Group
-              </button>
+              <div className="flex gap-4 w-full md:w-auto mx-auto md:mx-0">
+                <button 
+                  onClick={() => {
+                    setEditData(null);
+                    setIsModalOpen(true);
+                  }}
+                  className="flex-1 md:flex-none bg-slate-900 text-white px-10 py-5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                >
+                    <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center transition-all group-hover:rotate-90 group-hover:bg-white/20">
+                      <Plus size={20} />
+                    </div>
+                    Launch Group
+                </button>
+                <button 
+                  onClick={() => setIsJoinModalOpen(true)}
+                  className="flex-1 md:flex-none bg-white text-slate-900 border border-slate-200 px-8 py-5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:border-blue-600 transition-all duration-500 shadow-sm active:scale-95"
+                >
+                    <Hash size={20} className="text-blue-600" />
+                    Join with Code
+                </button>
+              </div>
           )}
         </div>
       </div>
@@ -153,7 +185,7 @@ export default function Communities() {
             <input 
                 type="text" 
                 placeholder="Find your tribe (e.g. Science, Coding, Art)..." 
-                className="w-full pl-16 pr-8 py-5 bg-slate-50/50 border border-transparent rounded-[1.25rem] md:rounded-[1.75rem] outline-none focus:bg-white focus:border-blue-600/20 focus:ring-8 focus:ring-blue-600/5 transition-all text-sm font-black text-slate-900 placeholder:text-slate-400"
+                className="w-full pl-16 pr-8 py-5 bg-slate-50/50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 focus:ring-8 focus:ring-blue-600/5 transition-all text-sm font-black text-slate-900 placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -206,6 +238,12 @@ export default function Communities() {
         editData={editData}
       />
 
+      <JoinModal 
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onJoin={handleJoinByCode}
+      />
+
       {toast.show && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
       )}
@@ -221,7 +259,7 @@ function StatItem({ icon, label, value, color }) {
   };
   return (
     <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[3rem] border border-slate-100 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.03)] flex items-center gap-6 md:gap-8 group hover:shadow-2xl transition-all duration-500">
-      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
+      <div className={`w-16 h-16 rounded-xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
         {icon}
       </div>
       <div>
@@ -238,13 +276,13 @@ function Dropdown({ label, options, onSelect }) {
     <div className="relative w-full lg:w-auto" onMouseLeave={() => setOpen(false)}>
       <button 
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-6 bg-white border border-slate-200 px-8 py-5 rounded-[1.5rem] text-[10px] font-black text-slate-700 uppercase tracking-widest hover:border-blue-600 transition-all shadow-sm"
+        className="w-full flex items-center justify-between gap-6 bg-white border border-slate-200 px-8 py-5 rounded-xl text-[10px] font-black text-slate-700 uppercase tracking-widest hover:border-blue-600 transition-all shadow-sm"
       >
         {label}
         <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden py-3">
+        <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-xl shadow-2xl z-50 overflow-hidden py-3">
           {options.map(opt => (
             <button 
               key={opt}

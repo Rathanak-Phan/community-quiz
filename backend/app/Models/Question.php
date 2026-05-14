@@ -16,6 +16,8 @@ class Question extends Model
         'question_type',
         'question_text',
         'points',
+        'time_limit',
+        'allow_multiple',
         'correct_answer',
         'image',
     ];

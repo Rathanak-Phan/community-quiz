@@ -37,6 +37,7 @@ export const getQuestions = (quizId) =>
 
 export const updateQuestion = (id, data) => {
   if (data instanceof FormData) {
+    data.append("_method", "PUT");
     return apiClient.post(`/questions/${id}`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });

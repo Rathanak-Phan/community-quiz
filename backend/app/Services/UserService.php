@@ -33,4 +33,20 @@ class UserService
 
         return $user->load('role');
     }
+
+    /**
+     * Create a new user.
+     *
+     * @param array $data
+     * @return User
+     */
+    public function createUser(array $data): User
+    {
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'role_id' => $data['role_id'] ?? 3, // Default to User role
+        ]);
+    }
 }

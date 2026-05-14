@@ -61,7 +61,7 @@ export default function RoleNavigator({ role }) {
   const Icon = info.icon;
 
   return (
-    <div className="fixed bottom-8 right-8 w-80 bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-100 overflow-hidden z-[100] animate-in slide-in-from-bottom-10 duration-500">
+    <div className="fixed bottom-8 right-8 w-80 bg-white rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-300 overflow-hidden z-[100] animate-in slide-in-from-bottom-10 duration-500">
       <div className={`p-6 ${info.bg} flex items-center justify-between`}>
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl bg-white flex items-center justify-center ${info.color} shadow-sm`}>

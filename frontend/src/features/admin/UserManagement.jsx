@@ -12,11 +12,13 @@ import {
 } from 'lucide-react';
 import api from '../../config/api';
 import Toast from '../../components/ui/Toast';
+import UserFormModal from './components/UserFormModal';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -70,16 +72,19 @@ const UserManagement = () => {
                 <input 
                     type="text" 
                     placeholder="Search users..." 
-                    className="pl-14 pr-10 py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-600 transition min-w-[300px]"
+                    className="pl-14 pr-10 py-4 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-600 transition min-w-[300px]"
                 />
             </div>
-            <button className="px-6 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center gap-3 hover:bg-blue-600 transition">
+            <button 
+                onClick={() => setIsModalOpen(true)}
+                className="px-6 py-4 bg-slate-900 text-white rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-3 hover:bg-blue-600 transition"
+            >
                 <UserPlus size={16} /> Add User
             </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-[3rem] border border-slate-50 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-50 shadow-sm overflow-hidden">
           <table className="w-full text-left border-collapse">
               <thead>
                   <tr className="bg-slate-50/50">
@@ -94,7 +99,7 @@ const UserManagement = () => {
                       <tr key={user.id} className="border-t border-slate-50 hover:bg-slate-50/30 transition-colors group">
                           <td className="px-10 py-8">
                               <div className="flex items-center gap-5">
-                                  <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-blue-600 transition shadow-inner">
+                                  <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-blue-600 transition shadow-inner">
                                       <Users size={24} />
                                   </div>
                                   <div>
@@ -142,6 +147,15 @@ const UserManagement = () => {
               </tbody>
           </table>
       </div>
+
+      <UserFormModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={(msg) => {
+          setToast({ message: msg, type: 'success' });
+          fetchUsers();
+        }}
+      />
 
       {toast && (
         <Toast

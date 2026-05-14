@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   FileQuestion, BarChart2, Network, Award, 
   Microscope, Sigma, FlaskConical, BookOpen, 
-  UserPlus, TrendingUp, Calculator
+  UserPlus, TrendingUp, Calculator, ClipboardCheck
 } from 'lucide-react';
 import { getQuizMakerDashboard, getStudentDashboard } from "../../services/dashboardService";
 import api from "../../config/api";
@@ -14,10 +14,10 @@ import ActionHub from "./components/ActionHub";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
-  const [makerStatus, setMakerStatus] = useState(user?.maker_status || 'none');
+  const { user, isAdmin, refreshProfile } = useAuth();
   const [applying, setApplying] = useState(false);
   const role = isAdmin ? 'admin' : (user?.role?.name || "user");
+  const makerStatus = user?.maker_status || 'none';
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +43,7 @@ const Dashboard = () => {
     setApplying(true);
     try {
       await api.post('/maker-request');
-      setMakerStatus('pending');
+      await refreshProfile();
     } catch (err) {
       console.error(err);
     } finally {
@@ -115,6 +115,7 @@ const Dashboard = () => {
             <StatCard icon={<FileQuestion size={24}/>} label="Published Quizzes" value={stats.total_quizzes} trend="Live" color="blue" />
             <StatCard icon={<BookOpen size={24}/>} label="Draft Quizzes" value={stats.draft_quizzes_count} trend="Editing" color="orange" />
             <StatCard icon={<TrendingUp size={24}/>} label="Total Submissions" value={stats.total_submissions} trend="Global" color="emerald" />
+            <StatCard icon={<ClipboardCheck size={24}/>} label="Pending Reviews" value={stats.pending_reviews} trend="Action" color="orange" onClick={() => navigate("/reviews/pending")} />
             <StatCard icon={<Network size={24}/>} label="Joined Circles" value={stats.joined_communities_count} trend="Active" color="violet" onClick={() => navigate("/communities")} />
           </>
         ) : (
@@ -144,7 +145,7 @@ const Dashboard = () => {
               {dashboardData?.recentQuizzes?.length > 0 ? dashboardData.recentQuizzes.map(quiz => (
                 <RecentActivityCard key={quiz.id} title={quiz.title} meta={quiz.category?.name} progress={quiz.completion || 0} icon={<Microscope size={28}/>}/>
               )) : (
-                <div className="py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="py-20 bg-white rounded-2xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-center space-y-4">
                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
                       <FileQuestion size={32} />
                    </div>

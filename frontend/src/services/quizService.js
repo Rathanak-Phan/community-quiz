@@ -42,3 +42,9 @@ export const getQuizLeaderboard = (quizId) =>
 
 export const getTrendingQuizzes = () =>
   apiClient.get("/quizzes/trending");
+
+export const applyDefaultTimer = (id) =>
+  apiClient.post(`/quizzes/${id}/apply-default-timer`);
+
+export const getQuizAttempts = (id) =>
+  apiClient.get(`/quizzes/${id}/attempts`);

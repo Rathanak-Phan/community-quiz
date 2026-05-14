@@ -111,4 +111,42 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/admin/users",
+     *     tags={"Admin User Management"},
+     *     summary="Create a new user",
+     *     operationId="adminUserStore",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","role_id"},
+     *             @OA\Property(property="name", type="string", example="New User"),
+     *             @OA\Property(property="email", type="string", format="email", example="newuser@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="role_id", type="integer", example=3)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User created successfully"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function store(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role_id' => 'required|exists:roles,id'
+        ]);
+
+        $user = $this->userService->createUser($validated);
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'user' => $user->load('role')
+        ], 201);
+    }
 }

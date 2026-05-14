@@ -10,6 +10,7 @@ use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Services\QuizService;
 use App\Http\Resources\LeaderboardResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class QuizController extends Controller
@@ -43,6 +44,13 @@ class QuizController extends Controller
     public function show(Quiz $quiz)
     {
         $user = auth('sanctum')->user();
+
+        // Draft check
+        if ($quiz->status === 'draft') {
+            if (!$user || ($quiz->created_by !== $user->id && !$user->isAdmin())) {
+                abort(403, 'Quiz is in draft mode');
+            }
+        }
 
         if (\Illuminate\Support\Facades\Gate::forUser($user)->denies('view', $quiz)) {
             abort(403);
@@ -117,26 +125,39 @@ class QuizController extends Controller
         return QuizResource::collection($quizzes);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = auth('sanctum')->user();
 
         $quizzes = Quiz::with(['community', 'category', 'creator'])
-            ->whereHas('community', function ($q) use ($user) {
-                if (!$user) {
-                    return $q->where('visibility', 'public');
-                }
-
-                if ($user->isAdmin()) return $q;
-
-                $q->where('visibility', 'public')
-                    ->orWhere(function ($q2) use ($user) {
-                        $q2->where('visibility', 'private')
-                            ->whereHas('members', function ($m) use ($user) {
-                                $m->where('user_id', $user->id)
-                                    ->where('status', 'approved');
-                            });
+            ->when(!$user, function ($query) {
+                // Guests see only published quizzes in public communities
+                return $query->where('status', 'published')
+                    ->whereHas('community', function ($q) {
+                        $q->where('visibility', 'public')->where('status', 'published');
                     });
+            })
+            ->when($user, function ($query) use ($user) {
+                if ($user->isAdmin()) return $query; // Admin sees everything
+
+                return $query->where(function ($q) use ($user) {
+                    // Own quizzes (any status, any community)
+                    $q->where('created_by', $user->id)
+                      // OR Published quizzes in visible communities
+                      ->orWhere(function ($q2) use ($user) {
+                          $q2->where('status', 'published')
+                             ->whereHas('community', function ($qc) use ($user) {
+                                 $qc->where('status', 'published')
+                                    ->where(function ($qvis) use ($user) {
+                                        $qvis->where('visibility', 'public')
+                                             ->orWhereHas('members', function ($m) use ($user) {
+                                                 $m->where('user_id', $user->id)
+                                                   ->where('status', 'approved');
+                                             });
+                                    });
+                             });
+                      });
+                });
             })->get();
 
         return QuizResource::collection($quizzes);
@@ -269,6 +290,19 @@ class QuizController extends Controller
      *     @OA\Response(response=404, description="Quiz not found")
      * )
      */
+    public function applyDefaultTimer(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        if (!$quiz->has_timer) {
+            return response()->json(['message' => 'Timer is not enabled for this quiz'], 400);
+        }
+
+        $quiz->questions()->update(['time_limit' => $quiz->default_time_limit]);
+
+        return response()->json(['message' => 'Applied to all questions']);
+    }
+
     public function leaderboard(Quiz $quiz)
     {
         $attempts = QuizAttempt::where('quiz_id', $quiz->id)

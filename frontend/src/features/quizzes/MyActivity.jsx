@@ -78,7 +78,7 @@ export default function MyActivity() {
                     ))}
                 </div>
             ) : (
-                <div className="py-32 bg-white rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-6">
+                <div className="py-32 bg-white rounded-3xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-6">
                    <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center text-slate-200">
                       {activeTab === "completed" ? <Award size={48} /> : <Clock size={48} />}
                    </div>
@@ -148,8 +148,17 @@ function ActivityItem({ item, isCompleted, onClick }) {
                     </div>
                     {isCompleted && (
                         <div className="flex items-center gap-1.5">
-                            <Layout size={14} className="text-slate-300" />
-                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Score: {Math.round((item.score / item.max_score) * 100)}%</span>
+                            {item.grading_status === 'pending' ? (
+                                <>
+                                    <Clock size={14} className="text-orange-400" />
+                                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Pending Review</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Layout size={14} className="text-slate-300" />
+                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Score: {Math.round((item.score / item.max_score) * 100)}%</span>
+                                </>
+                            )}
                         </div>
                     )}
                     {!isCompleted && (

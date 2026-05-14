@@ -13,6 +13,7 @@ class AttemptAnswer extends Model
         'quiz_attempt_id',
         'question_id',
         'selected_option_id',
+        'selected_options',
         'answer_boolean',
         'answer_text',
         'is_correct',
@@ -26,6 +27,7 @@ class AttemptAnswer extends Model
         'answer_boolean' => 'boolean',
         'is_correct' => 'boolean',
         'graded_at' => 'datetime',
+        'selected_options' => 'array',
     ];
 
     public function attempt()

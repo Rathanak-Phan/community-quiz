@@ -7,6 +7,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("public");
+  const [status, setStatus] = useState("published");
   const [coverImage, setCoverImage] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
@@ -21,6 +22,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
       setName(editData?.name || "");
       setDescription(editData?.description || "");
       setVisibility(editData?.visibility || "public");
+      setStatus(editData?.status || "published");
       setCoverImage(null);
       setCoverImagePreview(editData?.cover_image ? `${STORAGE_URL}/${editData.cover_image}` : null);
       setErrors({});
@@ -94,6 +96,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
       formData.append("name", name.trim());
       formData.append("description", description.trim());
       formData.append("visibility", visibility);
+      formData.append("status", status);
       
       if (coverImage) {
         formData.append("cover_image", coverImage);
@@ -255,6 +258,46 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
                 <p className="text-xs text-gray-600 mt-1">Requires approval</p>
               </button>
             </div>
+          </div>
+
+          {/* Status */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-900 mb-3">
+              Publication Status
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="status"
+                  value="published"
+                  checked={status === "published"}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <span className={`text-sm font-medium ${status === "published" ? "text-blue-600" : "text-gray-600 group-hover:text-gray-900"}`}>
+                  Published
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="status"
+                  value="draft"
+                  checked={status === "draft"}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <span className={`text-sm font-medium ${status === "draft" ? "text-blue-600" : "text-gray-600 group-hover:text-gray-900"}`}>
+                  Draft
+                </span>
+              </label>
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              {status === "published" 
+                ? "Visible to everyone (or members if private)." 
+                : "Only visible to you and admins. Use this while you're still setting things up."}
+            </p>
           </div>
 
           {/* Cover Image */}

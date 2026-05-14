@@ -33,14 +33,19 @@ class QuizResource extends JsonResource
             'cover_image' => $this->cover_image,
             'created_by' => $this->created_by,
             'status' => $this->status,
+            'has_timer' => (bool)$this->has_timer,
+            'default_time_limit' => $this->default_time_limit,
             'created_at' => $this->created_at,
             'creator' => [
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
             ],
-            'time_limit' => $this->time_limit,
             'attempts_count' => $this->attempts()->count(),
             'questions_count' => $this->questions()->count(),
+            'total_time' => $this->questions->sum(function($q) {
+                if ($q->time_limit > 0) return $q->time_limit;
+                return $this->has_timer ? ($this->default_time_limit ?: 30) : 0;
+            }),
             'is_favorite' => auth('sanctum')->check() && $this->favorites()->where('user_id', auth('sanctum')->id())->exists(),
             'favorite_id' => auth('sanctum')->check() ? $this->favorites()->where('user_id', auth('sanctum')->id())->first()?->id : null,
             'questions' => QuestionResource::collection($this->whenLoaded('questions')),
