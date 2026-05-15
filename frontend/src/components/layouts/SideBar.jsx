@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
-    Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap
+    Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap, Award
 } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
@@ -31,6 +31,7 @@ const navItems = [
   { to: "/quizzes/my", label: "My Quizzes", icon: BookOpen, roles: ["quiz_maker"] },
   { to: "/quizzes/my-activity", label: "My Activity", icon: ClipboardCheck, roles: ["user"] },
   { to: "/communities/my", label: "My Communities", icon: Users, roles: ["quiz_maker", "user"] },
+  { to: "/become-creator", label: "Become a Creator", icon: Award, roles: ["user"] },
   { to: "/reviews/pending", label: "Pending Reviews", icon: ClipboardCheck, roles: ["quiz_maker", "admin"] },
   { to: "/categories", label: "Categories", icon: Grid2X2, roles: ["admin", "quiz_maker"] },
 

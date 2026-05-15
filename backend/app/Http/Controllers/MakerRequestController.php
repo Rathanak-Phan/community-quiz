@@ -26,12 +26,8 @@ class MakerRequestController extends Controller
             ], 400);
         }
 
-        if ($user->maker_status === 'approved') {
-            return response()->json([
-                'message' => 'Your application has already been approved.'
-            ], 400);
-        }
-
+        // If they were approved but are somehow back to being a regular user, 
+        // allow them to apply again.
         $user->update(['maker_status' => 'pending']);
 
         return response()->json([

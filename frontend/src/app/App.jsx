@@ -33,6 +33,7 @@ import AdminQuizzesPage from "../features/admin/AdminQuizzesPage";
 import AdminCommunitiesPage from "../features/admin/AdminCommunitiesPage";
 import MakerRequestsPage from "../features/admin/MakerRequestsPage";
 import FavoritesPage from "../features/favorites/FavoritesPage";
+import BecomeCreatorPage from "../features/profile/BecomeCreatorPage";
 import ProfilePage from "../features/profile/ProfilePage";
 import MyCommunities from "../features/communities/MyCommunities";
 import SettingsPage from "../page/admin/SettingsPage";
@@ -225,6 +226,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <QuizReview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/become-creator"
+              element={
+                <ProtectedRoute roles={["user"]}>
+                  <BecomeCreatorPage />
                 </ProtectedRoute>
               }
             />

@@ -240,163 +240,167 @@ const QuestionList = () => {
              <h3 className="text-xl font-bold text-slate-900">Configuration Error</h3>
              <p className="text-slate-500">{error}</p>
           </div>
-        ) : questions.length === 0 ? (
-          <div className="p-20 bg-white rounded-xl shadow-md border border-dashed border-slate-200 text-center space-y-6">
-             <Sparkles size={64} className="text-[#673ab7]/20 mx-auto" />
-             <h3 className="text-2xl font-medium text-slate-900">Start Building Your Quiz</h3>
-             <p className="text-slate-500 max-w-sm mx-auto">Create your first question using the floating menu on the right.</p>
-          </div>
         ) : (
           <div className="space-y-4 pb-40">
-            {questions.map((q, idx) => (
-              <React.Fragment key={q.id}>
-                {inlineEditingId === q.id ? (
+            {questions.length === 0 && inlineEditingId !== 'new' ? (
+              <div className="p-20 bg-white rounded-xl shadow-md border border-dashed border-slate-200 text-center space-y-6">
+                 <Sparkles size={64} className="text-[#673ab7]/20 mx-auto" />
+                 <h3 className="text-2xl font-medium text-slate-900">Start Building Your Quiz</h3>
+                 <p className="text-slate-500 max-w-sm mx-auto">Create your first question using the floating menu on the right.</p>
+              </div>
+            ) : (
+              <>
+                {questions.map((q, idx) => (
+                  <React.Fragment key={q.id}>
+                    {inlineEditingId === q.id ? (
+                      <QuestionEditor 
+                        quizId={quizId}
+                        editData={q}
+                        onCancel={() => setInlineEditingId(null)}
+                        onSuccess={(msg) => {
+                          setToast({ message: msg, type: 'success' });
+                          setInlineEditingId(null);
+                          fetchQuestions();
+                        }}
+                        quizHasTimer={quiz?.has_timer}
+                        defaultTimeLimit={quiz?.default_time_limit}
+                      />
+                    ) : (
+                      <div 
+                        onClick={() => setActiveQuestionId(q.id)}
+                        className={`bg-white rounded-xl shadow-md p-8 transition-all duration-300 relative group border-l-4 ${
+                          activeQuestionId === q.id ? 'border-blue-500 scale-[1.01]' : 'border-transparent'
+                        }`}
+                      >
+                        {/* Active Sidebar Actions - Google Forms Style */}
+                        {activeQuestionId === q.id && (
+                            <div className="absolute top-4 right-4 flex gap-1">
+                                <button onClick={() => handleEdit(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Edit">
+                                    <Edit3 size={18} />
+                                </button>
+                                <button onClick={() => handleDeleteClick(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-slate-400 hover:text-rose-500 transition" title="Delete">
+                                    <Trash2 size={18} />
+                                </button>
+                                <button onClick={() => handleDuplicate(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Duplicate">
+                                    <Copy size={18} />
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="space-y-6">
+                          {/* Question Header */}
+                          <div className="flex items-start gap-6">
+                            <span className="text-slate-400 font-medium text-lg pt-1">{idx + 1}.</span>
+                            <div className="flex-1 space-y-4">
+                                <h3 className="text-xl font-normal text-slate-900">
+                                    {q.question_text}
+                                </h3>
+                                
+                                {/* Options Display */}
+                                <div className="space-y-3 pl-2">
+                                    {q.question_type === 'multiple_choice' && q.options?.map((opt, i) => (
+                                        <div key={i} className="flex items-center gap-4 group/opt">
+                                            {(() => {
+                                                const correctCount = q.options?.filter(o => o.is_correct).length || 0;
+                                                const isMultiple = q.allow_multiple || correctCount > 1;
+                                                return (
+                                                    <div className={`w-5 h-5 border-2 flex items-center justify-center transition-all ${isMultiple ? 'rounded-md' : 'rounded-full'} ${opt.is_correct ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                                                        {opt.is_correct && <Check size={12} className="text-white" strokeWidth={4} />}
+                                                    </div>
+                                                );
+                                            })()}
+                                            <span className={`text-sm ${opt.is_correct ? 'text-emerald-700 font-medium' : 'text-slate-600'}`}>
+                                                {opt.option_text}
+                                            </span>
+                                        </div>
+                                    ))}
+                                    
+                                    {q.question_type === 'true_false' && (
+                                        <div className="flex gap-8">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${q.correct_answer === 'true' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                                                    {q.correct_answer === 'true' && <Check size={12} className="text-white" />}
+                                                </div>
+                                                <span className="text-sm font-medium text-slate-600 uppercase tracking-widest">True</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${q.correct_answer === 'false' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                                                    {q.correct_answer === 'false' && <Check size={12} className="text-white" />}
+                                                </div>
+                                                <span className="text-sm font-medium text-slate-600 uppercase tracking-widest">False</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {q.question_type === 'short_answer' && (
+                                        <div className="max-w-md p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
+                                            <Type size={16} className="text-slate-400" />
+                                            <span className="text-sm text-slate-500 italic">Expected: {q.short_answer?.answer_text}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                          </div>
+
+                          {/* Question Footer Info */}
+                          <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                             <div className="flex items-center gap-4">
+                                <div className="px-2.5 py-1 bg-[#673ab7]/10 text-[#673ab7] rounded text-[10px] font-bold uppercase tracking-widest">
+                                    {(() => {
+                                        const correctCount = q.options?.filter(o => o.is_correct).length || 0;
+                                        const isMultiple = q.allow_multiple || correctCount > 1;
+                                        return isMultiple ? 'Checkboxes' : q.question_type.replace('_', ' ');
+                                    })()}
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{q.points || 1} Points</span>
+                                <div className="w-1 h-1 rounded-full bg-slate-200"></div>
+                                {(() => {
+                                    const limit = parseInt(q.time_limit) > 0 ? parseInt(q.time_limit) : (quiz?.has_timer ? (quiz?.default_time_limit || 30) : 0);
+                                    if (limit <= 0) return null;
+                                    return (
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                            <Clock size={12} className="text-blue-500" />
+                                            {limit}s Limit
+                                        </span>
+                                    );
+                                })()}
+                             </div>
+                             {!activeQuestionId && (
+                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => handleEdit(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition">
+                                        <Edit3 size={16} />
+                                    </button>
+                                    <button onClick={() => handleDeleteClick(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-rose-300 hover:text-rose-500 transition">
+                                        <Trash2 size={16} />
+                                    </button>
+                                 </div>
+                             )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+
+                {inlineEditingId === 'new' && (
                   <QuestionEditor 
                     quizId={quizId}
-                    editData={q}
-                    onCancel={() => setInlineEditingId(null)}
+                    editData={editData}
+                    onCancel={() => {
+                        setInlineEditingId(null);
+                        setEditData(null);
+                    }}
                     onSuccess={(msg) => {
                       setToast({ message: msg, type: 'success' });
                       setInlineEditingId(null);
+                      setEditData(null);
                       fetchQuestions();
                     }}
                     quizHasTimer={quiz?.has_timer}
                     defaultTimeLimit={quiz?.default_time_limit}
                   />
-                ) : (
-                  <div 
-                    onClick={() => setActiveQuestionId(q.id)}
-                    className={`bg-white rounded-xl shadow-md p-8 transition-all duration-300 relative group border-l-4 ${
-                      activeQuestionId === q.id ? 'border-blue-500 scale-[1.01]' : 'border-transparent'
-                    }`}
-                  >
-                    {/* Active Sidebar Actions - Google Forms Style */}
-                    {activeQuestionId === q.id && (
-                        <div className="absolute top-4 right-4 flex gap-1">
-                            <button onClick={() => handleEdit(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Edit">
-                                <Edit3 size={18} />
-                            </button>
-                            <button onClick={() => handleDeleteClick(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-slate-400 hover:text-rose-500 transition" title="Delete">
-                                <Trash2 size={18} />
-                            </button>
-                            <button onClick={() => handleDuplicate(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Duplicate">
-                                <Copy size={18} />
-                            </button>
-                        </div>
-                    )}
-
-                    <div className="space-y-6">
-                      {/* Question Header */}
-                      <div className="flex items-start gap-6">
-                        <span className="text-slate-400 font-medium text-lg pt-1">{idx + 1}.</span>
-                        <div className="flex-1 space-y-4">
-                            <h3 className="text-xl font-normal text-slate-900">
-                                {q.question_text}
-                            </h3>
-                            
-                            {/* Options Display */}
-                            <div className="space-y-3 pl-2">
-                                {q.question_type === 'multiple_choice' && q.options?.map((opt, i) => (
-                                    <div key={i} className="flex items-center gap-4 group/opt">
-                                        {(() => {
-                                            const correctCount = q.options?.filter(o => o.is_correct).length || 0;
-                                            const isMultiple = q.allow_multiple || correctCount > 1;
-                                            return (
-                                                <div className={`w-5 h-5 border-2 flex items-center justify-center transition-all ${isMultiple ? 'rounded-md' : 'rounded-full'} ${opt.is_correct ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
-                                                    {opt.is_correct && <Check size={12} className="text-white" strokeWidth={4} />}
-                                                </div>
-                                            );
-                                        })()}
-                                        <span className={`text-sm ${opt.is_correct ? 'text-emerald-700 font-medium' : 'text-slate-600'}`}>
-                                            {opt.option_text}
-                                        </span>
-                                    </div>
-                                ))}
-                                
-                                {q.question_type === 'true_false' && (
-                                    <div className="flex gap-8">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${q.correct_answer === 'true' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
-                                                {q.correct_answer === 'true' && <Check size={12} className="text-white" />}
-                                            </div>
-                                            <span className="text-sm font-medium text-slate-600 uppercase tracking-widest">True</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${q.correct_answer === 'false' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
-                                                {q.correct_answer === 'false' && <Check size={12} className="text-white" />}
-                                            </div>
-                                            <span className="text-sm font-medium text-slate-600 uppercase tracking-widest">False</span>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {q.question_type === 'short_answer' && (
-                                    <div className="max-w-md p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
-                                        <Type size={16} className="text-slate-400" />
-                                        <span className="text-sm text-slate-500 italic">Expected: {q.short_answer?.answer_text}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                      </div>
-
-                      {/* Question Footer Info */}
-                      <div className="flex items-center justify-between pt-6 border-t border-slate-100">
-                         <div className="flex items-center gap-4">
-                            <div className="px-2.5 py-1 bg-[#673ab7]/10 text-[#673ab7] rounded text-[10px] font-bold uppercase tracking-widest">
-                                {(() => {
-                                    const correctCount = q.options?.filter(o => o.is_correct).length || 0;
-                                    const isMultiple = q.allow_multiple || correctCount > 1;
-                                    return isMultiple ? 'Checkboxes' : q.question_type.replace('_', ' ');
-                                })()}
-                            </div>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{q.points || 1} Points</span>
-                            <div className="w-1 h-1 rounded-full bg-slate-200"></div>
-                            {(() => {
-                                const limit = parseInt(q.time_limit) > 0 ? parseInt(q.time_limit) : (quiz?.has_timer ? (quiz?.default_time_limit || 30) : 0);
-                                if (limit <= 0) return null;
-                                return (
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                        <Clock size={12} className="text-blue-500" />
-                                        {limit}s Limit
-                                    </span>
-                                );
-                            })()}
-                         </div>
-                         {!activeQuestionId && (
-                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => handleEdit(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition">
-                                    <Edit3 size={16} />
-                                </button>
-                                <button onClick={() => handleDeleteClick(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-rose-300 hover:text-rose-500 transition">
-                                    <Trash2 size={16} />
-                                </button>
-                             </div>
-                         )}
-                      </div>
-                    </div>
-                  </div>
                 )}
-              </React.Fragment>
-            ))}
-
-            {inlineEditingId === 'new' && (
-              <QuestionEditor 
-                quizId={quizId}
-                editData={editData}
-                onCancel={() => {
-                    setInlineEditingId(null);
-                    setEditData(null);
-                }}
-                onSuccess={(msg) => {
-                  setToast({ message: msg, type: 'success' });
-                  setInlineEditingId(null);
-                  setEditData(null);
-                  fetchQuestions();
-                }}
-                quizHasTimer={quiz?.has_timer}
-                defaultTimeLimit={quiz?.default_time_limit}
-              />
+              </>
             )}
           </div>
         )}

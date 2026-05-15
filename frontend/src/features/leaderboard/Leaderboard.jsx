@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { getLeaderboard, getTopUsers, getTrendingQuizzes, getMyRank } from "../../api/leaderboardApi";
 import { useAuth } from "../../providers/AuthContext";
+import SEO from "../../components/common/SEO";
 
 export default function Leaderboard() {
   const navigate = useNavigate();
@@ -75,6 +76,11 @@ export default function Leaderboard() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-24 selection:bg-blue-100 overflow-x-hidden">
+      <SEO 
+        title="Global Leaderboard" 
+        description="See who's leading the pack on QuizSphere. Check out top performers, climb the rankings, and earn your place in the Hall of Fame."
+        url="/leaderboard"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         
         {/* Header Section */}

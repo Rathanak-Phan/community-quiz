@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
+import SEO from "../../components/common/SEO";
 import { 
   GraduationCap, 
   Mail, 
@@ -14,7 +15,6 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { useEffect } from "react";
 import { STORAGE_URL } from "../../config/api";
 
 import googleLogo from "../../assets/images/google_logo.png";
@@ -214,6 +214,11 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 md:p-8 font-sans">
+      <SEO 
+        title="Register" 
+        description="Join QuizSphere today! Create your account to start taking quizzes, joining communities, and sharing your knowledge."
+        url="/register"
+      />
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -right-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>

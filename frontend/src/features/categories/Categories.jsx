@@ -3,6 +3,7 @@ import { Search, Plus, Grid2X2, BookOpen, ChevronRight, Sparkles, TrendingUp } f
 import { getCategories } from "../../api/categoryApi";
 import CategoryFormModal from "./components/CategoryFormModal";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -36,6 +37,11 @@ export default function Categories() {
 
   return (
     <div className="space-y-12">
+      <SEO 
+        title="Explore Categories" 
+        description="Discover quiz categories ranging from Science and Tech to History and Arts on QuizSphere." 
+        url="/categories"
+      />
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div className="space-y-2">

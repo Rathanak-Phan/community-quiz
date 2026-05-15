@@ -7,6 +7,7 @@ import { Clock, Users, BookOpen, Play, ChevronLeft, Calendar, User, Layers, Shie
 import { STORAGE_URL } from "../../config/api";
 import { useAuth } from "../../providers/AuthContext";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 
 export default function QuizDetail() {
     const { quizId } = useParams();
@@ -102,6 +103,12 @@ export default function QuizDetail() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:space-y-12 pb-20 overflow-x-hidden">
+            <SEO 
+                title={quiz.title} 
+                description={quiz.description || `Take the ${quiz.title} quiz on QuizSphere. Challenge yourself with community-driven learning!`}
+                image={quiz.cover_image ? `${STORAGE_URL}/${quiz.cover_image}` : null}
+                url={`/quizzes/${quizId}`}
+            />
             {/* Breadcrumb & Action */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <button 

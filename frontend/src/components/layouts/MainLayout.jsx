@@ -70,11 +70,12 @@ export default function MainLayout() {
               <div className="relative flex items-center gap-2 md:gap-4">
                 {user?.role?.name === 'user' && (
                   <button 
-                    onClick={() => navigate("/dashboard")}
-                    className="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-xl font-bold text-[10px] md:text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                    onClick={() => navigate("/become-creator")}
+                    className="group relative flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-[10px] md:text-sm hover:shadow-xl hover:shadow-blue-600/20 transition-all active:scale-95 overflow-hidden"
                   >
-                    <UserPlus size={16} className="hidden sm:block" />
-                    Become a Creator
+                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                    <UserPlus size={16} className="hidden sm:block relative z-10" />
+                    <span className="relative z-10">Become a Creator</span>
                   </button>
                 )}
                 
@@ -101,7 +102,7 @@ export default function MainLayout() {
                         
                         {user?.role?.name === 'user' && (
                           <DropdownItem 
-                            onClick={() => { setIsDropdownOpen(false); navigate("/dashboard"); }} 
+                            onClick={() => { setIsDropdownOpen(false); navigate("/become-creator"); }} 
                             icon={<UserPlus size={16}/>} 
                             label="Become a Creator" 
                             highlight 
@@ -160,6 +161,9 @@ export default function MainLayout() {
                 <MobileNavLink to="/leaderboard" active={isActive("/leaderboard")} onClick={() => setIsMobileMenuOpen(false)}>Leaderboard</MobileNavLink>
                 <MobileNavLink to="/communities" active={isActive("/communities")} onClick={() => setIsMobileMenuOpen(false)}>Communities</MobileNavLink>
                 {token && <MobileNavLink to="/dashboard" active={isActive("/dashboard")} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</MobileNavLink>}
+                {token && user?.role?.name === 'user' && (
+                  <MobileNavLink to="/become-creator" active={isActive("/become-creator")} onClick={() => setIsMobileMenuOpen(false)} highlight>Become a Creator</MobileNavLink>
+                )}
                 
                 {!token && (
                   <div className="flex flex-col gap-3 pt-4 border-t border-slate-50 mt-2">
@@ -235,8 +239,12 @@ export default function MainLayout() {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200/50 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          <span>&copy; {new Date().getFullYear()} {settings.site_name || "QuizSphere"}. All rights reserved.</span>
+        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+            <span>&copy; {new Date().getFullYear()} {settings.site_name || "QuizSphere"}. All rights reserved.</span>
+            <span className="hidden md:block text-slate-200">|</span>
+            <span>Developed by <span className="text-slate-900">Rathanak Phan</span></span>
+          </div>
           <div className="flex gap-6">
             <Link to="#" className="hover:text-slate-900 transition">Privacy</Link>
             <Link to="#" className="hover:text-slate-900 transition">Terms</Link>
@@ -287,7 +295,7 @@ function DropdownItem({ icon, label, onClick, danger = false, highlight = false 
   );
 }
 
-function MobileNavLink({ to, children, active, onClick }) {
+function MobileNavLink({ to, children, active, onClick, highlight }) {
   return (
     <Link 
       to={to} 
@@ -295,7 +303,9 @@ function MobileNavLink({ to, children, active, onClick }) {
       className={`px-4 py-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${
         active 
           ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
-          : 'text-slate-500 hover:bg-slate-50'
+          : highlight
+            ? 'bg-blue-50 text-blue-600 border border-blue-100'
+            : 'text-slate-500 hover:bg-slate-50'
       }`}
     >
       {children}

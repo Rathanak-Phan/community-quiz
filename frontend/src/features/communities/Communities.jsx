@@ -9,6 +9,7 @@ import Toast from "../../components/ui/Toast";
 import { getCommunities, joinCommunity, leaveCommunity, deleteCommunity } from "../../api/communityApi";
 import { useAuth } from "../../providers/AuthContext";
 import ConfirmModal from "../../components/ui/ConfirmModal";
+import SEO from "../../components/common/SEO";
 
 const filterOptions = ["All Communities", "My Communities", "Public", "Private"];
 const sortOptions = ["Newest First", "Most Members", "A–Z"];
@@ -161,6 +162,11 @@ export default function Communities() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-20 pb-32 overflow-x-hidden">
+      <SEO 
+        title="Explore Communities" 
+        description="Find and join your tribe. Join elite knowledge circles, collaborate with global peers, and access exclusive community-driven quizzes."
+        url="/communities"
+      />
       {/* Hero Section */}
       <div className="relative pt-8 md:pt-12">
         <div className="absolute top-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-blue-600/5 blur-[80px] md:blur-[120px] rounded-full -z-10"></div>

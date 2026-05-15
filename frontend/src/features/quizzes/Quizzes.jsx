@@ -8,6 +8,7 @@ import { STORAGE_URL } from "../../config/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
 import ConfirmModal from "../../components/ui/ConfirmModal";
+import SEO from "../../components/common/SEO";
 
 export default function Quizzes() {
     const navigate = useNavigate();
@@ -91,6 +92,11 @@ export default function Quizzes() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:space-y-12 pb-20 overflow-x-hidden">
+            <SEO 
+                title="Quiz Library" 
+                description="Explore our vast library of community-created quizzes. Challenge yourself across various categories and climb the global leaderboard."
+                url="/quizzes"
+            />
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-8 pt-8 md:pt-0">
             <div className="space-y-2">
