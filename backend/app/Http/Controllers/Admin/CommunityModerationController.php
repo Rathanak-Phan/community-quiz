@@ -19,9 +19,25 @@ class CommunityModerationController extends Controller
      *     @OA\Response(response=200, description="List of all communities")
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $communities = Community::with(['creator'])->latest()->get();
+        $query = Community::with(['creator']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('creator', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('visibility')) {
+            $query->where('visibility', $request->visibility);
+        }
+
+        $communities = $query->latest()->paginate($request->query('per_page', 10));
         return CommunityResource::collection($communities);
     }
 

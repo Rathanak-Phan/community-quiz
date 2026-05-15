@@ -187,7 +187,7 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
                             handleTypeChange(val);
                         }
                     }}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3.5 text-sm font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#673ab7]/20 focus:border-[#673ab7] transition-all cursor-pointer shadow-sm"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#673ab7]/20 focus:border-[#673ab7] transition-all cursor-pointer shadow-sm"
                 >
                     <option value="multiple_choice">Multiple Choice</option>
                     <option value="checkboxes">Checkboxes</option>
@@ -290,13 +290,12 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
                 </div>
                 <div className="space-y-4">
                    <div className="flex items-center justify-between">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected Answer</label>
-                      {formData.is_manual_grading && <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Optional for manual grading</span>}
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reference Answer (Optional)</label>
+                      {!formData.is_manual_grading && <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Auto-marked as correct if answered</span>}
                    </div>
                    <input
-                       required={!formData.is_manual_grading}
                        type="text"
-                       placeholder={formData.is_manual_grading ? "Enter expected answer (optional)..." : "Enter correct answer(s) separated by commas..."}
+                       placeholder="Enter reference answer for students (optional)..."
                        className="w-full px-6 py-4 bg-white border border-slate-200 rounded-xl outline-none focus:border-[#673ab7] focus:ring-4 focus:ring-[#673ab7]/5 text-sm font-bold shadow-sm transition-all"
                        value={formData.correct_answer_sa}
                        onChange={(e) => setFormData({ ...formData, correct_answer_sa: e.target.value })}
@@ -308,7 +307,7 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
 
         {/* Image Preview */}
         {imagePreview && (
-            <div className="relative rounded-2xl overflow-hidden border border-slate-100 group">
+            <div className="relative rounded-xl overflow-hidden border border-slate-100 group">
                 <img src={imagePreview} className="w-full max-h-80 object-cover" alt="Preview" />
                 <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                     <button 
@@ -338,7 +337,7 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
                       type="number"
                       value={formData.points}
                       onChange={(e) => setFormData({ ...formData, points: e.target.value })}
-                      className="w-20 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none shadow-inner"
+                      className="w-20 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none shadow-inner"
                   />
               </div>
               <div className="flex items-center gap-3">
@@ -346,7 +345,7 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
                   <select
                       value={formData.time_limit}
                       onChange={(e) => setFormData({ ...formData, time_limit: parseInt(e.target.value) })}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none cursor-pointer shadow-inner"
+                      className="px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none cursor-pointer shadow-inner"
                   >
                       <option value={0}>No Timer</option>
                       {[10, 20, 30, 60, 90, 120, 180, 300].map(s => (
@@ -390,18 +389,27 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
             </div>
 
             <div className="flex items-center gap-6">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Manual Grade</span>
-                    <div className="relative inline-flex items-center">
-                        <input 
-                            type="checkbox" 
-                            className="sr-only peer" 
-                            checked={formData.is_manual_grading}
-                            onChange={(e) => setFormData({...formData, is_manual_grading: e.target.checked})}
-                        />
-                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#673ab7]"></div>
+                {formData.question_type === 'short_answer' && (
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1">Grading Mode</span>
+                        <div className="flex bg-slate-100 p-1 rounded-xl">
+                            <button 
+                                type="button"
+                                onClick={() => setFormData({...formData, is_manual_grading: false})}
+                                className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${!formData.is_manual_grading ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Auto
+                            </button>
+                            <button 
+                                type="button"
+                                onClick={() => setFormData({...formData, is_manual_grading: true})}
+                                className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${formData.is_manual_grading ? 'bg-white text-[#673ab7] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Manual
+                            </button>
+                        </div>
                     </div>
-                </label>
+                )}
                 <div className="w-px h-6 bg-slate-100"></div>
                 <div className="flex gap-3">
                     <button

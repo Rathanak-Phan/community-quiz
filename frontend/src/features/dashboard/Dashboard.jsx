@@ -69,54 +69,59 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-8 md:space-y-16 overflow-x-hidden">
       {/* Dynamic Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
+        <div className="space-y-4 md:space-y-6 w-full lg:w-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
              System Online
           </div>
-          <div className="flex items-center gap-4">
-            <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase">
-              {role === 'admin' ? "System" : role === 'quiz_maker' ? "Creator" : "Learning"}{" "}
-              <span className="text-blue-600">Studio</span>
-            </h1>
-            <RoleBadge role={role} className="hidden sm:inline-flex" />
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-none uppercase">
+                {role === 'admin' ? "System" : role === 'quiz_maker' ? "Creator" : "Learning"}{" "}
+                <span className="text-blue-600">Studio</span>
+              </h1>
+              <RoleBadge role={role} className="hidden sm:inline-flex" />
+            </div>
+            <p className="text-slate-500 font-bold text-base md:text-xl leading-relaxed">
+              {role === 'admin' 
+                ? "Welcome back, Commander. All systems are operational." 
+                : role === 'quiz_maker' 
+                  ? `Welcome back, ${user?.name?.split(' ')[0]}. Ready to inspire?`
+                  : `Hello ${user?.name?.split(' ')[0]}, your knowledge journey continues.`}
+            </p>
           </div>
-          <p className="text-slate-500 font-bold text-lg">
-            {role === 'admin' 
-              ? "Welcome back, Commander. All systems are operational." 
-              : role === 'quiz_maker' 
-                ? `Welcome back, ${user?.name?.split(' ')[0]}. Ready to inspire?`
-                : `Hello ${user?.name?.split(' ')[0]}, your knowledge journey continues.`}
-          </p>
         </div>
         
-        <div className="flex-1 lg:max-w-xl">
-           <ActionHub role={role} />
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+           <div className="w-full sm:flex-1 lg:max-w-md">
+              <ActionHub role={role} />
+           </div>
+           <div className="flex gap-4 w-full sm:w-auto">
+              <button 
+                onClick={() => navigate("/")}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-4 bg-white border border-slate-200 rounded-xl text-slate-600 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm active:scale-95 whitespace-nowrap"
+              >
+                <BookOpen size={16} className="text-blue-600" />
+                Library
+              </button>
+              <button className="w-14 h-14 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm flex items-center justify-center shrink-0">
+                <BarChart2 size={20} />
+              </button>
+           </div>
         </div>
-           <button 
-             onClick={() => navigate("/")}
-             className="hidden sm:flex items-center gap-3 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-slate-600 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm active:scale-95"
-           >
-             <BookOpen size={18} className="text-blue-600" />
-             Browse Quizzes
-           </button>
-           <button className="flex items-center justify-center w-12 h-12 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-             <BarChart2 size={20} />
-           </button>
-        </div>
+      </div>
 
       {/* Grid Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         {role === 'quiz_maker' ? (
           <>
-            <StatCard icon={<FileQuestion size={24}/>} label="Published Quizzes" value={stats.total_quizzes} trend="Live" color="blue" />
-            <StatCard icon={<BookOpen size={24}/>} label="Draft Quizzes" value={stats.draft_quizzes_count} trend="Editing" color="orange" />
-            <StatCard icon={<TrendingUp size={24}/>} label="Total Submissions" value={stats.total_submissions} trend="Global" color="emerald" />
-            <StatCard icon={<ClipboardCheck size={24}/>} label="Pending Reviews" value={stats.pending_reviews} trend="Action" color="orange" onClick={() => navigate("/reviews/pending")} />
-            <StatCard icon={<Network size={24}/>} label="Joined Circles" value={stats.joined_communities_count} trend="Active" color="violet" onClick={() => navigate("/communities")} />
+            <StatCard icon={<FileQuestion size={24}/>} label="Published" value={stats.total_quizzes} trend="Live" color="blue" />
+            <StatCard icon={<BookOpen size={24}/>} label="Drafts" value={stats.draft_quizzes_count} trend="Editing" color="orange" />
+            <StatCard icon={<TrendingUp size={24}/>} label="Submissions" value={stats.total_submissions} trend="Global" color="emerald" />
+            <StatCard icon={<ClipboardCheck size={24}/>} label="Reviews" value={stats.pending_reviews} trend="Action" color="orange" onClick={() => navigate("/reviews/pending")} />
           </>
         ) : (
           <>
@@ -128,17 +133,17 @@ const Dashboard = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
         {/* Main Content Area */}
         <div className="lg:col-span-8 space-y-12">
-          {/* Recent Quizzes */}
+          {/* Recent Activity */}
           <section className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                <div className="w-2 h-6 bg-blue-600 rounded-full"></div>
+              <h2 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
+                <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
                 Recent Activity
               </h2>
-              <button onClick={() => navigate("/quizzes")} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">View Library</button>
+              <button onClick={() => navigate("/quizzes")} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
             </div>
             
             <div className="grid grid-cols-1 gap-6">
@@ -160,8 +165,8 @@ const Dashboard = () => {
 
           {/* Communities */}
           <section className="space-y-6">
-             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                <div className="w-2 h-6 bg-emerald-500 rounded-full"></div>
+             <h2 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
+                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                 Suggested Circles
              </h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,21 +177,21 @@ const Dashboard = () => {
         </div>
 
         {/* Sidebar Widgets */}
-        <div className="lg:col-span-4 space-y-12">
+        <div className="lg:col-span-4 space-y-8 md:space-y-12">
           {/* Leaderboard Activity */}
-          <div className="bg-white p-10 rounded-[3rem] shadow-xl shadow-slate-200/40 border border-slate-50">
-            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-10 flex items-center justify-between">
+          <div className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] border border-slate-50">
+            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-8 md:mb-10 flex items-center justify-between">
                Wall of Fame
                <Award size={20} className="text-yellow-500" />
             </h2>
-            <div className="space-y-8 mb-10">
+            <div className="space-y-6 md:space-y-8 mb-8 md:mb-10">
                 <ActivityRow name="Sarah Chen" action='Unlocked "Elite Master"' points="+250" img="https://i.pravatar.cc/100?img=47" />
                 <ActivityRow name="James Wilson" action="New Personal Best" points="+180" img="https://i.pravatar.cc/100?img=12" />
                 <ActivityRow name="Elena Rodriguez" action="Climbed to Rank #5" points="+42" img="https://i.pravatar.cc/100?img=32" />
             </div>
             <button 
               onClick={() => navigate("/leaderboard")}
-              className="w-full py-4 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+              className="w-full py-4 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm"
             >
               Explore Full Rankings
             </button>
@@ -194,10 +199,10 @@ const Dashboard = () => {
 
           {/* Become a Creator Widget */}
           {role === 'user' && (
-            <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl">
+            <div className="bg-slate-900 rounded-2xl p-8 md:p-10 text-white relative overflow-hidden shadow-2xl">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 blur-3xl rounded-full"></div>
               <div className="relative z-10 space-y-8">
-                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-blue-400 shadow-inner">
+                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center text-blue-400 shadow-inner">
                   <UserPlus size={28} />
                 </div>
                 <div className="space-y-2">
@@ -206,14 +211,14 @@ const Dashboard = () => {
                 </div>
                 
                 {makerStatus === 'pending' ? (
-                  <div className="flex items-center gap-3 py-4 px-6 bg-white/5 border border-white/10 text-amber-400 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl">
+                  <div className="flex items-center justify-center gap-3 py-4 px-6 bg-white/5 border border-white/10 text-amber-400 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl">
                     <TrendingUp size={16} className="animate-pulse" /> Review in Progress
                   </div>
                 ) : (
                   <button 
                     onClick={handleApply}
                     disabled={applying}
-                    className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                    className="w-full py-4.5 bg-white text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 disabled:opacity-50"
                   >
                     {applying ? "Submitting..." : "Apply To Create"}
                   </button>
@@ -239,7 +244,7 @@ const StatCard = ({ icon, label, value, trend, color, onClick }) => {
   return (
     <div 
       onClick={onClick}
-      className={`bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between h-52 group hover:shadow-xl transition-all duration-500 ${onClick ? 'cursor-pointer hover:-translate-y-1' : ''}`}
+      className={`bg-white p-8 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between h-52 group hover:shadow-xl transition-all duration-500 ${onClick ? 'cursor-pointer hover:-translate-y-1' : ''}`}
     >
       <div className="flex justify-between items-start">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
@@ -256,8 +261,8 @@ const StatCard = ({ icon, label, value, trend, color, onClick }) => {
 };
 
 const RecentActivityCard = ({ title, meta, progress, icon }) => (
-  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-6 group hover:shadow-lg transition-all duration-500">
-    <div className="w-20 h-20 rounded-2xl bg-slate-50 flex items-center justify-center text-blue-600 shrink-0 border border-slate-100 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500">
+  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-6 group hover:shadow-lg transition-all duration-500">
+    <div className="w-20 h-20 rounded-xl bg-slate-50 flex items-center justify-center text-blue-600 shrink-0 border border-slate-100 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500">
       {icon}
     </div>
     <div className="flex-1">
@@ -266,7 +271,7 @@ const RecentActivityCard = ({ title, meta, progress, icon }) => (
           <h3 className="font-black text-slate-900 text-lg uppercase tracking-tight">{title}</h3>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{meta}</p>
         </div>
-        <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">{progress}%</span>
+        <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-xl">{progress}%</span>
       </div>
       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
         <div className="h-full bg-blue-600 rounded-full transition-all duration-1000" style={{width: `${progress}%`}}></div>
@@ -279,9 +284,9 @@ const RecentActivityCard = ({ title, meta, progress, icon }) => (
 );
 
 const CommunityActionCard = ({ title, members, icon, color }) => (
-  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center justify-between group hover:shadow-lg transition-all duration-500">
+  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between group hover:shadow-lg transition-all duration-500">
     <div className="flex items-center gap-5">
-      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg group-hover:scale-110 transition-transform ${color === 'blue' ? 'bg-blue-600 shadow-blue-600/20' : 'bg-emerald-500 shadow-emerald-500/20'}`}>
+      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg group-hover:scale-110 transition-transform ${color === 'blue' ? 'bg-blue-600 shadow-blue-600/20' : 'bg-emerald-500 shadow-emerald-500/20'}`}>
         {icon}
       </div>
       <div>
@@ -307,7 +312,7 @@ const ActivityRow = ({ name, action, points, img }) => (
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{action}</p>
       </div>
     </div>
-    <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">{points}</span>
+    <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-xl">{points}</span>
   </div>
 );
 

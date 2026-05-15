@@ -10,7 +10,7 @@ function ConfirmDeleteModal({ isOpen, categoryName, onConfirm, onCancel, loading
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 z-10">
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 p-6 z-10">
         {/* Icon */}
         <div className="flex justify-center mb-4">
           <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-2xl">
@@ -35,14 +35,14 @@ function ConfirmDeleteModal({ isOpen, categoryName, onConfirm, onCancel, loading
           <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 py-2 rounded-lg text-sm font-medium text-gray-600 border border-gray-300 hover:bg-gray-50 transition"
+            className="flex-1 py-2 rounded-xl text-sm font-medium text-gray-600 border border-gray-300 hover:bg-gray-50 transition"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium text-white transition ${
+            className={`flex-1 py-2 rounded-xl text-sm font-medium text-white transition ${
               loading
                 ? "bg-red-300 cursor-not-allowed"
                 : "bg-red-500 hover:bg-red-600"

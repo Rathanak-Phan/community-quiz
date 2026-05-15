@@ -6,6 +6,7 @@ import QuizFormModal from "./components/QuizFormModal";
 import { STORAGE_URL } from "../../config/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
+import ConfirmModal from "../../components/ui/ConfirmModal";
 
 export default function MyQuizzes() {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function MyQuizzes() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editData, setEditData] = useState(null);
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, loading: false });
 
     const loadQuizzes = useCallback(async () => {
         setLoading(true);
@@ -46,15 +48,22 @@ export default function MyQuizzes() {
         setIsModalOpen(true);
     };
 
-    const handleDelete = async (e, id) => {
+    const handleDeleteClick = (e, id) => {
         e.stopPropagation();
-        if (!window.confirm("Are you sure you want to delete this quiz?")) return;
+        setConfirmDelete({ isOpen: true, id, loading: false });
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = confirmDelete.id;
+        setConfirmDelete(prev => ({ ...prev, loading: true }));
         try {
             await deleteQuiz(id);
             setToast({ show: true, message: "Quiz deleted successfully", type: "success" });
             loadQuizzes();
+            setConfirmDelete({ isOpen: false, id: null, loading: false });
         } catch (error) {
             setToast({ show: true, message: "Failed to delete quiz", type: "error" });
+            setConfirmDelete(prev => ({ ...prev, loading: false }));
         }
     };
 
@@ -76,9 +85,9 @@ export default function MyQuizzes() {
                         setEditData(null);
                         setIsModalOpen(true);
                     }}
-                    className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                    className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
                 >
-                    <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/40">
+                    <div className="w-6 h-6 bg-white/20 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white/40">
                       <Plus size={16} />
                     </div>
                     CREATE NEW
@@ -86,13 +95,13 @@ export default function MyQuizzes() {
             </div>
 
             {/* Search */}
-            <div className="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200/40 border border-slate-100">
+            <div className="bg-white p-6 rounded-xl shadow-xl shadow-slate-200/40 border border-slate-100">
                 <div className="relative group w-full">
                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
                     <input 
                         type="text" 
                         placeholder="Search your quizzes..." 
-                        className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-[1.5rem] outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
+                        className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-full outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -103,7 +112,7 @@ export default function MyQuizzes() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-[420px] bg-white rounded-3xl animate-pulse border border-slate-100"></div>
+                        <div key={i} className="h-[420px] bg-white rounded-xl animate-pulse border border-slate-100"></div>
                     ))}
                 </div>
             ) : filteredQuizzes.length > 0 ? (
@@ -114,7 +123,7 @@ export default function MyQuizzes() {
                             quiz={quiz} 
                             userId={user?.id}
                             onEdit={handleEdit}
-                            onDelete={handleDelete}
+                            onDelete={handleDeleteClick}
                             onManage={() => navigate(`/quizzes/${quiz.id}/questions`)}
                             onClick={() => navigate(`/quizzes/${quiz.id}`)}
                         />
@@ -122,7 +131,7 @@ export default function MyQuizzes() {
                 </div>
             ) : (
                 <div className="py-32 flex flex-col items-center text-center space-y-6">
-                   <div className="w-24 h-24 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-300">
+                   <div className="w-24 h-24 bg-slate-100 rounded-xl flex items-center justify-center text-slate-300">
                       <BookOpen size={40} />
                    </div>
                    <div className="space-y-2">
@@ -137,6 +146,15 @@ export default function MyQuizzes() {
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={handleSuccess}
                 editData={editData}
+            />
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                title="Delete Quiz"
+                message="Are you sure you want to delete this quiz? This action is permanent and will remove all questions and student results."
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setConfirmDelete({ isOpen: false, id: null, loading: false })}
+                loading={confirmDelete.loading}
+                confirmText="Delete Quiz"
             />
 
             {toast.show && (
@@ -164,7 +182,7 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-blue-100 transition-all duration-500 cursor-pointer hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]"
+            className="group relative bg-white rounded-xl overflow-hidden border border-slate-100 hover:border-blue-100 transition-all duration-500 cursor-pointer hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]"
         >
             {/* Action Menu - Positioned at top level of card to avoid clipping */}
             <div className="absolute top-6 right-6 z-50">
@@ -185,7 +203,7 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
                 {showMenu && (
                     <div 
                         onClick={(e) => e.stopPropagation()}
-                        className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-white/50 p-3 animate-in fade-in zoom-in slide-in-from-top-4 duration-300 overflow-hidden"
+                        className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-2xl rounded-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-white/50 p-3 animate-in fade-in zoom-in slide-in-from-top-4 duration-300 overflow-hidden"
                     >
                         <div className="px-5 py-3 mb-2">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Management</p>

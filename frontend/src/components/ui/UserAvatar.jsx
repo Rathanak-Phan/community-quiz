@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function UserAvatar({ user, size = "md", className = "" }) {
-  const initials = user?.name?.charAt(0) || "U";
+  const initials = (user?.name?.charAt(0) || user?.email?.charAt(0) || "U").toUpperCase();
   
   const sizeClasses = {
     xs: "w-8 h-8 text-[10px] rounded-full",

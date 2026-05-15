@@ -33,9 +33,13 @@ class UserController extends Controller
      *     @OA\Response(response=403, description="Forbidden")
      * )
      */
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
-        $users = $this->userService->getAllUsers();
+        $users = $this->userService->getAllUsers(
+            $request->query('per_page', 15),
+            $request->query('search'),
+            $request->query('role_id')
+        );
         return response()->json($users);
     }
 
@@ -148,5 +152,20 @@ class UserController extends Controller
             'message' => 'User created successfully',
             'user' => $user->load('role')
         ], 201);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/admin/users/stats",
+     *     tags={"Admin User Management"},
+     *     summary="Get user statistics",
+     *     operationId="adminUserStats",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Stats retrieved successfully")
+     * )
+     */
+    public function stats(): JsonResponse
+    {
+        return response()->json($this->userService->getUserStats());
     }
 }

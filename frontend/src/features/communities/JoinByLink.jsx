@@ -44,10 +44,10 @@ export default function JoinByLink() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-      <div className="w-full max-w-md bg-white rounded-[3rem] shadow-2xl p-12 text-center space-y-8 border border-slate-100">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-12 text-center space-y-8 border border-slate-100">
         {loading ? (
           <>
-            <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-blue-600 mx-auto">
+            <div className="w-20 h-20 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto">
               <Loader2 size={40} className="animate-spin" />
             </div>
             <div className="space-y-2">
@@ -57,7 +57,7 @@ export default function JoinByLink() {
           </>
         ) : error ? (
           <>
-            <div className="w-20 h-20 bg-rose-50 rounded-3xl flex items-center justify-center text-rose-500 mx-auto">
+            <div className="w-20 h-20 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 mx-auto">
               <AlertCircle size={40} />
             </div>
             <div className="space-y-2">
@@ -66,14 +66,14 @@ export default function JoinByLink() {
             </div>
             <button 
               onClick={() => navigate('/communities')}
-              className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+              className="w-full py-5 bg-slate-900 text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95"
             >
               Back to Communities
             </button>
           </>
         ) : (
           <>
-            <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center text-emerald-500 mx-auto">
+            <div className="w-20 h-20 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 mx-auto">
               <CheckCircle size={40} />
             </div>
             <div className="space-y-2">

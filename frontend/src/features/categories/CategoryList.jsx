@@ -5,8 +5,10 @@ import {
 } from "lucide-react";
 import { getCategories, deleteCategory } from "../../api/categoryApi";
 import { addFavorite, removeFavorite } from "../../services/favoriteService";
+import api from "../../config/api";
 import CategoryFormModal from "./components/CategoryFormModal";
-import ConfirmDeleteModal from "./components/ConfirmDeleteModal";
+import ConfirmModal from "../../components/ui/ConfirmModal";
+import Pagination from "../admin/components/Pagination";
 import Toast from "../../components/ui/Toast";
 
 function CategoryList() {
@@ -24,6 +26,10 @@ function CategoryList() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const isAdmin = user?.role?.name === "admin" || user?.role_id === 1;
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const showToast = useCallback((message, type = "success") => {
     setToast({ message, type });
   }, []);
@@ -32,17 +38,27 @@ function CategoryList() {
     setLoading(true);
     setFetchError("");
     try {
-      const res = await getCategories();
-      setCategories(res.data?.data || res.data || []);
+      const res = await api.get('/categories', {
+        params: {
+          page,
+          search: searchQuery,
+          per_page: 15
+        }
+      });
+      setCategories(res.data.data || []);
+      setTotalPages(res.data.last_page || 1);
     } catch (err) {
       setFetchError(err.response?.data?.message || "Failed to load categories.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, searchQuery]);
 
   useEffect(() => {
-    fetchCategories();
+    const timer = setTimeout(() => {
+      fetchCategories();
+    }, 500);
+    return () => clearTimeout(timer);
   }, [fetchCategories]);
 
   const handleOpenCreate = () => {
@@ -78,11 +94,6 @@ function CategoryList() {
       setDeleteLoading(false);
     }
   };
-
-  const filteredCategories = categories.filter(cat => 
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
   const handleFavorite = async (cat) => {
     try {
       if (cat.is_favorite) {
@@ -107,7 +118,7 @@ function CategoryList() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
         <div className="space-y-4">
-           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-violet-50 text-violet-600 text-[10px] font-black uppercase tracking-widest border border-violet-100">
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-violet-50 text-violet-600 text-[10px] font-black uppercase tracking-widest border border-violet-100">
               <Grid2X2 size={14} />
               {isAdmin ? "Global Taxonomy Management" : "Taxonomy Manager"}
            </div>
@@ -123,7 +134,7 @@ function CategoryList() {
           onClick={handleOpenCreate}
           className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-violet-600 transition-all shadow-xl active:scale-95 group"
         >
-          <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
+          <div className="w-6 h-6 bg-white/10 rounded-xl flex items-center justify-center group-hover:rotate-90 transition-transform">
             <Plus size={16} />
           </div>
           New Category
@@ -133,25 +144,24 @@ function CategoryList() {
       {/* Grid Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
          <StatItem icon={<Hash size={24} />} label="Total Classes" value={categories.length} color="violet" />
-         <StatItem icon={<Layout size={24} />} label="Active Filters" value={filteredCategories.length} color="blue" />
+         <StatItem icon={<Layout size={24} />} label="Active Filters" value={categories.length} color="blue" />
          <StatItem icon={<User size={24} />} label="Permissions" value={isAdmin ? "Full Access" : "Maker"} color="emerald" />
       </div>
 
       {/* Search & List */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
         <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
            <div className="relative flex-1 max-w-md group w-full">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-600 transition-colors" size={20} />
               <input 
                 type="text" 
                 placeholder="Search categories..." 
-                className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-violet-200 transition-all text-xs font-black uppercase tracking-widest"
+                className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-full outline-none focus:bg-white focus:border-violet-200 transition-all text-xs font-black uppercase tracking-widest"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
            </div>
         </div>
-
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -167,8 +177,8 @@ function CategoryList() {
                 [1,2,3].map(i => (
                   <tr key={i} className="animate-pulse"><td colSpan="4" className="px-10 py-8"><div className="h-4 bg-slate-100 rounded w-full"></div></td></tr>
                 ))
-              ) : filteredCategories.length > 0 ? (
-                filteredCategories.map((cat) => {
+              ) : categories.length > 0 ? (
+                categories.map((cat) => {
                   const canManage = cat.user_id === user?.id || isAdmin;
                   const isGlobal = cat.user?.role?.name === "admin" || !cat.user;
                   const isMine = cat.user_id === user?.id;
@@ -177,7 +187,7 @@ function CategoryList() {
                     <tr key={cat.id} className="hover:bg-slate-50/30 transition-all group">
                       <td className="px-10 py-8">
                         <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-2xl ${cat.color || 'bg-violet-600 shadow-violet-600/20'} flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:rotate-6 transition-transform`}>
+                          <div className={`w-12 h-12 rounded-xl ${cat.color || 'bg-violet-600 shadow-violet-600/20'} flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:rotate-6 transition-transform`}>
                              {cat.name?.[0]?.toUpperCase()}
                           </div>
                           <div>
@@ -201,7 +211,7 @@ function CategoryList() {
                       <td className="px-10 py-8">
                          <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                               <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+                               <div className="w-6 h-6 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                                   <User size={12} />
                                 </div>
                                 {isMine ? "You" : (cat.user?.name || "System Admin")}
@@ -236,7 +246,7 @@ function CategoryList() {
                                </button>
                              </>
                            ) : (
-                             <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">Protected</span>
+                             <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">Protected</span>
                            )}
                            <button className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 flex items-center justify-center transition-all">
                               <ChevronRight size={18} />
@@ -255,7 +265,23 @@ function CategoryList() {
       </div>
 
       <CategoryFormModal isOpen={formModalOpen} onClose={() => setFormModalOpen(false)} onSuccess={handleFormSuccess} editData={editData} />
-      <ConfirmDeleteModal isOpen={deleteModal.open} categoryName={deleteModal.name} onConfirm={handleDeleteConfirm} onCancel={() => setDeleteModal({ open: false, id: null, name: "" })} loading={deleteLoading} />
+      <ConfirmModal 
+        isOpen={deleteModal.open} 
+        title="Delete Category"
+        message={`Are you sure you want to delete "${deleteModal.name}"? This action will archive the category and might affect quizzes assigned to it.`}
+        onConfirm={handleDeleteConfirm} 
+        onCancel={() => setDeleteModal({ open: false, id: null, name: "" })} 
+        loading={deleteLoading} 
+        confirmText="Archive Category"
+      />
+      
+      <div className="mt-8">
+        <Pagination 
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   );
 }
@@ -267,8 +293,8 @@ function StatItem({ icon, label, value, color }) {
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
   };
   return (
-    <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all duration-500">
-      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
+    <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm flex items-center gap-6 group hover:shadow-xl transition-all duration-500">
+      <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
         {icon}
       </div>
       <div>

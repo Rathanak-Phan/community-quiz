@@ -19,12 +19,26 @@ class QuizModerationController extends Controller
      *     @OA\Response(response=200, description="List of all quizzes")
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $quizzes = Quiz::with(['category', 'community', 'creator'])
-            ->withCount('favorites')
-            ->latest()
-            ->get();
+        $query = Quiz::with(['category', 'community', 'creator'])
+            ->withCount('favorites');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('creator', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $quizzes = $query->latest()->paginate($request->query('per_page', 10));
         return QuizResource::collection($quizzes);
     }
 

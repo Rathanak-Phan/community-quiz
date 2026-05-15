@@ -23,9 +23,15 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json(
-            Category::with('user.role')->get()
-        );
+        $query = Category::with('user.role');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+
+        $categories = $query->latest()->paginate($request->query('per_page', 15));
+        
+        return response()->json($categories);
     }
 
     // Not needed for API

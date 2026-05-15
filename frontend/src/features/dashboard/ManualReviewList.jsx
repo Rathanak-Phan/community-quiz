@@ -2,19 +2,24 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPendingReviews } from "../../services/attemptService";
 import { ClipboardCheck, User, Clock, ChevronRight, AlertCircle, Sparkles } from "lucide-react";
+import Pagination from "../admin/components/Pagination";
 import Toast from "../../components/ui/Toast";
 
 export default function ManualReviewList() {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchReviews = async () => {
+            setLoading(true);
             try {
-                const res = await getPendingReviews();
-                setReviews(res.data.data || res.data);
+                const res = await getPendingReviews(page);
+                setReviews(res.data.data || []);
+                setTotalPages(res.data.meta?.last_page || res.data.last_page || 1);
             } catch (error) {
                 setToast({ show: true, message: "Failed to load pending reviews", type: "error" });
             } finally {
@@ -22,14 +27,14 @@ export default function ManualReviewList() {
             }
         };
         fetchReviews();
-    }, []);
+    }, [page]);
 
     return (
         <div className="max-w-7xl mx-auto px-6 space-y-12 pb-20">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
                 <div className="space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest border border-orange-100">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest border border-orange-100">
                         <ClipboardCheck size={14} />
                         Manual Assessment Center
                     </div>
@@ -46,7 +51,7 @@ export default function ManualReviewList() {
             {loading ? (
                 <div className="space-y-6">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-32 bg-white rounded-2xl animate-pulse border border-slate-100"></div>
+                        <div key={i} className="h-32 bg-white rounded-xl animate-pulse border border-slate-100"></div>
                     ))}
                 </div>
             ) : reviews.length > 0 ? (
@@ -55,10 +60,10 @@ export default function ManualReviewList() {
                         <div 
                             key={review.attempt_id}
                             onClick={() => navigate(`/reviews/${review.attempt_id}`)}
-                            className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500 group cursor-pointer flex flex-col md:flex-row items-center justify-between gap-8"
+                            className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500 group cursor-pointer flex flex-col md:flex-row items-center justify-between gap-8"
                         >
                             <div className="flex items-center gap-8 w-full">
-                                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-500 shrink-0">
+                                <div className="w-16 h-16 rounded-xl bg-slate-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-500 shrink-0">
                                     <Sparkles size={28} />
                                 </div>
                                 <div className="space-y-1 flex-1">
@@ -74,14 +79,14 @@ export default function ManualReviewList() {
                                             <Clock size={12} className="text-slate-300" />
                                             {new Date(review.submitted_at).toLocaleString()}
                                         </div>
-                                        <div className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        <div className="px-3 py-1 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest">
                                             {review.short_answer_count} Answers to grade
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <button className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg active:scale-95 flex items-center gap-2 whitespace-nowrap">
+                            <button className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg active:scale-95 flex items-center gap-2 whitespace-nowrap">
                                 Grade Submission <ChevronRight size={16} />
                             </button>
                         </div>
@@ -89,7 +94,7 @@ export default function ManualReviewList() {
                 </div>
             ) : (
                 <div className="py-32 flex flex-col items-center text-center space-y-6">
-                    <div className="w-24 h-24 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
+                    <div className="w-24 h-24 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200">
                         <AlertCircle size={40} />
                     </div>
                     <div className="space-y-2">
@@ -98,6 +103,14 @@ export default function ManualReviewList() {
                     </div>
                 </div>
             )}
+
+            <div className="mt-12">
+                <Pagination 
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                />
+            </div>
 
             {toast.show && (
                 <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />

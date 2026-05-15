@@ -47,6 +47,20 @@ export default function ManualReviewDetail() {
     };
 
     const submitGrade = async (answerId, isCorrectOverride = null, scoreOverride = null) => {
+        const answer = attempt.answers.find(a => a.id === parseInt(answerId));
+        const maxPoints = answer?.question?.points || 0;
+        const currentScore = scoreOverride !== null ? scoreOverride : grading[answerId]?.score;
+
+        if (currentScore < 0) {
+            setToast({ show: true, message: "Score cannot be negative", type: "error" });
+            return;
+        }
+
+        if (currentScore > maxPoints) {
+            setToast({ show: true, message: `Score cannot exceed max points (${maxPoints})`, type: "error" });
+            return;
+        }
+
         setSubmitting(true);
         try {
             const data = { 
@@ -56,16 +70,30 @@ export default function ManualReviewDetail() {
             };
             const res = await gradeAnswer(answerId, data);
             
-            // Update local attempt score if returned
-            if (res.data?.attempt_summary) {
-                setAttempt(prev => ({
-                    ...prev,
-                    score: res.data.attempt_summary.score
-                }));
-            }
+            const updatedAnswer = res.data?.answer;
+            
+            // Update local attempt state (score AND individual answer data)
+            setAttempt(prev => ({
+                ...prev,
+                score: res.data?.attempt_summary?.score ?? prev.score,
+                grading_status: res.data?.attempt_summary?.grading_status ?? prev.grading_status,
+                answers: prev.answers.map(ans => 
+                    ans.id === parseInt(answerId) 
+                        ? { 
+                            ...ans, 
+                            ...updatedAnswer,
+                            // Preserve question object if missing in response
+                            question: updatedAnswer?.question || ans.question,
+                            score: updatedAnswer?.score !== undefined ? parseFloat(updatedAnswer.score) : ans.score,
+                            is_correct: updatedAnswer?.is_correct !== undefined ? updatedAnswer.is_correct : ans.is_correct
+                          } 
+                        : ans
+                )
+            }));
 
             setToast({ show: true, message: "Feedback and grade saved successfully", type: "success" });
         } catch (error) {
+            console.error("Grade submission error:", error);
             setToast({ show: true, message: "Failed to update feedback", type: "error" });
         } finally {
             setSubmitting(false);
@@ -108,11 +136,11 @@ export default function ManualReviewDetail() {
             </div>
 
             {/* Candidate Card */}
-            <div className="bg-slate-900 rounded-2xl p-12 text-white relative overflow-hidden">
+            <div className="bg-slate-900 rounded-xl p-12 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 blur-[100px] rounded-full"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white font-black text-2xl">
+                        <div className="w-20 h-20 rounded-xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white font-black text-2xl">
                             {attempt.user?.name?.charAt(0) || <User size={32} />}
                         </div>
                         <div className="space-y-1">
@@ -124,7 +152,7 @@ export default function ManualReviewDetail() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 text-center min-w-[120px]">
+                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/10 text-center min-w-[120px]">
                         <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Current Score</p>
                         <p className="text-4xl font-black tracking-tighter">{attempt.score || 0} <span className="text-lg text-white/40">/ {attempt.max_score || 100}</span></p>
                     </div>
@@ -156,7 +184,7 @@ export default function ManualReviewDetail() {
                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-6">Other Quiz Responses ({otherResponses.length})</h3>
                 <div className="space-y-6">
                     {otherResponses.map((ans, idx) => (
-                        <div key={ans.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm group hover:border-blue-200 transition-all duration-500">
+                        <div key={ans.id} className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm group hover:border-blue-200 transition-all duration-500">
                             <div className="p-8 space-y-6">
                                 <div className="flex gap-6">
                                     <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center font-black text-xs text-slate-300 shrink-0 group-hover:bg-blue-50 group-hover:text-blue-300 transition-colors">
@@ -165,13 +193,13 @@ export default function ManualReviewDetail() {
                                     <div className="flex-1 space-y-4">
                                         <div className="flex items-center justify-between">
                                             <h4 className="text-sm font-bold text-slate-900">{ans.question?.question_text}</h4>
-                                            <div className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${ans.is_correct ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                            <div className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest ${ans.is_correct ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                                                 {ans.is_correct ? 'Correct' : 'Incorrect'} • {ans.score || 0} pts
                                             </div>
                                         </div>
 
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="grid md:grid-cols-3 gap-4">
+                                            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Response</p>
                                                 <p className="text-sm font-medium text-slate-700">
                                                     {ans.selected_options_data && ans.selected_options_data.length > 0 
@@ -179,30 +207,46 @@ export default function ManualReviewDetail() {
                                                         : (ans.answer_text || (ans.answer_boolean !== null ? (ans.answer_boolean ? 'True' : 'False') : 'No Answer'))}
                                                 </p>
                                             </div>
-                                            {ans.question?.question_type === 'short_answer' && (
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <MessageSquare size={14} className="text-blue-500" />
-                                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Feedback to User</span>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <textarea 
-                                                            placeholder="Add feedback..."
-                                                            className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all text-xs font-medium h-[40px] resize-none"
-                                                            value={grading[ans.id]?.feedback || ""}
-                                                            onChange={(e) => handleGradeChange(ans.id, 'feedback', e.target.value)}
-                                                        />
-                                                        <button 
-                                                            onClick={() => submitGrade(ans.id)}
-                                                            disabled={submitting}
-                                                            className="p-3 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all disabled:opacity-50 self-end"
-                                                            title="Save Feedback"
-                                                        >
-                                                            <Save size={16} />
-                                                        </button>
-                                                    </div>
+                                            
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-2">
+                                                    <Star size={14} className="text-orange-500" />
+                                                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Score (Max {ans.question?.points})</span>
                                                 </div>
-                                            )}
+                                                <input 
+                                                    type="number"
+                                                    max={ans.question?.points}
+                                                    min={0}
+                                                    step="0.1"
+                                                    placeholder={`0 - ${ans.question?.points}`}
+                                                    className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-orange-500 transition-all text-sm font-black"
+                                                    value={grading[ans.id]?.score}
+                                                    onChange={(e) => handleGradeChange(ans.id, 'score', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-2">
+                                                    <MessageSquare size={14} className="text-blue-500" />
+                                                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Feedback</span>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <textarea 
+                                                        placeholder="Add feedback..."
+                                                        className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all text-xs font-medium h-[45px] resize-none"
+                                                        value={grading[ans.id]?.feedback || ""}
+                                                        onChange={(e) => handleGradeChange(ans.id, 'feedback', e.target.value)}
+                                                    />
+                                                    <button 
+                                                        onClick={() => submitGrade(ans.id)}
+                                                        disabled={submitting}
+                                                        className="p-3 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all disabled:opacity-50"
+                                                        title="Save Score & Feedback"
+                                                    >
+                                                        <Save size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -221,10 +265,10 @@ export default function ManualReviewDetail() {
 
 function AnswerGradeCard({ ans, idx, grading, handleGradeChange, submitGrade, submitting }) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/40 group hover:border-orange-200 transition-all duration-500">
+        <div className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/40 group hover:border-orange-200 transition-all duration-500">
             <div className="p-10 space-y-10">
                 <div className="flex flex-col md:flex-row gap-10">
-                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center font-black text-slate-200 shrink-0 group-hover:bg-orange-50 group-hover:text-orange-200 transition-colors">
+                    <div className="w-16 h-16 rounded-xl bg-slate-50 flex items-center justify-center font-black text-slate-200 shrink-0 group-hover:bg-orange-50 group-hover:text-orange-200 transition-colors">
                         {idx + 1}
                     </div>
                     <div className="flex-1 space-y-6">
@@ -234,13 +278,13 @@ function AnswerGradeCard({ ans, idx, grading, handleGradeChange, submitGrade, su
                         </div>
                         <div className="space-y-2">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Response</p>
-                            <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 font-medium text-slate-700 italic leading-relaxed">
+                            <div className="p-8 bg-slate-50 rounded-xl border border-slate-100 font-medium text-slate-700 italic leading-relaxed">
                                 "{ans.answer_text}"
                             </div>
                         </div>
                         <div className="space-y-2">
                             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Expected Answer</p>
-                            <div className="p-8 bg-emerald-50 rounded-3xl border border-emerald-100 font-bold text-emerald-900 leading-relaxed">
+                            <div className="p-8 bg-emerald-50 rounded-xl border border-emerald-100 font-bold text-emerald-900 leading-relaxed">
                                 {ans.question?.short_answer?.answer_text || "No reference provided"}
                             </div>
                         </div>
@@ -257,7 +301,7 @@ function AnswerGradeCard({ ans, idx, grading, handleGradeChange, submitGrade, su
                             type="number"
                             max={ans.question?.points || 10}
                             min={0}
-                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-orange-500 transition-all font-black text-lg"
+                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-orange-500 transition-all font-black text-lg"
                             value={grading[ans.id]?.score}
                             onChange={(e) => handleGradeChange(ans.id, 'score', e.target.value)}
                         />
@@ -269,7 +313,7 @@ function AnswerGradeCard({ ans, idx, grading, handleGradeChange, submitGrade, su
                         </label>
                         <textarea 
                             placeholder="Provide constructive feedback..."
-                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium h-[60px]"
+                            className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium h-[60px]"
                             value={grading[ans.id]?.feedback}
                             onChange={(e) => handleGradeChange(ans.id, 'feedback', e.target.value)}
                         />
@@ -283,7 +327,7 @@ function AnswerGradeCard({ ans, idx, grading, handleGradeChange, submitGrade, su
                             submitGrade(ans.id, true, ans.question?.points || 10);
                         }}
                         disabled={submitting}
-                        className="px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
                         <CheckCircle2 size={16} /> Mark Correct
                     </button>
@@ -293,14 +337,14 @@ function AnswerGradeCard({ ans, idx, grading, handleGradeChange, submitGrade, su
                             submitGrade(ans.id, false, 0);
                         }}
                         disabled={submitting}
-                        className="px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border-2 border-rose-500 text-rose-600 hover:bg-rose-500 hover:text-white transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest border-2 border-rose-500 text-rose-600 hover:bg-rose-500 hover:text-white transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
                         <XCircle size={16} /> Mark Incorrect
                     </button>
                     <button 
                         onClick={() => submitGrade(ans.id)}
                         disabled={submitting}
-                        className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl active:scale-95 flex items-center gap-3 disabled:opacity-50"
+                        className="bg-slate-900 text-white px-10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl active:scale-95 flex items-center gap-3 disabled:opacity-50"
                     >
                         {submitting ? "Processing..." : "Save Score"}
                         <Save size={18} />

@@ -16,7 +16,22 @@ class Community extends Model
         'invite_code'
     ];
 
-    protected $appends = ['is_member', 'join_status'];
+    protected $appends = ['is_member', 'join_status', 'is_favorited'];
+
+    public function getIsFavoritedAttribute()
+    {
+        $user = auth('sanctum')->user();
+        if (!$user) return false;
+
+        return $this->favorites()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'favoritable');
+    }
 
     public function getIsMemberAttribute()
     {
@@ -61,5 +76,13 @@ class Community extends Model
 
     public function members(){
         return $this->hasMany(CommunityMember::class);
+    }
+
+    public function recentMembers()
+    {
+        return $this->users()
+            ->wherePivot('status', 'approved')
+            ->latest('community_members.created_at')
+            ->limit(3);
     }
 }

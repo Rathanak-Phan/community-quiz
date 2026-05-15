@@ -50,26 +50,30 @@ export default function QuizReview() {
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-20 px-4 mt-6">
             {/* Header Card */}
-            <div className="bg-white rounded-[2rem] border border-slate-200/60 p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-200/60 p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
                 {/* Subtle background glow for success/fail */}
                 <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-[80px] opacity-20 pointer-events-none ${
                     isGraded ? (isSuccess ? 'bg-emerald-500' : 'bg-rose-500') : 'bg-blue-500'
                 }`}></div>
 
                 <div className="flex items-center gap-5 relative z-10 w-full md:w-auto">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                        isGraded 
-                            ? (isSuccess ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600') 
-                            : 'bg-blue-50 text-blue-600'
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${
+                        review.grading_status === 'pending' 
+                            ? 'bg-amber-50 text-amber-600'
+                            : (isSuccess ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600')
                     }`}>
-                        {isGraded ? <Trophy size={28} /> : <Clock size={28} />}
+                        {review.grading_status === 'pending' ? <Clock size={28} /> : <Trophy size={28} />}
                     </div>
                     <div className="space-y-1 text-left">
                         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                            {isGraded ? (isSuccess ? "Great Job!" : "Needs Review") : "Awaiting Grading"}
+                            {review.grading_status === 'pending' 
+                                ? "Needs Review" 
+                                : (isSuccess ? "Great Job!" : "Quiz Completed")}
                         </h1>
                         <p className="text-sm font-medium text-slate-500">
-                            {review.quiz?.title}
+                            {review.grading_status === 'pending' 
+                                ? "Some questions are awaiting manual grading" 
+                                : (isSuccess ? "You've successfully passed the quiz" : "Keep practicing to improve your score")}
                         </p>
                     </div>
                 </div>
@@ -100,7 +104,7 @@ export default function QuizReview() {
 
             {/* Quick Actions & Share Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-3xl border border-slate-200/60 p-8 shadow-sm flex flex-col justify-center space-y-6">
+                <div className="bg-white rounded-xl border border-slate-200/60 p-8 shadow-sm flex flex-col justify-center space-y-6">
                     <div className="space-y-1">
                         <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Next Steps</h3>
                         <p className="text-xs text-slate-500">Continue learning or check your progress.</p>
@@ -122,7 +126,7 @@ export default function QuizReview() {
                 </div>
 
                 {review.submission_id && (
-                    <div className="bg-white rounded-3xl border border-slate-200/60 p-8 shadow-sm space-y-6 flex flex-col justify-center">
+                    <div className="bg-white rounded-xl border border-slate-200/60 p-8 shadow-sm space-y-6 flex flex-col justify-center">
                         <div className="flex items-center justify-between">
                             <div className="space-y-1">
                                 <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Share</h3>
@@ -131,13 +135,13 @@ export default function QuizReview() {
                             <div className="flex bg-slate-100 p-1 rounded-xl">
                                 <button 
                                     onClick={() => setShareMode('result')} 
-                                    className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${shareMode === 'result' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${shareMode === 'result' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                 >
                                     Result
                                 </button>
                                 <button 
                                     onClick={() => setShareMode('quiz')} 
-                                    className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${shareMode === 'quiz' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${shareMode === 'quiz' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                 >
                                     Quiz
                                 </button>
@@ -235,8 +239,8 @@ export default function QuizReview() {
 
                 <div className="space-y-4">
                     {review.answers?.map((ans, idx) => (
-                        <div key={ans.id} className="bg-white rounded-3xl border border-slate-200/60 p-6 md:p-8 shadow-sm flex flex-col md:flex-row gap-6 md:gap-8 transition-all hover:shadow-md">
-                            <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center font-bold text-slate-400 shrink-0">
+                        <div key={ans.id} className="bg-white rounded-xl border border-slate-200/60 p-6 md:p-8 shadow-sm flex flex-col md:flex-row gap-6 md:gap-8 transition-all hover:shadow-md">
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-400 shrink-0">
                                 {idx + 1}
                             </div>
                             
@@ -244,7 +248,7 @@ export default function QuizReview() {
                                 <h4 className="text-lg font-bold text-slate-900 leading-snug">{ans.question?.question_text}</h4>
                                 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="p-4 bg-slate-50 rounded-2xl space-y-1.5 border border-slate-100">
+                                    <div className="p-4 bg-slate-50 rounded-xl space-y-1.5 border border-slate-100">
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                                             Your Answer
                                         </p>
@@ -256,7 +260,7 @@ export default function QuizReview() {
                                     </div>
                                     
                                     {ans.question?.question_type === 'short_answer' && ans.score === null ? (
-                                        <div className="p-4 bg-orange-50 rounded-2xl space-y-1.5 border border-orange-100">
+                                        <div className="p-4 bg-orange-50 rounded-xl space-y-1.5 border border-orange-100">
                                             <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest flex items-center justify-between">
                                                 Status
                                                 <Clock size={14} />
@@ -266,7 +270,7 @@ export default function QuizReview() {
                                             </p>
                                         </div>
                                     ) : (ans.score !== null || isGraded) && (
-                                        <div className={`p-4 rounded-2xl space-y-1.5 border ${ans.is_correct ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
+                                        <div className={`p-4 rounded-xl space-y-1.5 border ${ans.is_correct ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
                                             <p className={`text-[10px] font-bold uppercase tracking-widest flex items-center justify-between ${ans.is_correct ? 'text-emerald-500' : 'text-rose-500'}`}>
                                                 Result
                                                 {ans.is_correct ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
@@ -278,8 +282,8 @@ export default function QuizReview() {
                                     )}
                                 </div>
 
-                                {ans.feedback && ans.question?.question_type === 'short_answer' && (
-                                    <div className="p-6 bg-blue-50/40 rounded-[1.5rem] border border-blue-100/50 flex flex-col gap-3 relative overflow-hidden group/feedback">
+                                {ans.feedback && (
+                                    <div className="p-6 bg-blue-50/40 rounded-xl border border-blue-100/50 flex flex-col gap-3 relative overflow-hidden group/feedback">
                                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover/feedback:opacity-10 transition-opacity">
                                             <MessageSquare size={48} className="text-blue-600" />
                                         </div>
@@ -310,7 +314,7 @@ function ShareButton({ icon, color, loading, disabled, onClick }) {
         <button 
             disabled={disabled}
             onClick={onClick}
-            className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-300 ${color} ${loading ? 'opacity-50 animate-pulse cursor-wait' : (disabled ? 'opacity-50 cursor-not-allowed' : '')}`}
+            className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-300 ${color} ${loading ? 'opacity-50 animate-pulse cursor-wait' : (disabled ? 'opacity-50 cursor-not-allowed' : '')}`}
         >
             {icon}
         </button>

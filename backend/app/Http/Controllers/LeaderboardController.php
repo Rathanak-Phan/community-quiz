@@ -7,6 +7,7 @@ use App\Models\QuizAttempt;
 use App\Models\User;
 use App\Models\Submission;
 use App\Models\Community;
+use App\Http\Resources\QuizResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,7 +22,7 @@ class LeaderboardController extends Controller
 
         $query = QuizAttempt::where('status', 'submitted')
             ->where('grading_status', 'graded')
-            ->with(['user', 'quiz']);
+            ->with(['user.role', 'quiz']);
 
         if ($period === 'month') {
             $query->where('completed_at', '>=', now()->startOfMonth());
@@ -38,8 +39,10 @@ class LeaderboardController extends Controller
         $data = $attempts->map(function ($attempt) use (&$rank) {
             return [
                 'id' => $attempt->id,
+                'userId' => $attempt->user_id,
                 'rank' => $rank++,
                 'name' => $attempt->user->name,
+                'userRole' => $attempt->user->role?->name,
                 'avatar' => strtoupper(substr($attempt->user->name, 0, 1)),
                 'is_anonymous' => (bool)$attempt->is_anonymous,
                 'quizName' => $attempt->quiz->title,
@@ -59,7 +62,8 @@ class LeaderboardController extends Controller
         $limit = $request->query('limit', 3);
         $period = $request->query('period', 'all');
 
-        $query = User::select('users.*')
+        $query = User::with('role')
+            ->select('users.*')
             ->join('submissions', 'users.id', '=', 'submissions.user_id')
             ->where('submissions.grading_status', 'graded')
             ->groupBy('users.id')
@@ -81,6 +85,7 @@ class LeaderboardController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'score' => (int)$user->total_score,
+                'userRole' => $user->role?->name,
                 'rank' => $rank++,
                 'avatar' => strtoupper(substr($user->name, 0, 1))
             ];
@@ -152,7 +157,7 @@ class LeaderboardController extends Controller
             ->limit($limit)
             ->get();
 
-        return response()->json(['data' => $quizzes]);
+        return QuizResource::collection($quizzes);
     }
 
     /**
@@ -165,7 +170,14 @@ class LeaderboardController extends Controller
                 'total_users' => User::count() + 124000, 
                 'total_quizzes' => Quiz::count() + 850000,
                 'total_communities' => Community::count() + 12000,
-                'active_countries' => 142 
+                'users_this_week' => User::where('created_at', '>=', now()->startOfWeek())->count() + 10450,
+                'active_countries' => 142,
+                'recent_users' => User::latest()->limit(4)->get()->map(function($u) {
+                    return [
+                        'name' => $u->name,
+                        'avatar' => $u->avatar, // The accessor already handles the URL
+                    ];
+                })
             ]
         ]);
     }

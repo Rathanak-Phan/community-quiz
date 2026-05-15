@@ -13,6 +13,7 @@ import QuestionEditor from './components/QuestionEditor';
 import QuizFormModal from './components/QuizFormModal';
 import ShareQuizModal from './components/ShareQuizModal';
 import Toast from '../../components/ui/Toast';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 const QuestionList = () => {
   const { quizId } = useParams();
@@ -31,6 +32,7 @@ const QuestionList = () => {
   const [inlineEditingId, setInlineEditingId] = useState(null);
   const [isInlineMode, setIsInlineMode] = useState(true);
   const [editData, setEditData] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, loading: false });
 
   const fetchQuestions = useCallback(async () => {
     setLoading(true);
@@ -54,15 +56,22 @@ const QuestionList = () => {
     }
   }, [quizId, fetchQuestions]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this question?')) return;
+  const handleDeleteClick = (id) => {
+    setConfirmDelete({ isOpen: true, id, loading: false });
+  };
+
+  const handleConfirmDelete = async () => {
+    const id = confirmDelete.id;
+    setConfirmDelete(prev => ({ ...prev, loading: true }));
     try {
       await deleteQuestion(id);
       setToast({ message: 'Question removed', type: 'success' });
       fetchQuestions();
       if (inlineEditingId === id) setInlineEditingId(null);
+      setConfirmDelete({ isOpen: false, id: null, loading: false });
     } catch (err) {
       setToast({ message: 'Failed to delete', type: 'error' });
+      setConfirmDelete(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -136,13 +145,13 @@ const QuestionList = () => {
              <div className="flex bg-slate-100 p-1 rounded-xl">
                 <button 
                   onClick={() => setIsInlineMode(false)}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${!isInlineMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!isInlineMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   Modal
                 </button>
                 <button 
                   onClick={() => setIsInlineMode(true)}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${isInlineMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isInlineMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   Inline
                 </button>
@@ -166,7 +175,7 @@ const QuestionList = () => {
                 </button>
                 <button 
                     onClick={() => setIsShareModalOpen(true)}
-                    className="bg-[#673ab7] hover:bg-[#5e35b1] text-white px-6 py-2.5 rounded-lg font-bold text-sm transition shadow-md"
+                    className="bg-[#673ab7] hover:bg-[#5e35b1] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition shadow-md"
                 >
                     Send
                 </button>
@@ -182,7 +191,7 @@ const QuestionList = () => {
         <div className="bg-white rounded-xl border-t-[10px] border-[#673ab7] shadow-md p-8 relative overflow-hidden group/header">
              <button 
                 onClick={() => setIsQuizModalOpen(true)}
-                className="absolute top-4 right-4 p-2 bg-slate-50 text-slate-400 rounded-lg opacity-0 group-hover/header:opacity-100 transition hover:text-[#673ab7] hover:bg-white border border-transparent hover:border-slate-100"
+                className="absolute top-4 right-4 p-2 bg-slate-50 text-slate-400 rounded-xl opacity-0 group-hover/header:opacity-100 transition hover:text-[#673ab7] hover:bg-white border border-transparent hover:border-slate-100"
              >
                 <Edit3 size={18} />
              </button>
@@ -267,7 +276,7 @@ const QuestionList = () => {
                             <button onClick={() => handleEdit(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Edit">
                                 <Edit3 size={18} />
                             </button>
-                            <button onClick={() => handleDelete(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-slate-400 hover:text-rose-500 transition" title="Delete">
+                            <button onClick={() => handleDeleteClick(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-slate-400 hover:text-rose-500 transition" title="Delete">
                                 <Trash2 size={18} />
                             </button>
                             <button onClick={() => handleDuplicate(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Duplicate">
@@ -322,7 +331,7 @@ const QuestionList = () => {
                                 )}
 
                                 {q.question_type === 'short_answer' && (
-                                    <div className="max-w-md p-4 bg-slate-50 border border-slate-100 rounded-lg flex items-center gap-4">
+                                    <div className="max-w-md p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
                                         <Type size={16} className="text-slate-400" />
                                         <span className="text-sm text-slate-500 italic">Expected: {q.short_answer?.answer_text}</span>
                                     </div>
@@ -359,7 +368,7 @@ const QuestionList = () => {
                                 <button onClick={() => handleEdit(q)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition">
                                     <Edit3 size={16} />
                                 </button>
-                                <button onClick={() => handleDelete(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-rose-300 hover:text-rose-500 transition">
+                                <button onClick={() => handleDeleteClick(q.id)} className="p-2 hover:bg-rose-50 rounded-full text-rose-300 hover:text-rose-500 transition">
                                     <Trash2 size={16} />
                                 </button>
                              </div>
@@ -397,7 +406,7 @@ const QuestionList = () => {
       <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-2 bg-white rounded-xl shadow-lg border border-slate-200 z-40">
         <button 
             onClick={handleCreate}
-            className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition shadow-sm group relative"
+            className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition shadow-sm group relative"
         >
             <Plus size={24} />
             <span className="absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Add Question</span>
@@ -405,28 +414,28 @@ const QuestionList = () => {
         <div className="w-full h-px bg-slate-100 my-1"></div>
         <button 
             onClick={() => handleActionStub('Import')}
-            className="w-12 h-12 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
+            className="w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
         >
             <Copy size={20} />
             <span className="absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Import Questions</span>
         </button>
         <button 
             onClick={() => handleActionStub('Title & Description')}
-            className="w-12 h-12 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
+            className="w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
         >
             <Type size={20} />
             <span className="absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Add Title/Description</span>
         </button>
         <button 
             onClick={handleCreate}
-            className="w-12 h-12 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
+            className="w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
         >
             <ImageIcon size={20} />
             <span className="absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Add Image</span>
         </button>
         <button 
             onClick={() => handleActionStub('Video')}
-            className="w-12 h-12 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
+            className="w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative"
         >
             <Sparkles size={20} />
             <span className="absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">AI Generate</span>
@@ -462,6 +471,16 @@ const QuestionList = () => {
         onClose={() => setIsShareModalOpen(false)}
         quizId={quizId}
         quizTitle={quiz?.title}
+      />
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Delete Question"
+        message="Are you sure you want to delete this question? This action cannot be undone."
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDelete({ isOpen: false, id: null, loading: false })}
+        loading={confirmDelete.loading}
+        confirmText="Delete Question"
       />
 
       {toast && (

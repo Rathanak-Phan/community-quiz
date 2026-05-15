@@ -16,6 +16,7 @@ const AdminDashboard = () => {
   });
   const [users, setUsers] = useState([]);
   const [makerRequests, setMakerRequests] = useState([]);
+  const [totalRequests, setTotalRequests] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('users'); // 'users' or 'requests'
 
@@ -30,7 +31,8 @@ const AdminDashboard = () => {
       ]);
 
       setUsers(usersRes.data?.data || []);
-      setMakerRequests(requestsRes.data || []);
+      setMakerRequests(requestsRes.data?.data || requestsRes.data || []);
+      setTotalRequests(requestsRes.data?.total || (requestsRes.data?.data ? requestsRes.data.data.length : (Array.isArray(requestsRes.data) ? requestsRes.data.length : 0)));
       setStats({
         totalUsers: usersRes.data?.total || usersRes.data?.data?.length || 0,
         totalQuizzes: quizzesRes.data?.total || quizzesRes.data?.data?.length || 0,
@@ -75,8 +77,8 @@ const AdminDashboard = () => {
             <p className="text-slate-500 font-medium max-w-lg">Manage users, communities, and monitor global activity in real-time</p>
         </div>
         <div className="flex gap-4">
-           <button className="bg-white border-2 border-slate-200 text-slate-900 px-6 py-3 rounded-lg font-black text-xs tracking-widest hover:border-slate-200 transition-all">Export Logs</button>
-           <button className="bg-slate-900 text-white px-6 py-3 rounded-lg font-black text-xs tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20">System Status</button>
+           <button className="bg-white border-2 border-slate-200 text-slate-900 px-6 py-3 rounded-xl font-black text-xs tracking-widest hover:border-slate-200 transition-all">Export Logs</button>
+           <button className="bg-slate-900 text-white px-6 py-3 rounded-xl font-black text-xs tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20">System Status</button>
         </div>
       </div>
 
@@ -90,7 +92,7 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* User Management Table */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/40 overflow-hidden">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xl shadow-slate-200/40 overflow-hidden">
           <div className="p-10 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-8">
                <button 
@@ -104,16 +106,16 @@ const AdminDashboard = () => {
                  className={`text-xl font-black uppercase tracking-tight transition-all flex items-center gap-3 ${activeTab === 'requests' ? 'text-slate-900 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
                >
                  Creator Requests
-                 {makerRequests.length > 0 && (
+                 {totalRequests > 0 && (
                    <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse">
-                     {makerRequests.length}
+                     {totalRequests}
                    </span>
                  )}
                </button>
             </div>
             <div className="relative flex-1 max-w-xs group">
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-               <input type="text" placeholder="Search..." className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:bg-white transition-all text-xs font-bold" />
+               <input type="text" placeholder="Search..." className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-full outline-none focus:bg-white transition-all text-xs font-bold" />
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -132,7 +134,7 @@ const AdminDashboard = () => {
                     <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-10 py-6">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-black uppercase border border-slate-200 group-hover:scale-110 transition-transform">
+                          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-black uppercase border border-slate-200 group-hover:scale-110 transition-transform">
                             {user.name?.charAt(0)}
                           </div>
                           <div>
@@ -180,7 +182,7 @@ const AdminDashboard = () => {
                     <tr key={request.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-10 py-6">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-black uppercase border border-blue-100 group-hover:scale-110 transition-transform">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-black uppercase border border-blue-100 group-hover:scale-110 transition-transform">
                             {request.name?.charAt(0)}
                           </div>
                           <div>
@@ -218,7 +220,7 @@ const AdminDashboard = () => {
                     <tr>
                       <td colSpan="4" className="px-10 py-20 text-center">
                         <div className="flex flex-col items-center gap-4">
-                          <div className="w-16 h-16 bg-slate-50 rounded-[2rem] flex items-center justify-center text-slate-200">
+                          <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200">
                              <UserCheck size={32} />
                           </div>
                           <div>
@@ -240,7 +242,7 @@ const AdminDashboard = () => {
 
         {/* System Activity */}
         <div className="space-y-8">
-           <div className="bg-slate-900 rounded-2xl p-10 text-white relative overflow-hidden shadow-2xl">
+           <div className="bg-slate-900 rounded-xl p-10 text-white relative overflow-hidden shadow-2xl">
               <Activity size={120} className="absolute -bottom-10 -right-10 text-white opacity-5 rotate-12" />
               <h3 className="text-xl font-black mb-10 leading-tight uppercase tracking-tight">System <br/><span className="text-blue-400">Activity</span></h3>
               <div className="space-y-8 relative z-10">
@@ -251,14 +253,14 @@ const AdminDashboard = () => {
               </div>
            </div>
 
-           <div className="bg-white rounded-2xl border border-slate-200 p-10 shadow-xl shadow-slate-200/40">
+           <div className="bg-white rounded-xl border border-slate-200 p-10 shadow-xl shadow-slate-200/40">
               <h3 className="font-black text-slate-900 uppercase tracking-tight mb-6">Environment</h3>
               <div className="space-y-6">
                  <EnvStat label="Production Server" value="ONLINE" status="success" />
                  <EnvStat label="Database Cluster" value="SYNCED" status="success" />
                  <EnvStat label="Redis Cache" value="WAKING" status="warning" />
               </div>
-              <button className="w-full mt-10 py-4 border-2 border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-slate-200 transition-all">Open Maintenance Console</button>
+              <button className="w-full mt-10 py-4 border-2 border-slate-200 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-slate-200 transition-all">Open Maintenance Console</button>
            </div>
         </div>
       </div>
@@ -274,9 +276,9 @@ const StatCard = ({ icon, label, value, color, trend }) => {
     orange: "bg-orange-50 text-orange-600 border-orange-100",
   };
   return (
-    <div className="bg-white p-10 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between h-56 group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+    <div className="bg-white p-10 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-56 group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
       <div className="flex justify-between items-start">
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
+        <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
           {icon}
         </div>
         <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Global</span>
@@ -308,7 +310,7 @@ const ActivityItem = ({ icon, text, time, color = "blue" }) => (
 const EnvStat = ({ label, value, status }) => (
   <div className="flex justify-between items-center">
      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
-     <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
+     <span className={`text-[10px] font-black px-2.5 py-1 rounded-xl uppercase tracking-widest ${
         status === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
      }`}>{value}</span>
   </div>

@@ -75,7 +75,7 @@ export default function MyCommunities() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
         <div className="space-y-4">
-           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
               <Users size={14} />
               Social Circles
            </div>
@@ -88,16 +88,16 @@ export default function MyCommunities() {
         <div className="flex gap-4 w-full md:w-auto">
           <button 
             onClick={() => setIsJoinModalOpen(true)}
-            className="flex-1 md:flex-none bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:border-blue-600 transition-all shadow-sm active:scale-95"
+            className="flex-1 md:flex-none bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:border-blue-600 transition-all shadow-sm active:scale-95"
           >
             Join with Code
           </button>
           {(user?.role?.name === 'admin' || user?.role?.name === 'quiz_maker') && (
             <button 
               onClick={() => { setEditData(null); setIsModalOpen(true); }}
-              className="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl active:scale-95 group"
+              className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl active:scale-95 group"
             >
-              <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
+              <div className="w-6 h-6 bg-white/10 rounded-xl flex items-center justify-center group-hover:rotate-90 transition-transform">
                 <Plus size={16} />
               </div>
               New Community
@@ -110,18 +110,18 @@ export default function MyCommunities() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
            {[1, 2, 3, 4].map(i => (
-             <div key={i} className="h-64 bg-white rounded-[3rem] animate-pulse border border-slate-100"></div>
+             <div key={i} className="h-64 bg-white rounded-2xl animate-pulse border border-slate-100"></div>
            ))}
         </div>
       ) : communities.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
            {communities.map(community => (
-             <div key={community.id} className="bg-white rounded-2xl border border-slate-100 p-8 hover:shadow-2xl transition-all duration-500 group relative overflow-hidden">
+             <div key={community.id} className="bg-white rounded-xl border border-slate-100 p-8 hover:shadow-2xl transition-all duration-500 group relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 -translate-y-16 translate-x-16 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
                 
                 <div className="flex items-start justify-between relative z-10 mb-8">
                    <div className="flex items-center gap-5">
-                      <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
+                      <div className="w-16 h-16 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
                          <Users size={28} />
                       </div>
                       <div>
@@ -143,7 +143,7 @@ export default function MyCommunities() {
                 <div className="flex items-center gap-3 relative z-10">
                    <button 
                      onClick={() => navigate(`/communities/${community.id}`)}
-                     className="flex-1 py-4 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                     className="flex-1 py-4 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                    >
                      <ArrowRight size={14} />
                      Enter Hub
@@ -152,21 +152,21 @@ export default function MyCommunities() {
                      <>
                        <button 
                          onClick={() => navigate(`/communities/${community.id}/requests`)}
-                         className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center hover:bg-emerald-100 transition-all"
+                         className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-all"
                          title="Members"
                        >
                          <Users size={18} />
                        </button>
                        <button 
                          onClick={() => { setEditData(community); setIsModalOpen(true); }}
-                         className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center hover:bg-blue-100 transition-all"
+                         className="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-100 transition-all"
                          title="Settings"
                        >
                          <Settings size={20} />
                        </button>
                        <button 
                          onClick={() => handleDelete(community.id)}
-                         className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center hover:bg-rose-100 transition-all"
+                         className="w-14 h-14 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center hover:bg-rose-100 transition-all"
                          title="Delete"
                        >
                          <Trash2 size={20} />
@@ -178,8 +178,8 @@ export default function MyCommunities() {
            ))}
         </div>
       ) : (
-        <div className="py-32 bg-white rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-6">
-           <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center text-slate-200">
+         <div className="py-32 bg-white rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-6">
+            <div className="w-24 h-24 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200">
               <Users size={48} />
            </div>
            <div className="space-y-2">

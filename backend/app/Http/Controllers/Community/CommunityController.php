@@ -35,7 +35,7 @@ class CommunityController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        $communities = Community::with('creator:id,name,email')
+        $communities = Community::with(['creator:id,name,email', 'recentMembers'])
             ->when(!$user, function ($query) {
                 return $query->where('status', 'published')
                              ->where('visibility', 'public');
@@ -75,6 +75,7 @@ class CommunityController extends Controller
                 $q->where('user_id', $user->id)
                   ->where('status', 'approved');
             })
+            ->with('recentMembers')
             ->withCount('members')
             ->get();
 
@@ -166,7 +167,7 @@ class CommunityController extends Controller
             }
         }
 
-        return response()->json($community->load(['creator:id,name', 'members.user:id,name']));
+        return response()->json($community->load(['creator.role', 'members.user.role']));
     }
 
     public function quizzes(Community $community)

@@ -1,10 +1,29 @@
-import { Users, Lock, Globe, CheckCircle, Clock, ChevronRight, Trash2, Settings, LogOut } from "lucide-react";
+import { Users, Lock, Globe, CheckCircle, Clock, ChevronRight, Trash2, Settings, LogOut, Heart } from "lucide-react";
 import { STORAGE_URL } from "../../../config/api";
+import { toggleFavorite } from "../../../services/favoriteService";
+import { useState } from "react";
 
 export default function CommunityCard({ community, onJoin, onLeave, onViewMore, onApprove, onEdit, onDelete }) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const isGuest = !localStorage.getItem("token");
   const isOwner = community.created_by === user?.id;
+
+  const [isFavorited, setIsFavorited] = useState(community.is_favorited);
+  const [favLoading, setFavLoading] = useState(false);
+
+  const handleToggleFavorite = async (e) => {
+    e.stopPropagation();
+    if (isGuest) return;
+    setFavLoading(true);
+    try {
+      const res = await toggleFavorite('community', community.id);
+      setIsFavorited(res.data.is_favorite);
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    } finally {
+      setFavLoading(false);
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -23,7 +42,7 @@ export default function CommunityCard({ community, onJoin, onLeave, onViewMore, 
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group flex flex-col">
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group flex flex-col">
       {/* Banner */}
       <div className="h-40 relative bg-slate-50 overflow-hidden">
         {community.cover_image ? (
@@ -37,6 +56,17 @@ export default function CommunityCard({ community, onJoin, onLeave, onViewMore, 
             <Users size={64} className="text-blue-600 opacity-10" />
           </div>
         )}
+        <div className="absolute top-6 left-6">
+           {!isGuest && (
+             <button 
+               onClick={handleToggleFavorite}
+               disabled={favLoading}
+               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg border backdrop-blur-md ${isFavorited ? 'bg-rose-500 text-white border-rose-400' : 'bg-white/90 text-slate-400 border-white/50 hover:text-rose-500'}`}
+             >
+               <Heart size={20} fill={isFavorited ? "currentColor" : "none"} className={favLoading ? 'animate-pulse' : ''} />
+             </button>
+           )}
+        </div>
         <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
            <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg border backdrop-blur-md bg-white/90 ${getStatusColor(community.visibility)}`}>
              {getStatusIcon(community.visibility)}
@@ -58,7 +88,7 @@ export default function CommunityCard({ community, onJoin, onLeave, onViewMore, 
 
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
                <Users size={16} />
             </div>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
@@ -67,9 +97,20 @@ export default function CommunityCard({ community, onJoin, onLeave, onViewMore, 
             </p>
           </div>
           <div className="flex -space-x-3">
-            {[1, 2, 3].map(i => (
-              <img key={i} src={`https://i.pravatar.cc/100?img=${i + 20}`} className="w-8 h-8 rounded-xl border-2 border-white shadow-sm" alt="Member" />
+            {community.memberAvatars?.slice(0, 3).map((member, i) => (
+              <img 
+                key={i} 
+                src={member.avatar || `https://i.pravatar.cc/100?u=${member.name}`} 
+                className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover" 
+                alt={member.name} 
+                title={member.name}
+              />
             ))}
+            {community.members > 3 && (
+              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm">
+                +{community.members - 3}
+              </div>
+            )}
           </div>
         </div>
 
@@ -92,11 +133,7 @@ export default function CommunityCard({ community, onJoin, onLeave, onViewMore, 
               </button>
               {!isOwner && onLeave && (
                 <button 
-                  onClick={() => {
-                    if (window.confirm(`Are you sure you want to leave ${community.name}?`)) {
-                      onLeave(community);
-                    }
-                  }}
+                  onClick={() => onLeave(community)}
                   className="w-12 h-12 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition flex items-center justify-center border border-rose-100 shadow-sm"
                   title="Leave Community"
                 >
@@ -155,9 +192,7 @@ export default function CommunityCard({ community, onJoin, onLeave, onViewMore, 
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (window.confirm(`Are you sure you want to delete ${community.name}?`)) {
-                    onDelete(community.id);
-                  }
+                  onDelete(community.id);
                 }}
                 className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition shadow-sm flex items-center justify-center border border-rose-100"
                 title="Delete Community"

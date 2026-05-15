@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { getQuizById } from "../../services/quizService";
 import { startAttempt } from "../../services/attemptService";
 import { addFavorite, removeFavorite } from "../../services/favoriteService";
@@ -101,43 +101,43 @@ export default function QuizDetail() {
     );
 
     return (
-        <div className="max-w-7xl mx-auto px-6 space-y-12 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:space-y-12 pb-20 overflow-x-hidden">
             {/* Breadcrumb & Action */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <button 
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black uppercase text-[10px] tracking-widest transition-colors"
+                    className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black uppercase text-[10px] tracking-widest transition-colors self-start sm:self-auto"
                 >
                     <ChevronLeft size={16} /> Back to previous
                 </button>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
                     <button 
                         onClick={handleFavorite}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${quiz.is_favorite ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-slate-50 text-slate-400 border border-slate-100 hover:text-slate-900'}`}
+                        className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2 rounded-xl transition-all ${quiz.is_favorite ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-slate-50 text-slate-400 border border-slate-100 hover:text-slate-900'}`}
                     >
                         {quiz.is_favorite ? <Heart size={14} fill="currentColor" /> : <Bookmark size={14} />}
-                        <span className="text-[10px] font-black uppercase tracking-widest">{quiz.is_favorite ? 'Saved for later' : 'Save for later'}</span>
+                        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{quiz.is_favorite ? 'Saved' : 'Save for later'}</span>
                     </button>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl">
+                    <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2 bg-blue-50 rounded-xl border border-blue-100/50">
                         <ShieldCheck size={14} className="text-blue-600" />
-                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Verified Content</span>
+                        <span className="text-[9px] md:text-[10px] font-black text-blue-600 uppercase tracking-widest whitespace-nowrap">Verified Content</span>
                     </div>
                     {(isAdmin || user?.id === quiz.created_by) && (
                         <button 
                             onClick={() => navigate(`/quizzes/${quizId}/questions`)}
-                            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10 active:scale-95"
                         >
                             <Settings size={14} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Manage Questions</span>
+                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Manage Questions</span>
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-12">
+            <div className="grid lg:grid-cols-12 gap-8 md:gap-12">
                 {/* Left Column: Visual & CTA */}
-                <div className="lg:col-span-5 space-y-8">
-                    <div className="aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white shadow-xl shadow-slate-200 relative group">
+                <div className="lg:col-span-5 space-y-6 md:space-y-8">
+                    <div className="aspect-video md:aspect-[4/5] rounded-xl overflow-hidden border-4 border-white shadow-xl shadow-slate-200 relative group">
                         {quiz.cover_image ? (
                             <img src={`${STORAGE_URL}/${quiz.cover_image}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={quiz.title} />
                         ) : (
@@ -149,16 +149,16 @@ export default function QuizDetail() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-3 bg-slate-100 p-2 rounded-2xl">
+                        <div className="flex items-center gap-3 bg-slate-100 p-2 rounded-xl">
                             <button 
                                 onClick={() => setMode('scored')}
-                                className={`flex-1 py-3 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'scored' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`flex-1 py-3 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'scored' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Scored Mode
                             </button>
                             <button 
                                 onClick={() => setMode('practice')}
-                                className={`flex-1 py-3 px-6 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'practice' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`flex-1 py-3 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${mode === 'practice' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                 Try Out
                             </button>
@@ -167,7 +167,7 @@ export default function QuizDetail() {
                         <button 
                             onClick={handleStart}
                             disabled={starting}
-                            className="w-full py-4.5 bg-slate-900 text-white rounded-2xl font-bold text-base flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50"
+                            className="w-full py-4.5 bg-slate-900 text-white rounded-xl font-bold text-base flex items-center justify-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95 disabled:opacity-50"
                         >
                             {starting ? "PREPARING..." : mode === 'practice' ? "START PRACTICE" : "START SCORED QUIZ"}
                             <Play size={20} fill="currentColor" />
@@ -202,14 +202,14 @@ export default function QuizDetail() {
                                 </span>
                             )}
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">{quiz.title}</h1>
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight uppercase">{quiz.title}</h1>
                     </div>
 
-                    <p className="text-xl text-slate-500 leading-relaxed font-medium">
+                    <p className="text-lg md:text-xl text-slate-500 leading-relaxed font-medium">
                         {quiz.description || "Challenge your understanding with this module. Perfect for test preparation or hobbyist learning."}
                     </p>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
                         <InfoBox 
                             icon={<Clock size={18}/>} 
                             label="Duration" 
@@ -224,12 +224,18 @@ export default function QuizDetail() {
 
                     <div className="pt-10 border-t border-slate-100">
                         <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">About the Creator</h3>
-                        <div className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center gap-4 p-5 bg-slate-50 rounded-xl border border-slate-100">
                             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-600 font-bold text-lg shadow-sm border border-slate-200">
                                 {quiz.creator?.name?.charAt(0) || "U"}
                             </div>
                             <div>
-                                <p className="font-bold text-slate-900 uppercase tracking-tight">{quiz.creator?.name}</p>
+                                {quiz.creator?.role !== 'admin' ? (
+                                    <Link to={`/profile/${quiz.creator?.id}`}>
+                                        <p className="font-bold text-slate-900 uppercase tracking-tight hover:text-blue-600 transition-colors cursor-pointer">{quiz.creator?.name}</p>
+                                    </Link>
+                                ) : (
+                                    <p className="font-bold text-slate-900 uppercase tracking-tight">{quiz.creator?.name}</p>
+                                )}
                                 <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-0.5">Top Rated Educator</p>
                             </div>
                         </div>
@@ -246,8 +252,8 @@ export default function QuizDetail() {
 
 function InfoBox({ icon, label, value }) {
     return (
-        <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-9 h-9 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 mb-4">
+        <div className="p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 mb-4">
                 {icon}
             </div>
             <p className="text-xs font-bold text-slate-900 tracking-tight">{value}</p>

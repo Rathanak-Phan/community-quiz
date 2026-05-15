@@ -54,13 +54,13 @@ export default function Categories() {
       </div>
 
       {/* Search */}
-      <div className="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 flex items-center gap-6">
+      <div className="bg-white p-6 rounded-xl shadow-xl shadow-slate-200/40 border border-slate-100 flex items-center gap-6">
         <div className="relative flex-1 group w-full">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
             <input 
                 type="text" 
                 placeholder="Search subjects (e.g. Science, Tech, History)..." 
-                className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
+                className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-full outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -71,7 +71,7 @@ export default function Categories() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="h-48 bg-white rounded-2xl animate-pulse border border-slate-50"></div>
+                <div key={i} className="h-48 bg-white rounded-xl animate-pulse border border-slate-50"></div>
             ))}
         </div>
       ) : (
@@ -79,7 +79,7 @@ export default function Categories() {
           {filteredCategories.map((cat) => (
             <div 
               key={cat.id} 
-              className="bg-white p-8 rounded-2xl border border-slate-100 hover:shadow-2xl hover:shadow-blue-600/5 hover:border-blue-100 transition-all duration-500 group cursor-pointer relative overflow-hidden"
+              className="bg-white p-8 rounded-xl border border-slate-100 hover:shadow-2xl hover:shadow-blue-600/5 hover:border-blue-100 transition-all duration-500 group cursor-pointer relative overflow-hidden"
             >
               <div className="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-inner">
                  <Grid2X2 size={24} className="group-hover:rotate-12 transition-transform" />

@@ -13,9 +13,22 @@ class UserService
      * @param int $perPage
      * @return LengthAwarePaginator
      */
-    public function getAllUsers(int $perPage = 15): LengthAwarePaginator
+    public function getAllUsers(int $perPage = 15, ?string $search = null, ?int $roleId = null): LengthAwarePaginator
     {
-        return User::with('role')->latest()->paginate($perPage);
+        $query = User::with('role')->latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($roleId) {
+            $query->where('role_id', $roleId);
+        }
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -48,5 +61,20 @@ class UserService
             'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
             'role_id' => $data['role_id'] ?? 3, // Default to User role
         ]);
+    }
+
+    /**
+     * Get user statistics.
+     *
+     * @return array
+     */
+    public function getUserStats(): array
+    {
+        return [
+            'total' => User::count(),
+            'admins' => User::where('role_id', 1)->count(),
+            'quiz_makers' => User::where('role_id', 2)->count(),
+            'regular_users' => User::where('role_id', 3)->count(),
+        ];
     }
 }

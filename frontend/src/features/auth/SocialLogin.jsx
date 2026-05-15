@@ -51,9 +51,9 @@ const SocialLogin = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-            <div className="text-center bg-white p-12 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+            <div className="text-center bg-white p-12 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
                 <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                    <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
                         <Loader2 className="animate-spin" size={32} />
                     </div>
                 </div>

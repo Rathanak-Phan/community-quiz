@@ -21,6 +21,18 @@ class Quiz extends Model
         'default_time_limit'
     ];
 
+    protected $appends = ['is_favorited'];
+
+    public function getIsFavoritedAttribute()
+    {
+        $user = auth('sanctum')->user();
+        if (!$user) return false;
+
+        return $this->favorites()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
     public function community()
     {
         return $this->belongsTo(Community::class);

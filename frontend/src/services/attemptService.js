@@ -23,7 +23,7 @@ export const getReview = (attemptId) =>
 export const gradeAnswer = (answerId, data) =>
   apiClient.put(`/answers/${answerId}/grade`, data);
 
-export const getPendingReviews = () =>
-  apiClient.get("/reviews/pending");
+export const getPendingReviews = (page = 1) =>
+  apiClient.get(`/reviews/pending?page=${page}`);
 export const getShareResult = (submissionId) =>
   apiClient.get(`/submissions/${submissionId}/share`);

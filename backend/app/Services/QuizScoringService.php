@@ -21,6 +21,7 @@ class QuizScoringService
         $gradedAnswers = [];
 
         foreach ($questions as $question) {
+            $maxScore += $question->points;
             $answer = $answers->get($question->id);
 
             if (!$answer) {
@@ -29,12 +30,8 @@ class QuizScoringService
                     'score' => 0,
                     'is_pending' => false,
                 ];
-                if ($question->question_type !== 'short_answer') {
-                    $maxScore += $question->points;
-                }
                 continue;
             }
-
             if ($question->question_type === 'short_answer') {
                 $isManual = $question->shortAnswer ? $question->shortAnswer->is_manual_grading : false;
                 
@@ -48,7 +45,6 @@ class QuizScoringService
                     $isPending = false;
                 }
             } else {
-                $maxScore += $question->points;
                 $isCorrect = $this->isCorrect($question, $answer);
                 $pointsEarned = $isCorrect ? $question->points : 0;
                 $isPending = false;
@@ -66,7 +62,7 @@ class QuizScoringService
                 'is_pending' => $isPending,
             ];
 
-            if ($pointsEarned !== null && $question->question_type !== 'short_answer') {
+            if ($pointsEarned !== null) {
                 $totalScore += $pointsEarned;
             }
         }
@@ -83,13 +79,11 @@ class QuizScoringService
     {
         $attempt->load(['answers.question', 'quiz.questions']);
         
-        // Sum only non-short-answer scores for the total score
-        $totalScore = $attempt->answers->reject(function ($answer) {
-            return $answer->question->question_type === 'short_answer';
-        })->sum('score');
+        // Sum all scores for the total score
+        $totalScore = $attempt->answers->sum('score');
         
-        // Sum only non-short-answer points for the max score
-        $maxScore = $attempt->quiz->questions->where('question_type', '!=', 'short_answer')->sum('points');
+        // Sum all points for the max score
+        $maxScore = $attempt->quiz->questions->sum('points');
 
         // Determine if grading is still pending for any short answer
         $isPending = $attempt->answers->contains(function ($answer) {
@@ -142,19 +136,8 @@ class QuizScoringService
                 $correct = filter_var($question->correct_answer, FILTER_VALIDATE_BOOLEAN);
                 return (bool)$answer->answer_boolean === $correct;
             case 'short_answer':
-                if (!$answer->answer_text || !$question->shortAnswer) {
-                    return false;
-                }
-                
-                $userAnswer = strtolower(trim($answer->answer_text));
-                $correctAnswers = explode(',', $question->shortAnswer->answer_text);
-                
-                foreach ($correctAnswers as $correct) {
-                    if ($userAnswer === strtolower(trim($correct))) {
-                        return true;
-                    }
-                }
-                return false;
+                // Auto-grade short answers are now always correct if an answer is provided
+                return !empty(trim($answer->answer_text ?? ''));
             default:
                 return false;
         }

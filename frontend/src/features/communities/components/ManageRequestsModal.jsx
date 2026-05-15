@@ -48,7 +48,7 @@ export default function ManageRequestsModal({ isOpen, onClose, communityId, comm
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+      <div className="relative bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
         <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Join Requests</h2>
@@ -67,7 +67,7 @@ export default function ManageRequestsModal({ isOpen, onClose, communityId, comm
             </div>
           ) : members.length === 0 ? (
             <div className="py-12 text-center space-y-4">
-               <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 mx-auto">
+               <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200 mx-auto">
                   <User size={32} />
                </div>
                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No pending requests</p>
@@ -75,7 +75,7 @@ export default function ManageRequestsModal({ isOpen, onClose, communityId, comm
           ) : (
             <div className="space-y-4">
               {members.map((member) => (
-                <div key={member.id} className="bg-slate-50 p-4 rounded-2xl flex items-center justify-between border border-transparent hover:border-blue-100 transition-all group">
+                <div key={member.id} className="bg-slate-50 p-4 rounded-xl flex items-center justify-between border border-transparent hover:border-blue-100 transition-all group">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm border border-slate-100">
                       <User size={18} />

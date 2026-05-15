@@ -75,7 +75,7 @@ class ShareController extends Controller
      */
     public function shareResult($id): JsonResponse
     {
-        $submission = Submission::with(['quiz', 'user'])->findOrFail($id);
+        $submission = Submission::with(['quiz', 'user.role'])->findOrFail($id);
         
         $shareUrl = route('share.result.preview', ['id' => $submission->id]);
         $frontendUrl = $this->shareService->generateResultShareUrl($submission);
@@ -85,7 +85,10 @@ class ShareController extends Controller
             'score' => $submission->score,
             'max_score' => $submission->max_score,
             'quiz_title' => $submission->quiz ? $submission->quiz->title : 'Unknown Quiz',
+            'user_id' => $submission->is_anonymous ? null : $submission->user_id,
+            'user_role' => $submission->is_anonymous ? null : $submission->user?->role?->name,
             'user_name' => $submission->is_anonymous ? 'Someone' : ($submission->user ? $submission->user->name : 'Unknown User'),
+            'is_anonymous' => (bool)$submission->is_anonymous,
             'share_url' => $shareUrl,
             'frontend_url' => $frontendUrl,
             'facebook_url' => $this->shareService->getFacebookShareUrl($shareUrl),

@@ -8,6 +8,7 @@ import JoinModal from "./components/JoinModal";
 import Toast from "../../components/ui/Toast";
 import { getCommunities, joinCommunity, leaveCommunity, deleteCommunity } from "../../api/communityApi";
 import { useAuth } from "../../providers/AuthContext";
+import ConfirmModal from "../../components/ui/ConfirmModal";
 
 const filterOptions = ["All Communities", "My Communities", "Public", "Private"];
 const sortOptions = ["Newest First", "Most Members", "A–Z"];
@@ -25,6 +26,7 @@ export default function Communities() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: 'leave', data: null, loading: false });
 
   const canCreate = isAdmin || isQuizMaker;
 
@@ -101,13 +103,41 @@ export default function Communities() {
     }
   };
 
-  const handleLeave = async (community) => {
+  const handleLeave = (community) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'leave',
+      data: community,
+      loading: false
+    });
+  };
+
+  const handleDelete = (id) => {
+    const community = communities.find(c => c.id === id);
+    setConfirmModal({
+      isOpen: true,
+      type: 'delete',
+      data: community,
+      loading: false
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { type, data } = confirmModal;
+    setConfirmModal(prev => ({ ...prev, loading: true }));
     try {
-      const res = await leaveCommunity(community.id);
-      setToast({ show: true, message: res.data?.message || "Left community successfully", type: "success" });
+      if (type === 'leave') {
+        const res = await leaveCommunity(data.id);
+        setToast({ show: true, message: res.data?.message || "Left community successfully", type: "success" });
+      } else {
+        await deleteCommunity(data.id);
+        setToast({ show: true, message: "Community deleted successfully", type: "success" });
+      }
       loadCommunities();
+      setConfirmModal({ isOpen: false, type: 'leave', data: null, loading: false });
     } catch (err) {
       setToast({ show: true, message: err.response?.data?.message || "Action failed", type: "error" });
+      setConfirmModal(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -130,9 +160,9 @@ export default function Communities() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-10 md:space-y-20 pb-32">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-20 pb-32 overflow-x-hidden">
       {/* Hero Section */}
-      <div className="relative pt-6 md:pt-12">
+      <div className="relative pt-8 md:pt-12">
         <div className="absolute top-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-blue-600/5 blur-[80px] md:blur-[120px] rounded-full -z-10"></div>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 md:gap-12 text-center md:text-left">
           <div className="space-y-4 md:space-y-6 w-full md:w-auto">
@@ -141,27 +171,27 @@ export default function Communities() {
                Global Discovery
             </div>
             <div className="space-y-3 md:space-y-4">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-none uppercase">Community <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Hubs.</span></h1>
-                <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl leading-relaxed mx-auto md:mx-0">Join elite knowledge circles, collaborate with global peers, and access exclusive community-driven quizzes.</p>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-none uppercase">Community <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Hubs.</span></h1>
+                <p className="text-sm md:text-lg text-slate-500 font-medium max-w-xl leading-relaxed mx-auto md:mx-0">Join elite knowledge circles, collaborate with global peers, and access exclusive community-driven quizzes.</p>
             </div>
           </div>
           {canCreate && (
-              <div className="flex gap-4 w-full md:w-auto mx-auto md:mx-0">
+              <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto mx-auto md:mx-0">
                 <button 
                   onClick={() => {
                     setEditData(null);
                     setIsModalOpen(true);
                   }}
-                  className="flex-1 md:flex-none bg-slate-900 text-white px-10 py-5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                  className="w-full sm:w-auto bg-slate-900 text-white px-10 py-5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
                 >
-                    <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center transition-all group-hover:rotate-90 group-hover:bg-white/20">
+                    <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center transition-all group-hover:rotate-90 group-hover:bg-white/20">
                       <Plus size={20} />
                     </div>
                     Launch Group
                 </button>
                 <button 
                   onClick={() => setIsJoinModalOpen(true)}
-                  className="flex-1 md:flex-none bg-white text-slate-900 border border-slate-200 px-8 py-5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:border-blue-600 transition-all duration-500 shadow-sm active:scale-95"
+                  className="w-full sm:w-auto bg-white text-slate-900 border border-slate-200 px-8 py-5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:border-blue-600 transition-all duration-500 shadow-sm active:scale-95"
                 >
                     <Hash size={20} className="text-blue-600" />
                     Join with Code
@@ -179,13 +209,13 @@ export default function Communities() {
       </div>
 
       {/* Advanced Filter Bar */}
-      <div className="bg-white/80 backdrop-blur-2xl p-5 md:p-8 rounded-[1.5rem] md:rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] border border-white/50 flex flex-col lg:flex-row items-center gap-6 md:gap-8 sticky top-24 z-20">
+      <div className="bg-white/80 backdrop-blur-2xl p-4 md:p-6 rounded-xl md:rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] border border-white/50 flex flex-col lg:flex-row items-center gap-6 md:gap-8 sticky top-20 z-20">
         <div className="relative flex-1 group w-full">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={22} />
             <input 
                 type="text" 
-                placeholder="Find your tribe (e.g. Science, Coding, Art)..." 
-                className="w-full pl-16 pr-8 py-5 bg-slate-50/50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 focus:ring-8 focus:ring-blue-600/5 transition-all text-sm font-black text-slate-900 placeholder:text-slate-400"
+                placeholder="Find your tribe (e.g. Science, Coding)..." 
+                className="w-full pl-16 pr-8 py-5 bg-slate-50/50 border border-transparent rounded-full outline-none focus:bg-white focus:border-blue-600/20 focus:ring-8 focus:ring-blue-600/5 transition-all text-xs md:text-sm font-black text-slate-900 placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -198,13 +228,13 @@ export default function Communities() {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="h-[450px] bg-white rounded-[3rem] animate-pulse border border-slate-100 shadow-sm"></div>
+                <div key={i} className="h-[400px] md:h-[450px] bg-white rounded-2xl animate-pulse border border-slate-100 shadow-sm"></div>
             ))}
         </div>
       ) : filteredCommunities.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           {filteredCommunities.map((community) => (
             <CommunityCard
               key={community.id}
@@ -213,18 +243,18 @@ export default function Communities() {
               onLeave={handleLeave}
               onViewMore={() => navigate(`/communities/${community.id}`)}
               onEdit={(c) => { setEditData(c); setIsModalOpen(true); }}
-              onDelete={async (id) => { await deleteCommunity(id); loadCommunities(); }}
+              onDelete={handleDelete}
               onApprove={(c) => navigate(`/communities/${c.id}/requests`)}
             />
           ))}
         </div>
       ) : (
-        <div className="py-40 flex flex-col items-center text-center space-y-8">
-           <div className="w-32 h-32 bg-slate-100 rounded-[3rem] flex items-center justify-center text-slate-200">
-              <Users size={64} />
+        <div className="py-24 md:py-40 flex flex-col items-center text-center space-y-8">
+           <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-200">
+              <Users size={48} className="md:w-16 md:h-16" />
            </div>
            <div className="space-y-2">
-              <h3 className="text-2xl font-black text-slate-900 uppercase">No Groups Found</h3>
+              <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase">No Groups Found</h3>
               <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search or filters</p>
            </div>
         </div>
@@ -244,6 +274,21 @@ export default function Communities() {
         onJoin={handleJoinByCode}
       />
 
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.type === 'leave' ? 'Leave Community' : 'Delete Community'}
+        message={
+          confirmModal.type === 'leave' 
+            ? `Are you sure you want to leave ${confirmModal.data?.name}? You will need to request access again to rejoin.`
+            : `Are you sure you want to PERMANENTLY delete ${confirmModal.data?.name}? This action cannot be undone and all community data will be lost.`
+        }
+        confirmText={confirmModal.type === 'leave' ? 'Leave' : 'Delete'}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setConfirmModal({ isOpen: false, type: 'leave', data: null, loading: false })}
+        loading={confirmModal.loading}
+        type={confirmModal.type === 'delete' ? 'danger' : 'warning'}
+      />
+
       {toast.show && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
       )}
@@ -258,12 +303,12 @@ function StatItem({ icon, label, value, color }) {
     orange: "bg-orange-50 text-orange-600 border-orange-100",
   };
   return (
-    <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[3rem] border border-slate-100 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.03)] flex items-center gap-6 md:gap-8 group hover:shadow-2xl transition-all duration-500">
-      <div className={`w-16 h-16 rounded-xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
+    <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-slate-100 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.03)] flex items-center gap-6 md:gap-8 group hover:shadow-2xl transition-all duration-500">
+      <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center transition-colors group-hover:bg-slate-900 group-hover:text-white ${colors[color]}`}>
         {icon}
       </div>
       <div>
-        <p className="text-3xl font-black text-slate-900 tracking-tight leading-none mb-2">{value}</p>
+        <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none mb-2">{value}</p>
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
       </div>
     </div>

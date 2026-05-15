@@ -103,10 +103,10 @@ export default function CommunityRequests() {
       </div>
 
       {/* Requests List */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
         {requests.length === 0 ? (
           <div className="py-32 flex flex-col items-center text-center space-y-6">
-            <div className="w-24 h-24 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
+            <div className="w-24 h-24 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200">
               <ShieldCheck size={48} />
             </div>
             <div className="space-y-2">
@@ -119,7 +119,7 @@ export default function CommunityRequests() {
             {requests.map((request) => (
               <div key={request.id} className="p-8 flex flex-col md:flex-row items-center justify-between gap-8 hover:bg-slate-50/50 transition-colors group">
                 <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                  <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                     <User size={28} />
                   </div>
                   <div className="space-y-1">
@@ -141,7 +141,7 @@ export default function CommunityRequests() {
                   <button
                     disabled={actionLoading === request.id}
                     onClick={() => handleAction(request.id, 'approve')}
-                    className="flex-1 md:flex-none bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl shadow-slate-900/10 hover:shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2"
+                    className="flex-1 md:flex-none bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl shadow-slate-900/10 hover:shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2"
                   >
                     {actionLoading === request.id ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -153,7 +153,7 @@ export default function CommunityRequests() {
                   <button
                     disabled={actionLoading === request.id}
                     onClick={() => handleAction(request.id, 'reject')}
-                    className="flex-1 md:flex-none bg-white border border-slate-200 text-slate-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 md:flex-none bg-white border border-slate-200 text-slate-400 px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all flex items-center justify-center gap-2"
                   >
                     <X size={14} />
                     Reject
