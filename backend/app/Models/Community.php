@@ -8,6 +8,7 @@ class Community extends Model
 {
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'visibility',
         'cover_image',
@@ -15,6 +16,17 @@ class Community extends Model
         'status',
         'invite_code'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($community) {
+            if (empty($community->slug)) {
+                $community->slug = \Illuminate\Support\Str::slug($community->name) . '-' . uniqid();
+            }
+        });
+    }
 
     protected $appends = ['is_member', 'join_status', 'is_favorited'];
 

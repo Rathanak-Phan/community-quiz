@@ -11,6 +11,7 @@ class Quiz extends Model
 
     protected $fillable = [
         'title',
+        'slug',
         'description',
         'category_id',
         'community_id',
@@ -20,6 +21,17 @@ class Quiz extends Model
         'has_timer',
         'default_time_limit'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($quiz) {
+            if (empty($quiz->slug)) {
+                $quiz->slug = \Illuminate\Support\Str::slug($quiz->title) . '-' . uniqid();
+            }
+        });
+    }
 
     protected $appends = ['is_favorited'];
 
