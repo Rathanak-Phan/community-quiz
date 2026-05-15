@@ -3,9 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, Loader2, CheckCircle, GraduationCap } from "lucide-react";
 import { getSettings } from "../../services/settingService";
 import { useEffect } from "react";
-import { STORAGE_URL } from "../../config/api";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { STORAGE_URL, BASE_URL } from "../../config/api";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -28,7 +26,7 @@ function ForgotPassword() {
     setError("");
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/forgot-password`, {
+      const response = await fetch(`${BASE_URL}/api/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +55,7 @@ function ForgotPassword() {
     setError("");
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/verify-reset-code`, {
+      const response = await fetch(`${BASE_URL}/api/verify-reset-code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

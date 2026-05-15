@@ -18,10 +18,15 @@ const ShareQuizModal = ({ isOpen, onClose, quizId, quizTitle }) => {
     try {
       const res = await api.get(`/quizzes/${quizId}/share`);
       // The backend returns { share_url: '...' }
-      // If it returns localhost, we might want to adjust it for the frontend
       let url = res.data.share_url;
-      if (url.includes('localhost:8000')) {
-          url = url.replace('http://localhost:8000', window.location.origin);
+      
+      // If the URL is relative or misconfigured, ensure it uses the current origin
+      if (!url.startsWith('http')) {
+          url = `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+      } else if (url.includes('localhost')) {
+          // If backend accidentally sends localhost, correct it to current origin
+          const urlObj = new URL(url);
+          url = `${window.location.origin}${urlObj.pathname}${urlObj.search}`;
       }
       setShareUrl(url);
     } catch (err) {

@@ -15,12 +15,10 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { STORAGE_URL } from "../../config/api";
+import { STORAGE_URL, BASE_URL } from "../../config/api";
 
 import googleLogo from "../../assets/images/google_logo.png";
 import githubLogo from "../../assets/images/github_logo.png";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function Register() {
   const navigate = useNavigate();
@@ -99,7 +97,7 @@ function Register() {
     setResendLoading(true);
     setResendMessage("");
     try {
-      const response = await fetch(`${BACKEND_URL}/api/email/verification-notification`, {
+      const response = await fetch(`${BASE_URL}/api/email/verification-notification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +123,7 @@ function Register() {
     setVerifyLoading(true);
     setVerifyError("");
     try {
-      const response = await fetch(`${BACKEND_URL}/api/email/verify-code`, {
+      const response = await fetch(`${BASE_URL}/api/email/verify-code`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -460,14 +458,14 @@ function Register() {
 
               <div className="grid grid-cols-2 gap-4">
                 <button 
-                  onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/google/redirect?role=${formData.role}`)}
+                  onClick={() => (window.location.href = `${BASE_URL}/api/auth/google/redirect?role=${formData.role}`)}
                   className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155] active:scale-[0.98]"
                 >
                   <img src={googleLogo} alt="Google" className="w-5 h-5" />
                   Google
                 </button>
                 <button 
-                  onClick={() => (window.location.href = `${BACKEND_URL}/api/auth/github/redirect?role=${formData.role}`)}
+                  onClick={() => (window.location.href = `${BASE_URL}/api/auth/github/redirect?role=${formData.role}`)}
                   className="flex items-center justify-center gap-3 border border-[#E2E8F0] rounded-xl py-3.5 hover:bg-slate-50 transition-all duration-300 font-bold text-xs text-[#334155] active:scale-[0.98]"
                 >
                   <img src={githubLogo} alt="GitHub" className="w-5 h-5" />

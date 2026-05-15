@@ -11,7 +11,7 @@ class ShareService
 
     public function __construct()
     {
-        $this->frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $this->frontendUrl = config('app.frontend_url', 'https://quizsphere.store');
     }
 
     /**

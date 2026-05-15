@@ -1,4 +1,4 @@
-import React from "react";
+import { STORAGE_URL } from "../../config/api";
 
 export default function UserAvatar({ user, size = "md", className = "" }) {
   const initials = (user?.name?.charAt(0) || user?.email?.charAt(0) || "U").toUpperCase();
@@ -15,7 +15,7 @@ export default function UserAvatar({ user, size = "md", className = "" }) {
     if (!path) return null;
     if (path.startsWith('http')) return path;
     // Fallback if the full URL wasn't provided by backend
-    return `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/storage/${path.startsWith('/') ? path.slice(1) : path}`;
+    return `${STORAGE_URL}/${path.startsWith('/') ? path.slice(1) : path}`;
   };
 
   const avatarUrl = getAvatarUrl(user?.avatar);

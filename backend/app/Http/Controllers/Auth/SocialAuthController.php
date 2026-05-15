@@ -73,7 +73,7 @@ class SocialAuthController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
 
             // Redirect to frontend
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            $frontendUrl = config('app.frontend_url', 'https://quizsphere.store');
             return redirect()->away("{$frontendUrl}/social-login?token={$token}");
 
         } catch (Exception $e) {
@@ -117,7 +117,7 @@ class SocialAuthController extends Controller
      */
     protected function redirectWithError(string $error): RedirectResponse
     {
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $frontendUrl = config('app.frontend_url', 'https://quizsphere.store');
         return redirect()->away("{$frontendUrl}/login?error={$error}");
     }
 }

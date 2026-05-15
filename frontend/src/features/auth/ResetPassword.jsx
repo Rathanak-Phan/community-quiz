@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Lock, ArrowLeft, Loader2, CheckCircle, GraduationCap, ShieldCheck } from "lucide-react";
 import { getSettings } from "../../services/settingService";
-import { STORAGE_URL } from "../../config/api";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { STORAGE_URL, BASE_URL } from "../../config/api";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -38,7 +36,7 @@ function ResetPassword() {
     setError("");
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/reset-password`, {
+      const response = await fetch(`${BASE_URL}/api/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
