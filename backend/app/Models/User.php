@@ -124,7 +124,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->generateOTP();
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $frontendUrl = config('app.frontend_url', 'https://quizsphere.store');
         $url = $frontendUrl . '/reset-password?token=' . $token . '&email=' . $this->getEmailForPasswordReset();
         $this->notify(new \App\Notifications\CustomResetPassword($url, $this->otp_code));
     }
