@@ -11,6 +11,7 @@ import { useAuth } from "../../providers/AuthContext";
 import AdminDashboard from "./AdminDashboard";
 import RoleBadge from "../../components/ui/RoleBadge";
 import ActionHub from "./components/ActionHub";
+import SEO from "../../components/common/SEO";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -70,6 +71,11 @@ const Dashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-8 md:space-y-16 overflow-x-hidden">
+      <SEO 
+        title="My Dashboard" 
+        description="Monitor your progress, manage your quizzes, and explore your learning statistics on QuizSphere."
+        url="/dashboard"
+      />
       {/* Dynamic Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
         <div className="space-y-4 md:space-y-6 w-full lg:w-auto">

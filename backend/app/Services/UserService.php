@@ -40,9 +40,14 @@ class UserService
      */
     public function updateUserRole(User $user, int $roleId): User
     {
-        $user->update([
-            'role_id' => $roleId
-        ]);
+        $updateData = ['role_id' => $roleId];
+
+        // If demoting to regular user, reset maker status so they can apply again if needed
+        if ($roleId == 3) {
+            $updateData['maker_status'] = 'none';
+        }
+
+        $user->update($updateData);
 
         return $user->load('role');
     }

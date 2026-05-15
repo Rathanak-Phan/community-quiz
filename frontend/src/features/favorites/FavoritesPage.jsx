@@ -3,6 +3,7 @@ import { Heart, Search, BookOpen, Trash2, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from "../../config/api";
 import Toast from '../../components/ui/Toast';
+import SEO from '../../components/common/SEO';
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
@@ -38,6 +39,11 @@ const FavoritesPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-20 pb-32 overflow-x-hidden">
+      <SEO 
+        title="My Favorites" 
+        description="Access and manage your saved quizzes and communities on QuizSphere."
+        url="/favorites"
+      />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pt-8 md:pt-12">
         <div className="space-y-2 text-center md:text-left w-full md:w-auto">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight uppercase">Saved <span className="text-rose-500">Quizzes</span></h1>

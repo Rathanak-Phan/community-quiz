@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { getUserPublicProfile } from '../../services/userService';
 import { STORAGE_URL } from '../../config/api';
+import UserAvatar from "../../components/ui/UserAvatar";
+import RoleBadge from "../../components/ui/RoleBadge";
+import SEO from "../../components/common/SEO";
 
 const GithubIcon = ({ size = 20, className = "" }) => (
   <svg 
@@ -152,6 +155,12 @@ const PublicProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-32 overflow-x-hidden">
+      <SEO 
+        title={`${user.name || user.email}'s Profile`} 
+        description={user.bio || `Check out ${user.name || user.email}'s profile on QuizSphere. See their quizzes, communities, and achievements.`}
+        image={user.avatar}
+        url={`/profile/${id}`}
+      />
       {/* SaaS Style Header */}
       <div className="h-[240px] sm:h-[280px] md:h-[350px] relative overflow-hidden bg-slate-900">
          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-indigo-600/30 to-violet-600/30"></div>

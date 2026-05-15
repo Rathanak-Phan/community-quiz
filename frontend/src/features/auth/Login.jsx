@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
+import SEO from "../../components/common/SEO";
 import { 
   GraduationCap, 
   Mail, 
@@ -133,6 +134,11 @@ function Login() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 md:p-8 font-sans">
+      <SEO 
+        title="Login" 
+        description="Sign in to QuizSphere to access your quizzes, communities, and track your learning progress."
+        url="/login"
+      />
       {/* Background blobs for depth */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>

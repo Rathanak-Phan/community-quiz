@@ -14,6 +14,7 @@ import { toggleFavorite } from "../../services/favoriteService";
 import Toast from "../../components/ui/Toast";
 import { getSettings } from "../../services/settingService";
 import { STORAGE_URL } from "../../config/api";
+import SEO from "../../components/common/SEO";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -110,6 +111,11 @@ const Home = () => {
 
   return (
     <div className="bg-white text-slate-900 max-w-full overflow-x-hidden">
+      <SEO 
+        title="Community-Based Quiz Management System" 
+        description="The ultimate platform created by Rathanak Phan to create, share, and play interactive community-driven quizzes. Join QuizSphere and enhance your learning today!"
+        url="/"
+      />
       <section className="relative min-h-[90vh] flex items-center pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden">
         {settings.hero_background ? (
           <div className="absolute inset-0 z-0">
@@ -407,16 +413,29 @@ const Home = () => {
                     <p className="text-slate-500 font-medium">Reviewing your profile. Expect an update in 24h.</p>
                   </div>
                 ) : (
-                  <div className="space-y-6 md:space-y-8">
-                    <h3 className="text-2xl font-black text-slate-900 text-center">Start Creating</h3>
-                    <p className="text-slate-500 text-center font-medium">Submit your application to become a certified instructor.</p>
+                  <div className="space-y-6 md:space-y-8 text-center">
+                    <h3 className="text-2xl font-black text-slate-900">
+                      {makerStatus === 'rejected' ? "Application Declined" : "Start Creating"}
+                    </h3>
+                    <p className="text-slate-500 font-medium">
+                      {makerStatus === 'rejected' 
+                        ? "Your previous application was not approved. You can update your profile and try again." 
+                        : "Submit your application to become a certified instructor."}
+                    </p>
                     <button 
                       onClick={handleApply}
                       disabled={applying}
-                      className="w-full py-5 md:py-6 bg-blue-600 text-white rounded-xl font-black text-lg md:text-xl hover:bg-slate-900 transition-all shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50"
+                      className={`w-full py-5 md:py-6 text-white rounded-xl font-black text-lg md:text-xl transition-all shadow-xl active:scale-95 disabled:opacity-50 ${
+                        makerStatus === 'rejected' ? 'bg-rose-600 shadow-rose-600/20' : 'bg-blue-600 shadow-blue-600/20'
+                      }`}
                     >
-                      {applying ? "Applying..." : "Apply Now"}
+                      {applying ? "Applying..." : makerStatus === 'rejected' ? "Try Again" : "Apply Now"}
                     </button>
+                    {makerStatus === 'rejected' && (
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                        Tip: Make sure your profile is complete.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

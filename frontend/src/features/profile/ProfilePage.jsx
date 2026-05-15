@@ -9,6 +9,7 @@ import api, { STORAGE_URL } from "../../config/api";
 import Toast from "../../components/ui/Toast";
 import UserAvatar from "../../components/ui/UserAvatar";
 import RoleBadge from "../../components/ui/RoleBadge";
+import SEO from "../../components/common/SEO";
 
 const GithubIcon = ({ size = 18, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -109,6 +110,11 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-32 pt-12">
+      <SEO 
+        title="My Profile Settings" 
+        description="Manage your personal information, profile picture, and social links on QuizSphere."
+        url="/profile"
+      />
       {toast && (
         <Toast 
           message={toast.message} 

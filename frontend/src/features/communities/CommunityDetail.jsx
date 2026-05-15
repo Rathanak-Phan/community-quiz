@@ -12,6 +12,7 @@ import CommunityFormModal from './components/CommunityFormModal';
 import QuizFormModal from '../quizzes/components/QuizFormModal';
 import JoinModal from './components/JoinModal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
+import SEO from '../../components/common/SEO';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -121,6 +122,12 @@ const CommunityDetail = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-20 pb-32 overflow-x-hidden">
+      <SEO 
+        title={community.name} 
+        description={community.description || `Join the ${community.name} community on QuizSphere and participate in interactive quizzes!`}
+        image={community.cover_image ? `${STORAGE_URL}/${community.cover_image}` : null}
+        url={`/communities/${id}`}
+      />
       {/* Hero Header */}
       <div className="relative min-h-[380px] md:h-[450px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end pt-20">
         {community.cover_image ? (
