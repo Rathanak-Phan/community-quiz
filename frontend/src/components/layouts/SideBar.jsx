@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
-    Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck
+    Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap
 } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
@@ -46,7 +46,18 @@ export default function Sidebar() {
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
-    getSettings().then(res => setSettings(res.data)).catch(() => {});
+    getSettings().then(res => {
+      setSettings(res.data);
+      if (res.data.site_name) {
+        document.title = `${res.data.site_name} | Dashboard`;
+      }
+      if (res.data.logo) {
+        const link = document.querySelector("link[rel*='icon']");
+        if (link) {
+          link.href = `${STORAGE_URL}/${res.data.logo}`;
+        }
+      }
+    }).catch(() => {});
   }, []);
 
   const isAdmin = user?.role?.name === "admin" || Number(user?.role_id) === 1;
@@ -131,11 +142,17 @@ export default function Sidebar() {
         <div className="p-8 flex items-center justify-between border-b border-slate-50">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
-               <img 
-                 src={settings.logo ? `${STORAGE_URL}/${settings.logo}` : "/logo.png"} 
-                 alt={settings.site_name || "Quizly"} 
-                 className="w-full h-full object-contain drop-shadow-md"
-               />
+               {settings.logo ? (
+                 <img 
+                   src={`${STORAGE_URL}/${settings.logo}`} 
+                   alt={settings.site_name || "Logo"} 
+                   className="w-full h-full object-contain drop-shadow-md"
+                 />
+               ) : (
+                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                   <GraduationCap size={24} />
+                 </div>
+               )}
             </div>
             <span className="font-black text-2xl tracking-tighter text-slate-900 uppercase">{settings.site_name || "Quizly"}</span>
           </div>
@@ -168,7 +185,7 @@ export default function Sidebar() {
                 end={to === "/"}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all duration-300 group ${
+                  `flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
                     isActive
                       ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
                       : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
@@ -178,7 +195,7 @@ export default function Sidebar() {
                 <Icon size={18} className="transition-transform group-hover:scale-110" />
                 <span className="text-sm tracking-tight flex-1">{label}</span>
                 {label === "Maker Requests" && pendingRequestsCount > 0 && (
-                  <span className="flex items-center justify-center w-5 h-5 bg-rose-500 text-white text-[10px] font-black rounded-lg shadow-lg shadow-rose-500/20 animate-pulse">
+                  <span className="flex items-center justify-center w-5 h-5 bg-rose-500 text-white text-[10px] font-black rounded-xl shadow-lg shadow-rose-500/20 animate-pulse">
                     {pendingRequestsCount}
                   </span>
                 )}
@@ -191,13 +208,19 @@ export default function Sidebar() {
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Support</p>
           <nav className="space-y-1">
             <SideLink to="/profile" icon={<Settings size={18}/>} label="Settings" onClick={() => setIsMobileMenuOpen(false)} />
-            <SideLink to="/help" icon={<HelpCircle size={18}/>} label="Help Center" onClick={() => setIsMobileMenuOpen(false)} />
+            <SideLink 
+              to={settings.help_center_type === 'external' ? settings.help_center_url : "/help"} 
+              icon={<HelpCircle size={18}/>} 
+              label="Help Center" 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              isExternal={settings.help_center_type === 'external'}
+            />
           </nav>
           
           <div className="mt-8 pt-6 border-t border-slate-100">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all duration-300 group font-bold"
+              className="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all duration-300 group font-bold"
             >
               <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm">Logout</span>
@@ -222,7 +245,7 @@ export default function Sidebar() {
               <input 
                 type="text" 
                 placeholder="Search everything..." 
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all font-medium text-sm"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-full outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all font-medium text-sm"
               />
             </div>
           </div>
@@ -259,21 +282,42 @@ export default function Sidebar() {
   );
 }
 
-function SideLink({ icon, label, to, onClick }) {
+function SideLink({ icon, label, to, onClick, isExternal }) {
+  const content = (
+    <>
+      <span className="transition-transform group-hover:scale-110">{icon}</span>
+      <span className="text-sm font-medium">{label}</span>
+    </>
+  );
+
+  const className = (isActive) =>
+    `flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
+      isActive
+        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
+        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+    }`;
+
+  if (isExternal) {
+    return (
+      <a 
+        href={to} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        onClick={onClick}
+        className={className(false)}
+      >
+        {content}
+      </a>
+    );
+  }
+
   return (
     <NavLink 
       to={to} 
       onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
-          isActive
-            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
-            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-        }`
-      }
+      className={({ isActive }) => className(isActive)}
     >
-      <span className="transition-transform group-hover:scale-110">{icon}</span>
-      <span className="text-sm font-medium">{label}</span>
+      {content}
     </NavLink>
   );
 }

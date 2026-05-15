@@ -39,9 +39,10 @@ class QuizResource extends JsonResource
             'creator' => [
                 'id' => $this->creator->id,
                 'name' => $this->creator->name,
+                'role' => $this->creator->role?->name,
             ],
-            'attempts_count' => $this->attempts()->count(),
-            'questions_count' => $this->questions()->count(),
+            'attempts_count' => $this->attempts_count ?? $this->attempts()->count(),
+            'questions_count' => $this->questions_count ?? $this->questions()->count(),
             'total_time' => $this->questions->sum(function($q) {
                 if ($q->time_limit > 0) return $q->time_limit;
                 return $this->has_timer ? ($this->default_time_limit ?: 30) : 0;

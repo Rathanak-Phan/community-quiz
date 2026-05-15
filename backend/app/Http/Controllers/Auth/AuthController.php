@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -47,13 +48,17 @@ class AuthController extends Controller
     {
         $user = $this->authService->register($request->validated());
 
-        Auth::login($user);
+        try {
+            // Explicitly send verification email
+            $user->sendEmailVerificationNotification();
+        } catch (\Exception $e) {
+            \Log::error('Email Verification Error: ' . $e->getMessage());
+            // We still return success for registration but note the error in logs
+        }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-        
         return response()->json([
-            'user' => $user->load('role'),
-            'token' => $token
+            'message' => 'Registration successful. Please verify your email.',
+            'user' => $user->load('role')
         ], 201);
     }
 
@@ -92,12 +97,23 @@ class AuthController extends Controller
             ], 401);
         }
 
+        $user = Auth::user();
+
+        if (!$user->hasVerifiedEmail()) {
+            Auth::logout();
+            return response()->json([
+                'message' => 'Your email address is not verified. Please check your inbox.',
+                'requires_verification' => true,
+                'email' => $user->email
+            ], 403);
+        }
+
         $request->session()->regenerate();
 
-        $token = Auth::user()->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
         
         return response()->json([
-            'user' => Auth::user()->load('role'),
+            'user' => $user->load('role'),
             'token' => $token
         ]);
     }
@@ -137,6 +153,14 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Invalid credentials'
             ], 401);
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Your email address is not verified.',
+                'requires_verification' => true,
+                'email' => $user->email
+            ], 403);
         }
 
         $token = $user->createToken('postman-token')->plainTextToken;

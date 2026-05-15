@@ -9,7 +9,8 @@ import {
   Share2, 
   Layout,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  LifeBuoy
 } from 'lucide-react';
 import { getSettings, updateSettings } from '../../services/settingService';
 import { STORAGE_URL } from '../../config/api';
@@ -46,6 +47,14 @@ export default function SettingsPage() {
     linkedin: ""
   });
 
+  // Help Center settings
+  const [helpSettings, setHelpSettings] = useState({
+    help_center_type: "default",
+    help_center_url: "",
+    support_email: "",
+    support_chat_url: ""
+  });
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -72,6 +81,14 @@ export default function SettingsPage() {
         twitter: data.twitter || "",
         instagram: data.instagram || "",
         linkedin: data.linkedin || "",
+      });
+
+      // Parse Help Center
+      setHelpSettings({
+        help_center_type: data.help_center_type || "default",
+        help_center_url: data.help_center_url || "",
+        support_email: data.support_email || "",
+        support_chat_url: data.support_chat_url || ""
       });
 
       if (data.logo) setLogoPreview(`${STORAGE_URL}/${data.logo}`);
@@ -109,6 +126,11 @@ export default function SettingsPage() {
     setSocials(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleHelpChange = (e) => {
+    const { name, value } = e.target;
+    setHelpSettings(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -125,6 +147,11 @@ export default function SettingsPage() {
 
       // Add socials
       Object.entries(socials).forEach(([key, val]) => {
+        formData.append(key, val);
+      });
+
+      // Add help settings
+      Object.entries(helpSettings).forEach(([key, val]) => {
         formData.append(key, val);
       });
 
@@ -165,16 +192,17 @@ export default function SettingsPage() {
           <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Manage your platform's global configurations and features.</p>
         </div>
 
-        <div className="flex bg-white p-1.5 rounded-[1.5rem] border border-slate-100 shadow-sm">
+        <div className="flex bg-white p-1.5 rounded-2xl border border-slate-100 shadow-sm">
           <TabButton id="general" icon={Globe} label="General" />
           <TabButton id="features" icon={ToggleRight} label="Features" />
           <TabButton id="social" icon={Share2} label="Social" />
+          <TabButton id="help" icon={LifeBuoy} label="Help Center" />
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {activeTab === 'general' && (
-          <div className="bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white p-8 md:p-12 rounded-2xl border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Site Name</label>
               <input 
@@ -227,7 +255,7 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'features' && (
-          <div className="bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white p-8 md:p-12 rounded-2xl border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {[
               { id: 'maintenance_mode', label: 'Maintenance Mode', desc: 'Take the site offline for updates', danger: true },
               { id: 'allow_registration', label: 'Allow Registrations', desc: 'Allow new users to create accounts' },
@@ -255,7 +283,7 @@ export default function SettingsPage() {
         )}
 
         {activeTab === 'social' && (
-          <div className="bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white p-8 md:p-12 rounded-2xl border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {Object.keys(socials).map((platform) => (
               <div key={platform} className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 capitalize">{platform} URL</label>
@@ -274,6 +302,81 @@ export default function SettingsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === 'help' && (
+          <div className="bg-white p-8 md:p-12 rounded-2xl border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-6">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Help Center Type</label>
+                <div className="grid grid-cols-2 gap-4">
+                    <button
+                        type="button"
+                        onClick={() => setHelpSettings(prev => ({...prev, help_center_type: 'default'}))}
+                        className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${helpSettings.help_center_type === 'default' ? 'border-blue-600 bg-blue-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+                    >
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${helpSettings.help_center_type === 'default' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                            <Layout size={24} />
+                        </div>
+                        <div className="text-center">
+                            <p className="font-black text-xs uppercase tracking-tight text-slate-900">Built-in Center</p>
+                            <p className="text-[10px] font-bold text-slate-400 mt-1">Use the platform's native help page</p>
+                        </div>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setHelpSettings(prev => ({...prev, help_center_type: 'external'}))}
+                        className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${helpSettings.help_center_type === 'external' ? 'border-blue-600 bg-blue-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+                    >
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${helpSettings.help_center_type === 'external' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                            <Globe size={24} />
+                        </div>
+                        <div className="text-center">
+                            <p className="font-black text-xs uppercase tracking-tight text-slate-900">External URL</p>
+                            <p className="text-[10px] font-bold text-slate-400 mt-1">Redirect users to a custom help site</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            {helpSettings.help_center_type === 'external' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Help Center URL (Dynamic Link)</label>
+                    <input 
+                        type="url"
+                        name="help_center_url"
+                        value={helpSettings.help_center_url}
+                        onChange={handleHelpChange}
+                        className="w-full px-8 py-5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-sm"
+                        placeholder="https://help.yoursite.com"
+                    />
+                </div>
+            )}
+
+            <div className="pt-6 border-t border-slate-50 grid md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Support Email</label>
+                    <input 
+                        type="email"
+                        name="support_email"
+                        value={helpSettings.support_email}
+                        onChange={handleHelpChange}
+                        className="w-full px-8 py-5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-sm"
+                        placeholder="support@example.com"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Live Chat URL</label>
+                    <input 
+                        type="url"
+                        name="support_chat_url"
+                        value={helpSettings.support_chat_url}
+                        onChange={handleHelpChange}
+                        className="w-full px-8 py-5 bg-slate-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-blue-600/20 transition-all font-bold text-sm"
+                        placeholder="https://tawk.to/yourchat"
+                    />
+                </div>
+            </div>
           </div>
         )}
 

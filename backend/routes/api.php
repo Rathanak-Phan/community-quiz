@@ -13,6 +13,8 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\User\FavoriteController;
 use App\Http\Controllers\SiteSettingController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::post('/verify-reset-code', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'verifyResetCode']);
+Route::post('/reset-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'reset']);
 
 // OAuth
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect']);
@@ -29,6 +34,67 @@ Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'
 
 // For Postman testing
 Route::post('/login-token', [AuthController::class, 'loginToken']);
+
+// Email Verification
+Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+    $user = User::findOrFail($id);
+
+    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        return response()->json(['message' => 'Invalid verification link'], 403);
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email already verified']);
+    }
+
+    if ($user->markEmailAsVerified()) {
+        event(new \Illuminate\Auth\Events\Verified($user));
+    }
+
+    return response()->json([
+        'message' => 'Email verified successfully. You can now login.'
+    ]);
+})->middleware(['signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email already verified']);
+    }
+
+    $user->sendEmailVerificationNotification();
+
+    return response()->json(['message' => 'Verification link sent']);
+})->middleware(['throttle:6,1'])->name('verification.send');
+
+Route::post('/email/verify-code', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required|string|size:6'
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user || !$user->verifyOTP($request->code)) {
+        return response()->json(['message' => 'Invalid or expired code'], 400);
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email already verified']);
+    }
+
+    if ($user->markEmailAsVerified()) {
+        event(new \Illuminate\Auth\Events\Verified($user));
+    }
+
+    return response()->json(['message' => 'Email verified successfully']);
+});
 
 // Sharing
 Route::get('/quizzes/{id}/share', [ShareController::class, 'shareQuiz']);
@@ -47,6 +113,7 @@ Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 
 Route::get('/leaderboard/top-users', [\App\Http\Controllers\LeaderboardController::class, 'topUsers']);
 Route::get('/leaderboard/my-rank', [\App\Http\Controllers\LeaderboardController::class, 'myRank'])->middleware('auth:sanctum');
 Route::get('/settings', [SiteSettingController::class, 'index']);
+Route::get('/users/{id}/profile', [\App\Http\Controllers\User\UserProfileController::class, 'show']);
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +157,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Favorites
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
     Route::delete('/favorites/{favorite}', [FavoriteController::class, 'destroy']);
 
     // Maker Request
@@ -161,6 +229,7 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
 
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
+    Route::get('/users/stats', [\App\Http\Controllers\Admin\UserController::class, 'stats']);
     Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store']);
     Route::put('/users/{id}/role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole']);
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);

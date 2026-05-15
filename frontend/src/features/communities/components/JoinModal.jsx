@@ -27,7 +27,7 @@ export default function JoinModal({ isOpen, onClose, onJoin }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col">
         <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
           <div>
             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Join Community</h2>
@@ -49,7 +49,7 @@ export default function JoinModal({ isOpen, onClose, onJoin }) {
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="e.g. AB12CD34"
-              className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-center text-2xl font-black tracking-[0.5em] text-slate-900 focus:bg-white focus:border-blue-600 outline-none transition-all placeholder:text-slate-200 placeholder:tracking-normal"
+              className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-xl text-center text-2xl font-black tracking-[0.5em] text-slate-900 focus:bg-white focus:border-blue-600 outline-none transition-all placeholder:text-slate-200 placeholder:tracking-normal"
               autoFocus
             />
           </div>
@@ -57,7 +57,7 @@ export default function JoinModal({ isOpen, onClose, onJoin }) {
           <button 
             type="submit"
             disabled={loading || !code.trim()}
-            className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:bg-slate-200 disabled:shadow-none"
+            className="w-full py-5 bg-slate-900 text-white rounded-xl font-black text-sm uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:bg-slate-200 disabled:shadow-none"
           >
             {loading ? (
               <Loader2 size={20} className="animate-spin" />

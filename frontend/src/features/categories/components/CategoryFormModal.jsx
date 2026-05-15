@@ -102,7 +102,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 z-10">
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold text-gray-900">
@@ -118,7 +118,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
 
         {/* API Error */}
         {apiError && (
-          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
             {apiError}
           </div>
         )}
@@ -137,7 +137,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
                 if (errors.name) setErrors((p) => ({ ...p, name: "" }));
               }}
               placeholder="e.g. Mathematics"
-              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
+              className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
                 errors.name ? "border-red-400 bg-red-50" : "border-gray-300"
               }`}
             />
@@ -156,7 +156,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the topics covered..."
               rows={4}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
           </div>
 
@@ -173,7 +173,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
                     key={option.id}
                     type="button"
                     onClick={() => setSelectedIcon(option.id)}
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg transition ${
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl transition ${
                       selectedIcon === option.id
                         ? "bg-blue-600 text-white"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -186,7 +186,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
               })}
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
               >
                 <MoreHorizontal size={20} />
               </button>
@@ -204,7 +204,7 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
                   key={color}
                   type="button"
                   onClick={() => setSelectedColor(color)}
-                  className={`h-10 w-10 rounded-lg transition ${color} ${
+                  className={`h-10 w-10 rounded-xl transition ${color} ${
                     selectedColor === color
                       ? "ring-2 ring-offset-2 ring-gray-400"
                       : "hover:opacity-80"
@@ -220,14 +220,14 @@ function CategoryFormModal({ isOpen, onClose, onSuccess, editData }) {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 border border-gray-300 hover:bg-gray-50 transition"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 border border-gray-300 hover:bg-gray-50 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`px-5 py-2 rounded-lg text-sm font-medium text-white transition ${
+              className={`px-5 py-2 rounded-xl text-sm font-medium text-white transition ${
                 loading
                   ? "bg-blue-300 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"

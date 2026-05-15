@@ -34,9 +34,9 @@ const AdminDashboard = () => {
 
   if (loading) return (
     <div className="animate-pulse space-y-8">
-        <div className="h-12 bg-white rounded-2xl w-1/4"></div>
+        <div className="h-12 bg-white rounded-xl w-1/4"></div>
         <div className="grid grid-cols-4 gap-6">
-            {[1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-2xl"></div>)}
+            {[1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-xl"></div>)}
         </div>
     </div>
   );
@@ -69,9 +69,9 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {cards.map((card, i) => (
-          <div key={i} className="bg-white rounded-2xl p-8 border border-slate-50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.04)] hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group relative overflow-hidden">
+          <div key={i} className="bg-white rounded-xl p-8 border border-slate-50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.04)] hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 group relative overflow-hidden">
             <div className="relative z-10 space-y-6">
-                <div className={`w-16 h-16 ${card.color} rounded-3xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
+                <div className={`w-16 h-16 ${card.color} rounded-xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
                     {card.icon}
                 </div>
                 <div>
@@ -91,14 +91,14 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-3 gap-8">
-          <div className="col-span-2 bg-white rounded-2xl p-10 border border-slate-50 shadow-sm min-h-[400px] flex flex-col items-center justify-center text-center">
+          <div className="col-span-2 bg-white rounded-xl p-10 border border-slate-50 shadow-sm min-h-[400px] flex flex-col items-center justify-center text-center">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mb-6">
                   <TrendingUp size={40} />
               </div>
               <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">Growth Activity</h4>
               <p className="text-slate-400 text-xs font-medium max-w-xs mt-2 leading-relaxed">Interactive growth charts will be visualized here once more data points are collected.</p>
           </div>
-          <div className="bg-slate-900 rounded-2xl p-10 text-white shadow-2xl shadow-slate-900/40 relative overflow-hidden">
+          <div className="bg-slate-900 rounded-xl p-10 text-white shadow-2xl shadow-slate-900/40 relative overflow-hidden">
               <div className="relative z-10 space-y-8">
                   <div className="space-y-2">
                       <h4 className="text-2xl font-black uppercase tracking-tight">System Status</h4>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -17,9 +18,9 @@ use Laravel\Sanctum\HasApiTokens;
  *
  * @property-read \Laravel\Sanctum\NewAccessToken $currentAccessToken
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, \Illuminate\Auth\MustVerifyEmail;
 
     protected $fillable = [
         'name',
@@ -44,6 +45,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'otp_expires_at' => 'datetime',
     ];
 
     public function role()
@@ -76,6 +78,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favorite::class);
     }
+
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class, 'created_by');
+    }
     public function isAdmin(): bool
     {
         return $this->role?->name === 'admin';
@@ -96,5 +103,56 @@ class User extends Authenticatable
         if (!$value) return null;
         if (str_starts_with($value, 'http')) return $value;
         return url('storage/' . $value);
+    }
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->generateOTP();
+        $this->notify(new \App\Notifications\CustomVerifyEmail);
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->generateOTP();
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $url = $frontendUrl . '/reset-password?token=' . $token . '&email=' . $this->getEmailForPasswordReset();
+        $this->notify(new \App\Notifications\CustomResetPassword($url, $this->otp_code));
+    }
+
+    /**
+     * Generate a new OTP code.
+     */
+    public function generateOTP()
+    {
+        $this->otp_code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $this->otp_expires_at = now()->addMinutes(10);
+        $this->save();
+        return $this->otp_code;
+    }
+
+    /**
+     * Verify the provided OTP code.
+     */
+    public function verifyOTP($code, $clear = true)
+    {
+        if ($this->otp_code === $code && $this->otp_expires_at && $this->otp_expires_at->isFuture()) {
+            if ($clear) {
+                $this->otp_code = null;
+                $this->otp_expires_at = null;
+                $this->save();
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import "./App.css";
 import Login from "../features/auth/Login";
 import Register from "../features/auth/Register";
+import ForgotPassword from "../features/auth/ForgotPassword";
+import ResetPassword from "../features/auth/ResetPassword";
 import SocialLogin from "../features/auth/SocialLogin";
 import Home from "../features/home/Home";
 import Dashboard from "../features/dashboard/Dashboard";
@@ -35,6 +37,7 @@ import ProfilePage from "../features/profile/ProfilePage";
 import MyCommunities from "../features/communities/MyCommunities";
 import SettingsPage from "../page/admin/SettingsPage";
 import HelpCenter from "../page/HelpCenter";
+import PublicProfile from "../features/profile/PublicProfile";
 
 import { AuthProvider } from "../providers/AuthContext";
 
@@ -46,6 +49,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/social-login" element={<SocialLogin />} />
 
           {/* GLOBAL PAGES - Always uses MainLayout (Header/Footer) */}
@@ -59,6 +64,7 @@ function App() {
             <Route path="/quiz/:quizId" element={<QuizDetail />} /> {/* Alias for share links */}
             <Route path="/result/:submissionId" element={<SharedResult />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/profile/:id" element={<PublicProfile />} />
           </Route>
 
           {/* PROTECTED DASHBOARD - Always uses Sidebar */}

@@ -58,11 +58,17 @@ class FavoriteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'target_type' => 'required|string|in:quiz,category',
+            'target_type' => 'required|string|in:quiz,category,community',
             'target_id' => 'required|integer',
         ]);
 
-        $type = $request->target_type === 'quiz' ? Quiz::class : Category::class;
+        $typeMap = [
+            'quiz' => Quiz::class,
+            'category' => Category::class,
+            'community' => \App\Models\Community::class
+        ];
+
+        $type = $typeMap[$request->target_type];
         $id = $request->target_id;
 
         // Verify target exists
@@ -80,25 +86,42 @@ class FavoriteController extends Controller
         return new FavoriteResource($favorite->load('favoritable'));
     }
 
-    /**
-     * @OA\Delete(
-     *     path="/api/favorites/{favorite}",
-     *     tags={"Favorites"},
-     *     summary="Remove an item from favorites",
-     *     operationId="favoriteDestroy",
-     *     security={{"sanctum":{}}},
-     *     @OA\Parameter(
-     *         name="favorite",
-     *         in="path",
-     *         required=true,
-     *         description="Favorite ID",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(response=200, description="Favorite removed successfully"),
-     *     @OA\Response(response=403, description="Forbidden"),
-     *     @OA\Response(response=404, description="Favorite not found")
-     * )
-     */
+    public function toggle(Request $request)
+    {
+        $request->validate([
+            'target_type' => 'required|string|in:quiz,category,community',
+            'target_id' => 'required|integer',
+        ]);
+
+        $typeMap = [
+            'quiz' => Quiz::class,
+            'category' => Category::class,
+            'community' => \App\Models\Community::class
+        ];
+
+        $type = $typeMap[$request->target_type];
+        $id = $request->target_id;
+
+        $favorite = Favorite::where([
+            'user_id' => auth()->id(),
+            'favoritable_id' => $id,
+            'favoritable_type' => $type,
+        ])->first();
+
+        if ($favorite) {
+            $favorite->delete();
+            return response()->json(['message' => 'Removed from favorites', 'is_favorite' => false]);
+        }
+
+        Favorite::create([
+            'user_id' => auth()->id(),
+            'favoritable_id' => $id,
+            'favoritable_type' => $type,
+        ]);
+
+        return response()->json(['message' => 'Added to favorites', 'is_favorite' => true]);
+    }
+
     public function destroy(Favorite $favorite)
     {
         if ($favorite->user_id !== auth()->id()) {

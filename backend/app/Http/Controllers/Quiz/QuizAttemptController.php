@@ -197,7 +197,7 @@ class QuizAttemptController extends Controller
                 }
             }
 
-            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers']));
+            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers.question.shortAnswer']));
         });
     }
 
@@ -223,7 +223,7 @@ class QuizAttemptController extends Controller
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
-        $attempt->load(['quiz.questions.options', 'answers']);
+        $attempt->load(['quiz.questions.options', 'answers.question.shortAnswer']);
         return new QuizAttemptDetailResource($attempt);
     }
 
@@ -265,6 +265,12 @@ class QuizAttemptController extends Controller
 
         $question = $attemptAnswer->question;
         
+        if ($request->score > $question->points) {
+            return response()->json([
+                'message' => "Score cannot exceed maximum points ({$question->points})"
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        
         // Use provided is_correct or calculate based on score (>= 50% is correct)
         $isCorrect = $request->has('is_correct') 
             ? $request->boolean('is_correct') 
@@ -300,6 +306,7 @@ class QuizAttemptController extends Controller
 
         return response()->json([
             'message' => 'Answer graded successfully',
+            'answer' => new AttemptAnswerResource($attemptAnswer->load('question')),
             'attempt_summary' => [
                 'score' => $attempt->fresh()->score,
                 'grading_status' => $attempt->fresh()->grading_status,
@@ -317,7 +324,7 @@ class QuizAttemptController extends Controller
      *     @OA\Response(response=200, description="Pending reviews")
      * )
      */
-    public function pendingReviews()
+    public function pendingReviews(Request $request)
     {
         $user = auth()->user();
         $query = QuizAttempt::where('grading_status', 'pending');
@@ -326,7 +333,7 @@ class QuizAttemptController extends Controller
             $query->whereHas('quiz', fn($q) => $q->where('created_by', $user->id));
         }
 
-        return PendingReviewResource::collection($query->with(['quiz', 'user'])->latest('completed_at')->get());
+        return PendingReviewResource::collection($query->with(['quiz', 'user'])->latest('completed_at')->paginate($request->query('per_page', 10)));
     }
 
     /**

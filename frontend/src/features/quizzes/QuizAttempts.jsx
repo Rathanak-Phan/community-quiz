@@ -81,7 +81,7 @@ export default function QuizAttempts() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-4 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
                     <div className="px-6 py-3 border-r border-slate-100 text-center">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
                         <p className="text-xl font-black text-slate-900">{attempts.length}</p>
@@ -98,19 +98,19 @@ export default function QuizAttempts() {
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-6">
+            <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row gap-6">
                 <div className="relative flex-1 group">
                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
                     <input 
                         type="text" 
                         placeholder="Search by participant name..." 
-                        className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-2xl outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
+                        className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-full outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 
-                <div className="flex gap-2 p-1.5 bg-slate-50 rounded-2xl shrink-0">
+                <div className="flex gap-2 p-1.5 bg-slate-50 rounded-xl shrink-0">
                     {['all', 'public', 'anonymous'].map((f) => (
                         <button
                             key={f}
@@ -128,7 +128,7 @@ export default function QuizAttempts() {
             </div>
 
             {/* Attempts Table/List */}
-            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -145,7 +145,7 @@ export default function QuizAttempts() {
                                 <tr key={attempt.id} className="group hover:bg-slate-50/50 transition-colors">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg shadow-sm border ${
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg shadow-sm border ${
                                                 attempt.is_anonymous 
                                                 ? 'bg-slate-100 text-slate-400 border-slate-200' 
                                                 : 'bg-blue-50 text-blue-600 border-blue-100'
@@ -207,7 +207,7 @@ export default function QuizAttempts() {
                                 <tr>
                                     <td colSpan="5" className="px-8 py-20 text-center">
                                         <div className="flex flex-col items-center gap-4">
-                                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
+                                            <div className="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200">
                                                 <Users size={32} />
                                             </div>
                                             <div className="space-y-1">

@@ -14,7 +14,8 @@ export default function QuizAttempt() {
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(0);
+    const [totalTimeLeft, setTotalTimeLeft] = useState(null);
+    const [questionTimeLeft, setQuestionTimeLeft] = useState(null);
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
     useEffect(() => {
@@ -38,21 +39,18 @@ export default function QuizAttempt() {
                     }
                 });
                 setAnswers(initialAnswers);
-                
+
+                // Calculate Total Quiz Time
                 if (res.data.expires_at) {
                     const expiry = new Date(res.data.expires_at);
                     const now = new Date();
-                    setTimeLeft(Math.max(0, Math.floor((expiry - now) / 1000)));
+                    setTotalTimeLeft(Math.max(0, Math.floor((expiry - now) / 1000)));
                 } else {
-                    const defaultLimit = data.quiz?.has_timer ? (data.quiz?.default_time_limit || 30) : 0;
-                    const totalSeconds = data.quiz?.questions?.reduce((sum, q) => {
-                        const limit = parseInt(q.time_limit) > 0 ? parseInt(q.time_limit) : defaultLimit;
-                        return sum + limit;
-                    }, 0) || 0;
-                    setTimeLeft(totalSeconds > 0 ? totalSeconds : null);
+                    const totalSeconds = data.quiz?.questions?.reduce((sum, q) => sum + (parseInt(q.time_limit) || 30), 0) || 0;
+                    setTotalTimeLeft(totalSeconds > 0 ? totalSeconds : null);
                 }
             } catch (error) {
-                setToast({ show: true, message: "Failed to load dynamic session", type: "error" });
+                setToast({ show: true, message: "Failed to load session", type: "error" });
             } finally {
                 setLoading(false);
             }
@@ -60,18 +58,50 @@ export default function QuizAttempt() {
         fetchAttempt();
     }, [attemptId]);
 
+    // Question Timer Reset Effect
     useEffect(() => {
-        if (timeLeft === null) return;
-        if (timeLeft <= 0 && attempt && !submitting) {
-             setToast({ show: true, message: "Time is up! Submitting automatically...", type: "warning" });
-             handleSubmit(true);
-             return;
-        };
-        const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+        if (!attempt?.quiz?.questions) return;
+        const currentQ = attempt.quiz.questions[currentQuestionIdx];
+        if (currentQ && currentQ.time_limit > 0) {
+            setQuestionTimeLeft(currentQ.time_limit);
+        } else {
+            setQuestionTimeLeft(null);
+        }
+    }, [currentQuestionIdx, attempt]);
+
+    // Main Timer Loop
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTotalTimeLeft(prev => (prev !== null && prev > 0 ? prev - 1 : prev));
+            setQuestionTimeLeft(prev => (prev !== null && prev > 0 ? prev - 1 : prev));
+        }, 1000);
         return () => clearInterval(timer);
-    }, [timeLeft, attempt]);
+    }, []);
+
+    // Handling Timeouts
+    useEffect(() => {
+        // Total Quiz Timeout
+        if (totalTimeLeft === 0 && attempt && !submitting) {
+            setToast({ show: true, message: "Quiz time is up! Submitting...", type: "warning" });
+            handleSubmit(true);
+        }
+    }, [totalTimeLeft, attempt, submitting]);
+
+    useEffect(() => {
+        // Individual Question Timeout
+        if (questionTimeLeft === 0) {
+            if (currentQuestionIdx < (attempt.quiz?.questions?.length - 1)) {
+                setToast({ show: true, message: "Question time's up! Next question...", type: "warning" });
+                setCurrentQuestionIdx(prev => prev + 1);
+            } else if (!submitting) {
+                setToast({ show: true, message: "Time's up! Submitting quiz...", type: "warning" });
+                handleSubmit(true);
+            }
+        }
+    }, [questionTimeLeft, currentQuestionIdx, attempt, submitting]);
 
     const formatTime = (seconds) => {
+        if (seconds === null) return "--";
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
         return `${m}:${s < 10 ? '0' : ''}${s}`;
@@ -158,7 +188,7 @@ export default function QuizAttempt() {
     if (questions.length === 0) return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
             <div className="space-y-6">
-                <div className="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mx-auto">
+                <div className="w-20 h-20 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 mx-auto">
                     <AlertCircle size={32} />
                 </div>
                 <div className="space-y-2">
@@ -167,7 +197,7 @@ export default function QuizAttempt() {
                 </div>
                 <button 
                     onClick={() => navigate("/quizzes")} 
-                    className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-600 transition shadow-xl shadow-slate-900/10"
+                    className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-600 transition shadow-xl shadow-slate-900/10"
                 >
                     Back to Library
                 </button>
@@ -207,10 +237,10 @@ export default function QuizAttempt() {
                             {isAnonymous ? "Stay Anonymous" : "Public Answer"}
                         </button>
                         
-                        {timeLeft !== null && (
-                            <div className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-colors ${timeLeft < 60 ? 'bg-rose-50 text-rose-600 animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
-                                <Clock size={16} className="animate-spin-slow" />
-                                <span className="font-mono text-base font-bold tracking-tighter">{formatTime(timeLeft)}</span>
+                        {totalTimeLeft !== null && (
+                            <div className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-colors ${totalTimeLeft < 60 ? 'bg-rose-50 text-rose-600 animate-pulse' : 'bg-slate-900 text-white shadow-xl shadow-slate-900/10'}`}>
+                                <Clock size={16} className={totalTimeLeft < 60 ? "animate-spin-slow" : ""} />
+                                <span className="font-mono text-lg font-bold tracking-tighter">{formatTime(totalTimeLeft)}</span>
                             </div>
                         )}
                     </div>
@@ -226,18 +256,37 @@ export default function QuizAttempt() {
             </header>
 
             <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
-                <div className="bg-white rounded-3xl border border-slate-100 p-10 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8">
-                        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200 group-hover:text-blue-100 transition-colors">
-                           <span className="font-bold text-xl tracking-tighter">{currentQuestionIdx + 1}</span>
+                <div className="bg-white rounded-xl border border-slate-100 p-10 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
+                    {/* Question Timer Bar */}
+                    {questionTimeLeft !== null && (
+                        <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-50 overflow-hidden">
+                            <div 
+                                className={`h-full transition-all duration-1000 ease-linear ${
+                                    (questionTimeLeft / currentQuestion?.time_limit) < 0.3 ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                                }`}
+                                style={{ width: `${(questionTimeLeft / currentQuestion?.time_limit) * 100}%` }}
+                            />
+                        </div>
+                    )}
+
+                    <div className="absolute top-0 right-0 p-8 pt-10">
+                        <div className="flex flex-col items-end gap-2">
+                            <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200 group-hover:text-blue-100 transition-colors">
+                                <span className="font-bold text-xl tracking-tighter">{currentQuestionIdx + 1}</span>
+                            </div>
+                            {questionTimeLeft !== null && (
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${questionTimeLeft < 10 ? 'text-rose-500' : 'text-slate-400'}`}>
+                                    {questionTimeLeft}s
+                                </span>
+                            )}
                         </div>
                     </div>
 
-                    <div className="space-y-10">
+                    <div className="space-y-10 pt-4">
                         <h2 className="text-2xl font-bold text-slate-900 leading-[1.4] max-w-2xl">{currentQuestion?.question_text}</h2>
                         
                         {currentQuestion?.image && (
-                            <div className="rounded-2xl overflow-hidden border-4 border-slate-50 shadow-inner group-hover:scale-[1.01] transition-transform duration-700">
+                            <div className="rounded-xl overflow-hidden border-4 border-slate-50 shadow-inner group-hover:scale-[1.01] transition-transform duration-700">
                                 <img src={`${STORAGE_URL}/${currentQuestion.image}`} alt="Question visual" className="w-full object-cover max-h-[25rem]" />
                             </div>
                         )}
@@ -267,13 +316,13 @@ export default function QuizAttempt() {
                                         <button 
                                             key={val}
                                             onClick={() => handleAnswerChange(currentQuestion.id, val)}
-                                            className={`py-12 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
+                                            className={`py-12 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-4 ${
                                                 answers[currentQuestion.id] === val
                                                 ? 'border-blue-600 bg-blue-50/50 text-blue-700 shadow-xl shadow-blue-600/10'
                                                 : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 text-slate-600'
                                             }`}
                                         >
-                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner ${answers[currentQuestion.id] === val ? 'bg-blue-600 text-white' : 'bg-white text-slate-200'}`}>
+                                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl shadow-inner ${answers[currentQuestion.id] === val ? 'bg-blue-600 text-white' : 'bg-white text-slate-200'}`}>
                                                 {val.charAt(0)}
                                             </div>
                                             <span className="font-black uppercase tracking-[0.2em] text-xs">{val}</span>
@@ -285,7 +334,7 @@ export default function QuizAttempt() {
                             {currentQuestion?.question_type === 'short_answer' && (
                                 <div className="space-y-4">
                                     <textarea 
-                                        className="w-full p-10 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-blue-600 transition-all duration-500 outline-none min-h-[250px] text-lg font-bold placeholder:text-slate-200"
+                                        className="w-full p-10 bg-slate-50 border-2 border-slate-50 rounded-xl focus:bg-white focus:border-blue-600 transition-all duration-500 outline-none min-h-[250px] text-lg font-bold placeholder:text-slate-200"
                                         placeholder="Type your structured response here..."
                                         value={answers[currentQuestion.id] || ""}
                                         onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
@@ -344,7 +393,7 @@ function OptionBtn({ label, letter, active, onClick, isMultiple }) {
     return (
         <button 
             onClick={onClick}
-            className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group ${
+            className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-300 flex items-center justify-between group ${
                 active 
                 ? 'border-blue-600 bg-blue-50/20 text-blue-700 shadow-sm' 
                 : 'border-slate-100 bg-white hover:border-blue-200 hover:bg-slate-50/50 text-slate-600'

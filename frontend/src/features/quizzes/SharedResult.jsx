@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Trophy, CheckCircle2, Home, Sparkles, Loader2, Share2 } from "lucide-react";
 import apiClient from "../../config/api";
 
@@ -35,7 +35,7 @@ export default function SharedResult() {
 
     if (error || !result) return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 text-center space-y-6">
-            <div className="w-24 h-24 bg-rose-100 text-rose-500 rounded-3xl flex items-center justify-center">
+            <div className="w-24 h-24 bg-rose-100 text-rose-500 rounded-xl flex items-center justify-center">
                 <Trophy size={48} className="opacity-50" />
             </div>
             <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Result Not Found</h2>
@@ -56,7 +56,7 @@ export default function SharedResult() {
         <div className="min-h-screen bg-slate-50 py-12 px-6 flex items-center justify-center">
             <div className="max-w-xl w-full space-y-8">
                 {/* Result Card */}
-                <div className={`rounded-[3rem] p-10 md:p-14 text-center relative overflow-hidden transition-all duration-700 shadow-2xl shadow-slate-200/50 ${
+                <div className={`rounded-2xl p-10 md:p-14 text-center relative overflow-hidden transition-all duration-700 shadow-2xl shadow-slate-200/50 ${
                     isSuccess ? 'bg-slate-900 text-white' : 'bg-white text-slate-900 border border-slate-100'
                 }`}>
                     <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
@@ -66,7 +66,7 @@ export default function SharedResult() {
 
                     <div className="relative z-10 space-y-10">
                         <div className="space-y-4">
-                            <div className={`inline-flex items-center justify-center w-24 h-24 backdrop-blur-xl rounded-3xl border mb-2 ${
+                            <div className={`inline-flex items-center justify-center w-24 h-24 backdrop-blur-xl rounded-xl border mb-2 ${
                                 isSuccess ? 'bg-white/10 border-white/20 text-amber-400' : 'bg-slate-50 border-slate-200 text-slate-400'
                             }`}>
                                 <Trophy size={48} />
@@ -85,10 +85,17 @@ export default function SharedResult() {
                             </p>
                         </div>
 
-                        <div className={`p-8 rounded-2xl flex flex-col gap-2 ${isSuccess ? 'bg-white/5' : 'bg-slate-50'}`}>
-                            <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${isSuccess ? 'text-white/40' : 'text-slate-400'}`}>
-                                {result.user_name} scored
-                            </p>
+                        <div className={`p-8 rounded-xl flex flex-col gap-2 ${isSuccess ? 'bg-white/5' : 'bg-slate-50'}`}>
+                            <div className={`text-[10px] font-black uppercase tracking-[0.2em] ${isSuccess ? 'text-white/40' : 'text-slate-400'}`}>
+                                {result.user_id && result.user_role !== 'admin' && !result.is_anonymous ? (
+                                    <Link to={`/profile/${result.user_id}`} className="hover:text-blue-500 transition-colors underline decoration-dotted underline-offset-4">
+                                        {result.user_name}
+                                    </Link>
+                                ) : (
+                                    result.user_name
+                                )}{" "}
+                                scored
+                            </div>
                             <p className="text-xl font-bold">
                                 {result.score} out of {result.max_score} objective points
                                 {result.grading_status === 'pending' && (
@@ -109,9 +116,9 @@ export default function SharedResult() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button 
                         onClick={() => navigate("/quizzes")}
-                        className="flex flex-col items-center justify-center gap-3 p-6 bg-white border border-slate-100 rounded-3xl font-black uppercase tracking-widest text-xs hover:border-blue-500 hover:shadow-lg hover:text-blue-600 transition-all group"
+                        className="flex flex-col items-center justify-center gap-3 p-6 bg-white border border-slate-100 rounded-xl font-black uppercase tracking-widest text-xs hover:border-blue-500 hover:shadow-lg hover:text-blue-600 transition-all group"
                     >
-                        <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Sparkles size={20} />
                         </div>
                         Take a Quiz
@@ -119,9 +126,9 @@ export default function SharedResult() {
                     
                     <button 
                         onClick={() => navigate("/")}
-                        className="flex flex-col items-center justify-center gap-3 p-6 bg-white border border-slate-100 rounded-3xl font-black uppercase tracking-widest text-xs hover:border-slate-400 hover:shadow-lg transition-all group"
+                        className="flex flex-col items-center justify-center gap-3 p-6 bg-white border border-slate-100 rounded-xl font-black uppercase tracking-widest text-xs hover:border-slate-400 hover:shadow-lg transition-all group"
                     >
-                        <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Home size={20} />
                         </div>
                         Home Page

@@ -10,16 +10,15 @@ class AuthService
 {
     public function register(array $data): User
     {
-        $roleName = $data['role'] ?? 'user';
-        $role = Role::firstWhere('name', $roleName);
+        $requestedRole = $data['role'] ?? 'user';
+        
+        // If they register as a maker, they start as a user but with pending status
+        $isMakerRequest = $requestedRole === 'quiz_maker';
+        
+        $role = \App\Models\Role::firstWhere('name', 'user');
 
         if (!$role) {
-            // Fallback to user if specified role doesn't exist
-            $role = Role::firstWhere('name', 'user');
-        }
-
-        if (!$role) {
-            throw new \Exception('Default role not found. Please run RoleSeeder.');
+            throw new \Exception('Default user role not found. Please run RoleSeeder.');
         }
 
         return User::create([
@@ -27,6 +26,7 @@ class AuthService
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role_id' => $role->id,
+            'maker_status' => $isMakerRequest ? 'pending' : 'none',
         ]);
     }
 }

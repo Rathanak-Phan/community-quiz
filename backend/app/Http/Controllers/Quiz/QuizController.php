@@ -56,7 +56,7 @@ class QuizController extends Controller
             abort(403);
         }
 
-        return new QuizResource($quiz->loadMissing(['community', 'category', 'creator']));
+        return new QuizResource($quiz->loadMissing(['community', 'category', 'creator.role']));
     }
 
     /**
@@ -94,7 +94,7 @@ class QuizController extends Controller
             auth()->user()
         );
 
-        return (new QuizResource($quiz->loadMissing(['community', 'category', 'creator'])))
+        return (new QuizResource($quiz->loadMissing(['community', 'category', 'creator.role'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -118,7 +118,7 @@ class QuizController extends Controller
     {
         $user = auth()->user();
         $quizzes = Quiz::where('created_by', $user->id)
-            ->with(['community', 'category', 'creator'])
+            ->with(['community', 'category', 'creator.role'])
             ->latest()
             ->get();
 
@@ -129,7 +129,7 @@ class QuizController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        $quizzes = Quiz::with(['community', 'category', 'creator'])
+        $quizzes = Quiz::with(['community', 'category', 'creator.role'])
             ->when(!$user, function ($query) {
                 // Guests see only published quizzes in public communities
                 return $query->where('status', 'published')
@@ -232,7 +232,7 @@ class QuizController extends Controller
 
         $quiz = $this->quizService->update($quiz, $request->validated(), auth()->user());
 
-        return new QuizResource($quiz->loadMissing(['community', 'category', 'creator']));
+        return new QuizResource($quiz->loadMissing(['community', 'category', 'creator.role']));
     }
 
     /**

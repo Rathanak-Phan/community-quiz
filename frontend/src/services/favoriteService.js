@@ -13,3 +13,6 @@ export const addFavorite = (data) =>
 
 export const removeFavorite = (id) =>
   apiClient.delete(`/favorites/${id}`);
+
+export const toggleFavorite = (target_type, target_id) =>
+  apiClient.post("/favorites/toggle", { target_type, target_id });

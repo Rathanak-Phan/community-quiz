@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User, Menu, X } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User, Menu, X, GraduationCap } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
 import { getSettings } from "../../services/settingService";
@@ -16,7 +16,18 @@ export default function MainLayout() {
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
-    getSettings().then(res => setSettings(res.data)).catch(() => {});
+    getSettings().then(res => {
+      setSettings(res.data);
+      if (res.data.site_name) {
+        document.title = `${res.data.site_name} | Interactive Learning Platform`;
+      }
+      if (res.data.logo) {
+        const link = document.querySelector("link[rel*='icon']");
+        if (link) {
+          link.href = `${STORAGE_URL}/${res.data.logo}`;
+        }
+      }
+    }).catch(() => {});
   }, []);
 
   const isActive = (path) => location.pathname === path;
@@ -30,11 +41,17 @@ export default function MainLayout() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 flex items-center justify-center group-hover:scale-110 transition duration-300">
-               <img 
-                 src={settings.logo ? `${STORAGE_URL}/${settings.logo}` : "/logo.png"} 
-                 alt={settings.site_name || "Quizly"} 
-                 className="w-full h-full object-contain drop-shadow-md"
-               />
+               {settings.logo ? (
+                 <img 
+                   src={`${STORAGE_URL}/${settings.logo}`} 
+                   alt={settings.site_name || "Logo"} 
+                   className="w-full h-full object-contain drop-shadow-md"
+                 />
+               ) : (
+                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+                   <GraduationCap size={24} />
+                 </div>
+               )}
             </div>
             <span className="font-black text-2xl tracking-tighter text-slate-900">{settings.site_name || "Quizly"}</span>
           </Link>
@@ -54,9 +71,9 @@ export default function MainLayout() {
                 {user?.role?.name === 'user' && (
                   <button 
                     onClick={() => navigate("/dashboard")}
-                    className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                    className="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-xl font-bold text-[10px] md:text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                   >
-                    <UserPlus size={16} />
+                    <UserPlus size={16} className="hidden sm:block" />
                     Become a Creator
                   </button>
                 )}
@@ -64,7 +81,7 @@ export default function MainLayout() {
                 <div className="relative">
                   <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="p-0 border-none bg-transparent cursor-pointer"
+                    className="p-0 border-none bg-transparent cursor-pointer flex items-center"
                   >
                     <UserAvatar user={user} size="sm" className="shadow-blue-600/20" />
                   </button>
@@ -72,7 +89,7 @@ export default function MainLayout() {
                   {isDropdownOpen && (
                     <>
                       <div className="fixed inset-0 z-50" onClick={() => setIsDropdownOpen(false)}></div>
-                      <div className="absolute right-0 mt-3 w-64 bg-white rounded-3xl shadow-2xl border border-slate-50 py-3 z-[60] animate-in fade-in zoom-in duration-200">
+                      <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-slate-50 py-3 z-[60] animate-in fade-in zoom-in duration-200">
                         <div className="px-5 py-3 border-b border-slate-50 mb-2">
                           <p className="text-xs font-black text-slate-400 uppercase tracking-widest text-left">Signed in as</p>
                           <p className="text-sm font-bold text-slate-900 truncate text-left">{user?.name}</p>
@@ -105,19 +122,19 @@ export default function MainLayout() {
                 </div>
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-2 md:gap-3">
                 <Link 
                   to="/login" 
-                  className="text-sm font-bold text-slate-600 hover:text-slate-900 px-4 py-2 flex items-center gap-2 transition"
+                  className="text-[10px] md:text-sm font-bold text-slate-600 hover:text-slate-900 px-2 md:px-4 py-2 flex items-center gap-2 transition"
                 >
-                  <LogIn size={16} />
+                  <LogIn size={16} className="hidden sm:block" />
                   Login
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 flex items-center gap-2"
+                  className="bg-blue-600 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-xl text-[10px] md:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 flex items-center gap-2"
                 >
-                  <UserPlus size={16} />
+                  <UserPlus size={16} className="hidden sm:block" />
                   Join Now
                 </Link>
               </div>
@@ -138,25 +155,25 @@ export default function MainLayout() {
           <>
             <div className="fixed inset-0 top-20 bg-slate-900/20 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>
             <div className="fixed top-20 left-0 right-0 bg-white border-b border-slate-100 z-50 md:hidden animate-in slide-in-from-top duration-300">
-              <div className="p-6 flex flex-col gap-4">
+              <div className="p-6 flex flex-col gap-2">
                 <MobileNavLink to="/" active={isActive("/")} onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink to="/leaderboard" active={isActive("/leaderboard")} onClick={() => setIsMobileMenuOpen(false)}>Leaderboard</MobileNavLink>
                 <MobileNavLink to="/communities" active={isActive("/communities")} onClick={() => setIsMobileMenuOpen(false)}>Communities</MobileNavLink>
                 {token && <MobileNavLink to="/dashboard" active={isActive("/dashboard")} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</MobileNavLink>}
                 
                 {!token && (
-                  <div className="flex flex-col gap-3 pt-4 border-t border-slate-50">
+                  <div className="flex flex-col gap-3 pt-4 border-t border-slate-50 mt-2">
                     <Link 
                       to="/login" 
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 text-center font-black text-slate-900 uppercase tracking-widest text-xs"
+                      className="w-full py-4 text-center font-black text-slate-900 uppercase tracking-widest text-[10px]"
                     >
                       Login
                     </Link>
                     <Link 
                       to="/register" 
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 bg-blue-600 text-white rounded-xl text-center font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-600/20"
+                      className="w-full py-4 bg-blue-600 text-white rounded-xl text-center font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-600/20"
                     >
                       Join Now
                     </Link>
@@ -219,7 +236,7 @@ export default function MainLayout() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200/50 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          <span>&copy; 2026 Quizly AI Community. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} {settings.site_name || "QuizSphere"}. All rights reserved.</span>
           <div className="flex gap-6">
             <Link to="#" className="hover:text-slate-900 transition">Privacy</Link>
             <Link to="#" className="hover:text-slate-900 transition">Terms</Link>

@@ -127,7 +127,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 p-8 z-10 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 p-8 z-10 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
@@ -142,7 +142,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
 
         {/* API Error */}
         {apiError && (
-          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
             {apiError}
           </div>
         )}
@@ -161,7 +161,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
                 if (errors.name) setErrors((p) => ({ ...p, name: "" }));
               }}
               placeholder="Enter community name"
-              className={`w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-gray-50 ${
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-gray-50 ${
                 errors.name ? "border-red-400" : "border-gray-300"
               }`}
             />
@@ -183,7 +183,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
               }}
               placeholder="Describe your community"
               rows={3}
-              className={`w-full border rounded-lg px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-gray-50 ${
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-gray-50 ${
                 errors.description ? "border-red-400" : "border-gray-300"
               }`}
             />
@@ -201,7 +201,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
               <button
                 type="button"
                 onClick={() => setVisibility("public")}
-                className={`p-4 rounded-lg border-2 transition text-left ${
+                className={`p-4 rounded-xl border-2 transition text-left ${
                   visibility === "public"
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-200 bg-white hover:border-gray-300"
@@ -231,7 +231,7 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
               <button
                 type="button"
                 onClick={() => setVisibility("private")}
-                className={`p-4 rounded-lg border-2 transition text-left ${
+                className={`p-4 rounded-xl border-2 transition text-left ${
                   visibility === "private"
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-200 bg-white hover:border-gray-300"
@@ -316,14 +316,14 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition"
+              className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition"
             >
               {coverImagePreview ? (
                 <div className="space-y-3">
                   <img
                     src={coverImagePreview}
                     alt="Cover preview"
-                    className="w-full h-32 object-cover rounded-lg"
+                    className="w-full h-32 object-cover rounded-xl"
                   />
                   <p className="text-xs text-gray-500">Click to change image</p>
                 </div>
@@ -352,14 +352,14 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-6 py-2.5 rounded-lg text-sm font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`px-6 py-2.5 rounded-lg text-sm font-medium text-white transition ${
+              className={`px-6 py-2.5 rounded-xl text-sm font-medium text-white transition ${
                 loading
                   ? "bg-blue-300 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"

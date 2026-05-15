@@ -44,7 +44,7 @@ const AdminSidebar = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) => `
-              flex items-center justify-between px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 group
+              flex items-center justify-between px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 group
               ${isActive 
                 ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 translate-x-2' 
                 : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-1'
@@ -65,7 +65,7 @@ const AdminSidebar = () => {
           onClick={() => {
             logout();
           }}
-          className="w-full flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all duration-300 font-black uppercase text-[10px] tracking-widest"
+          className="w-full flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all duration-300 font-black uppercase text-[10px] tracking-widest"
         >
           <LogOut size={20} />
           Logout

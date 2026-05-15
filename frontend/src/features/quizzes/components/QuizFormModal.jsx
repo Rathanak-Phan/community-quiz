@@ -139,7 +139,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData, pr
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
           <div>
             <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
@@ -214,7 +214,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData, pr
               />
             </div>
 
-            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+            <div className="p-6 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Global Quiz Timer</h3>
@@ -272,7 +272,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData, pr
               )}
             </div>
 
-            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+            <div className="p-6 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Publication Status</h3>
@@ -282,7 +282,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData, pr
                   <button
                     type="button"
                     onClick={() => setStatus("published")}
-                    className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                       status === "published" 
                         ? 'bg-slate-900 text-white' 
                         : 'text-slate-400 hover:text-slate-600'
@@ -293,7 +293,7 @@ export default function QuizFormModal({ isOpen, onClose, onSuccess, editData, pr
                   <button
                     type="button"
                     onClick={() => setStatus("draft")}
-                    className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                       status === "draft" 
                         ? 'bg-slate-900 text-white' 
                         : 'text-slate-400 hover:text-slate-600'

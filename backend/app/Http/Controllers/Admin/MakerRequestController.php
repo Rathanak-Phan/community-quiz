@@ -12,12 +12,12 @@ class MakerRequestController extends Controller
     /**
      * List all pending maker requests.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $users = User::where('maker_status', 'pending')
             ->with('role')
             ->latest()
-            ->get();
+            ->paginate($request->query('per_page', 10));
 
         return response()->json($users);
     }

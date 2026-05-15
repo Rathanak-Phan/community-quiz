@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->statefulApi();
 
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectTo(
             guests: '/login',
             users: '/home'
