@@ -23,7 +23,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('quizzes', function (Blueprint $table) {
-            $table->dropColumn(['has_timer', 'default_time_limit']);
+            if (Schema::hasColumn('quizzes', 'has_timer')) {
+                $table->dropColumn('has_timer');
+            }
+            if (Schema::hasColumn('quizzes', 'default_time_limit')) {
+                $table->dropColumn('default_time_limit');
+            }
         });
     }
 };
