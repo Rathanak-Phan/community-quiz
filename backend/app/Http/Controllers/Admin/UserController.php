@@ -77,7 +77,14 @@ class UserController extends Controller
     public function updateRole(UpdateUserRoleRequest $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
+        $oldRole = $user->role ? $user->role->name : 'Unknown';
         $updatedUser = $this->userService->updateUserRole($user, $request->role_id);
+        $newRole = $updatedUser->role ? $updatedUser->role->name : 'Unknown';
+
+        \App\Models\ActivityLog::log(
+            'role_updated',
+            "Updated user {$user->name} ({$user->email}) role from {$oldRole} to {$newRole}."
+        );
 
         return response()->json([
             'message' => 'User role updated successfully',
@@ -113,6 +120,11 @@ class UserController extends Controller
 
         $user->delete();
 
+        \App\Models\ActivityLog::log(
+            'user_deleted',
+            "Deleted user account {$user->name} ({$user->email})."
+        );
+
         return response()->json(['message' => 'User deleted successfully']);
     }
 
@@ -147,6 +159,11 @@ class UserController extends Controller
         ]);
 
         $user = $this->userService->createUser($validated);
+
+        \App\Models\ActivityLog::log(
+            'user_created',
+            "Registered a new user account: {$user->name} ({$user->email}) with role ID {$user->role_id}."
+        );
 
         return response()->json([
             'message' => 'User created successfully',

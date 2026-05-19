@@ -55,8 +55,10 @@ class CommunityModerationController extends Controller
     {
         $community = Community::findOrFail($id);
         
-        // Log deletion
-        // \Log::info("Community ID {$id} deleted by Admin ID " . auth()->id());
+        \App\Models\ActivityLog::log(
+            'community_deleted_by_admin',
+            "Deleted community '{$community->name}' (ID: {$community->id}) created by " . ($community->creator ? $community->creator->name : 'Unknown')
+        );
 
         $community->delete();
 

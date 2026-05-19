@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
-    Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap, Award
+  Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap, Award, Activity
 } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
@@ -25,6 +25,7 @@ const navItems = [
   { to: "/admin/moderation/quizzes", label: "Moderate Quizzes", icon: AlertTriangle, roles: ["admin"] },
   { to: "/admin/moderation/communities", label: "Moderate Communities", icon: Users, roles: ["admin"] },
   { to: "/admin/maker-requests", label: "Maker Requests", icon: ShieldCheck, roles: ["admin"] },
+  { to: "/admin/activity-logs", label: "Activity Logs", icon: Activity, roles: ["admin"] },
   { to: "/admin/settings", label: "Site Settings", icon: Settings, roles: ["admin"] },
   
   // Workspace / Quiz Maker Specific

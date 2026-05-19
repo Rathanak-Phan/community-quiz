@@ -88,7 +88,8 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string|min:8'
+            'password' => 'required|string|min:8',
+            'recaptcha_token' => ['required', new \App\Rules\Recaptcha()]
         ]);
 
         if (!Auth::attempt($request->only('email', 'password'))) {

@@ -8,6 +8,7 @@ import confetti from "canvas-confetti";
 import SEO from "../../components/common/SEO";
 import { getSettings } from "../admin/services/settingService";
 import { STORAGE_URL } from "../../config/api";
+import UserAvatar from "../../components/ui/UserAvatar";
 
 export default function QuizReview({ isPublic = false }) {
     const { attemptId } = useParams();
@@ -292,19 +293,32 @@ export default function QuizReview({ isPublic = false }) {
 
                 <div className="flex items-center gap-3 sm:gap-5 relative z-10 w-full sm:w-auto">
                     <div className="relative shrink-0">
-                        <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 shadow-md bg-slate-50 transition-transform duration-500 ${
-                            review.grading_status === 'pending' 
-                                ? 'border-amber-400'
-                                : (isSuccess 
-                                    ? 'border-emerald-400 animate-float' 
-                                    : 'border-rose-400')
-                        }`}>
-                            <img 
-                                src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(review.user?.name || review.anonymous_name || "Guest")}`} 
-                                alt="Challenger Avatar" 
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                            {!review.is_anonymous ? (
+                                <UserAvatar 
+                                    user={review.user} 
+                                    className={`!rounded-2xl border-2 shadow-md bg-slate-50 transition-transform duration-500 w-12 h-12 sm:w-16 sm:h-16 ${
+                                        review.grading_status === 'pending' 
+                                            ? 'border-amber-400'
+                                            : (isSuccess 
+                                                ? 'border-emerald-400 animate-float' 
+                                                : 'border-rose-400')
+                                    }`}
+                                />
+                            ) : (
+                                <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 shadow-md bg-slate-50 transition-transform duration-500 ${
+                                    review.grading_status === 'pending' 
+                                        ? 'border-amber-400'
+                                        : (isSuccess 
+                                            ? 'border-emerald-400 animate-float' 
+                                            : 'border-rose-400')
+                                }`}>
+                                    <img 
+                                        src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(review.anonymous_name || "Guest")}`} 
+                                        alt="Challenger Avatar" 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )}
                         {/* Status Icon Badge in Corner */}
                         <div className={`absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border-2 border-white shadow text-white ${
                             review.grading_status === 'pending' 
@@ -376,12 +390,22 @@ export default function QuizReview({ isPublic = false }) {
                     {review.rank && (
                         <>
                             <div className="w-px h-8 sm:h-12 bg-slate-200"></div>
-                            <div className="text-left md:text-right">
-                                <p className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-0.5">
+                            <div 
+                                onClick={() => {
+                                    if (review.is_anonymous) {
+                                        navigate(`/quizzes/${review.quiz_id || review.quiz?.id}/scoreboard${review.challenge_token ? `?challenge=${review.challenge_token}` : ''}`);
+                                    } else {
+                                        navigate('/leaderboard');
+                                    }
+                                }}
+                                className="text-left md:text-right cursor-pointer group/rank"
+                            >
+                                <p className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-0.5 group-hover/rank:text-blue-500 transition-colors">
                                     Leaderboard Rank
                                 </p>
-                                <p className="text-lg sm:text-2xl font-bold text-amber-500 tracking-tight leading-none flex items-center gap-1 md:justify-end">
+                                <p className="text-lg sm:text-2xl font-bold text-amber-500 tracking-tight leading-none flex items-center gap-1 md:justify-end group-hover/rank:text-amber-600 transition-colors">
                                     #{review.rank} <span className="text-xs sm:text-sm text-slate-400">/ {review.total_participants || 0}</span>
+                                    <Trophy size={12} className="text-amber-400 animate-pulse hidden sm:inline ml-1" />
                                 </p>
                             </div>
                         </>
@@ -398,11 +422,19 @@ export default function QuizReview({ isPublic = false }) {
                     </div>
                     <div className="flex gap-2.5">
                         <button 
-                            onClick={() => navigate(isPublic ? `/quizzes/${review?.quiz_id || review?.quiz?.id}` : "/quizzes")} 
+                            onClick={() => navigate(isPublic ? `/quizzes/${review?.quiz_id || review?.quiz?.id}${review.challenge_token ? `?challenge=${review.challenge_token}` : ''}` : "/quizzes")} 
                             className="flex-1 bg-blue-600 text-white px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-blue-700 hover:shadow-md transition-all flex justify-center items-center gap-1.5 active:scale-95 shadow-inner cursor-pointer"
                         >
                             <span>{isPublic ? "View Quiz" : "Try Another"}</span> <Sparkles size={12} />
                         </button>
+                        {review.is_anonymous && (
+                            <button 
+                                onClick={() => navigate(`/quizzes/${review.quiz_id || review.quiz?.id}/scoreboard${review.challenge_token ? `?challenge=${review.challenge_token}` : ''}`)} 
+                                className="flex-1 bg-amber-500 text-slate-950 px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-amber-600 transition-all flex justify-center items-center gap-1.5 active:scale-95 cursor-pointer shadow-md shadow-amber-500/10"
+                            >
+                                <Trophy size={12} /> <span>Scoreboard</span>
+                            </button>
+                        )}
                         <button 
                             onClick={() => navigate(isPublic ? "/quizzes" : "/dashboard")} 
                             className="flex-1 bg-slate-50 text-slate-700 border border-slate-200 px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all flex justify-center items-center gap-1.5 active:scale-95 cursor-pointer"
@@ -426,12 +458,7 @@ export default function QuizReview({ isPublic = false }) {
                                 >
                                     Result
                                 </button>
-                                <button 
-                                    onClick={() => setShareMode('review')} 
-                                    className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all ${shareMode === 'review' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    Real Review
-                                </button>
+
                                 <button 
                                     onClick={() => setShareMode('quiz')} 
                                     className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all ${shareMode === 'quiz' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
@@ -802,5 +829,3 @@ const XIcon = ({ size = 24 }) => (
         <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
     </svg>
 );
-
-// ... I will continue to do

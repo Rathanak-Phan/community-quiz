@@ -127,11 +127,74 @@ class DashboardController extends Controller
      */
     public function adminDashboard()
     {
+        // Fetch registrations over last 30 days
+        $userGrowth = \App\Models\User::selectRaw('DATE(created_at) as date, count(*) as count')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get();
+
+        // Fetch quiz creations over last 30 days
+        $quizGrowth = Quiz::selectRaw('DATE(created_at) as date, count(*) as count')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get();
+
+        // Fetch submissions over last 30 days
+        $submissionGrowth = QuizAttempt::selectRaw('DATE(created_at) as date, count(*) as count')
+            ->where('status', 'submitted')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get();
+
+        // Pre-fill last 30 days with 0 values to handle silent intervals
+        $days = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $days[now()->subDays($i)->format('Y-m-d')] = 0;
+        }
+
+        $userTimeline = $days;
+        foreach ($userGrowth as $record) {
+            $userTimeline[$record->date] = (int)$record->count;
+        }
+
+        $quizTimeline = $days;
+        foreach ($quizGrowth as $record) {
+            $quizTimeline[$record->date] = (int)$record->count;
+        }
+
+        $submissionTimeline = $days;
+        foreach ($submissionGrowth as $record) {
+            $submissionTimeline[$record->date] = (int)$record->count;
+        }
+
+        $userGrowthData = [];
+        foreach ($userTimeline as $date => $count) {
+            $userGrowthData[] = ['date' => date('M d', strtotime($date)), 'value' => $count];
+        }
+
+        $quizGrowthData = [];
+        foreach ($quizTimeline as $date => $count) {
+            $quizGrowthData[] = ['date' => date('M d', strtotime($date)), 'value' => $count];
+        }
+
+        $submissionGrowthData = [];
+        foreach ($submissionTimeline as $date => $count) {
+            $submissionGrowthData[] = ['date' => date('M d', strtotime($date)), 'value' => $count];
+        }
+
         return response()->json([
             'total_users' => \App\Models\User::count(),
             'total_quizzes' => Quiz::count(),
             'total_communities' => Community::count(),
             'total_submissions' => QuizAttempt::where('status', 'submitted')->count(),
+            'growth_data' => [
+                'users' => $userGrowthData,
+                'quizzes' => $quizGrowthData,
+                'submissions' => $submissionGrowthData
+            ]
         ]);
     }
 }

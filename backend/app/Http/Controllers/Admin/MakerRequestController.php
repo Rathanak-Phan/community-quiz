@@ -22,9 +22,6 @@ class MakerRequestController extends Controller
         return response()->json($users);
     }
 
-    /**
-     * Approve a maker request.
-     */
     public function approve($id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -34,6 +31,11 @@ class MakerRequestController extends Controller
             'role_id' => 2,
             'maker_status' => 'approved'
         ]);
+
+        \App\Models\ActivityLog::log(
+            'maker_request_approved',
+            "Approved creator application for user {$user->name} ({$user->email}). Promoted to Quiz Maker."
+        );
 
         return response()->json([
             'message' => "User {$user->name} has been approved as a Quiz Maker.",
@@ -51,6 +53,11 @@ class MakerRequestController extends Controller
         $user->update([
             'maker_status' => 'rejected'
         ]);
+
+        \App\Models\ActivityLog::log(
+            'maker_request_rejected',
+            "Rejected creator application for user {$user->name} ({$user->email})."
+        );
 
         return response()->json([
             'message' => "User {$user->name}'s request has been rejected.",

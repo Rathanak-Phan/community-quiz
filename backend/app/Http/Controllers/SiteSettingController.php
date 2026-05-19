@@ -10,7 +10,9 @@ class SiteSettingController extends Controller
 {
     public function index()
     {
-        return response()->json(SiteSetting::all()->pluck('value', 'key'));
+        $settings = SiteSetting::all()->pluck('value', 'key')->toArray();
+        $settings['recaptcha_site_key'] = config('services.recaptcha.site_key') ?: env('SITE_KEY');
+        return response()->json($settings);
     }
 
     public function update(Request $request)
@@ -37,6 +39,11 @@ class SiteSettingController extends Controller
                 ['value' => $value]
             );
         }
+
+        \App\Models\ActivityLog::log(
+            'site_settings_updated',
+            "Updated system configurations and platform settings."
+        );
 
         return response()->json(['message' => 'Settings updated successfully']);
     }

@@ -26,6 +26,10 @@ const adminService = {
     getMakerRequestsCount: () => api.get('/admin/maker-requests/count'),
     approveMakerRequest: (id) => api.post(`/admin/maker-requests/${id}/approve`),
     rejectMakerRequest: (id) => api.post(`/admin/maker-requests/${id}/reject`),
+
+    // Activity Logs
+    getActivityLogs: (params) => api.get('/admin/activity-logs', { params }),
+    clearActivityLogs: () => api.delete('/admin/activity-logs/clear'),
 };
 
 export default adminService;

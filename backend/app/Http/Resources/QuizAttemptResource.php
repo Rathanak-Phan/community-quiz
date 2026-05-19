@@ -24,7 +24,7 @@ class QuizAttemptResource extends JsonResource
                 $userData = [
                     'id' => null,
                     'name' => $this->anonymous_name ?: 'Anonymous User',
-                    'avatar' => null,
+                    'avatar' => 'https://api.dicebear.com/7.x/adventurer/svg?seed=' . urlencode($this->anonymous_name ?: 'Anonymous User'),
                 ];
             } else {
                 $userData = new UserResource($this->user);
@@ -33,7 +33,7 @@ class QuizAttemptResource extends JsonResource
             $userData = [
                 'id' => null,
                 'name' => $this->anonymous_name ?: 'Anonymous User',
-                'avatar' => null,
+                'avatar' => 'https://api.dicebear.com/7.x/adventurer/svg?seed=' . urlencode($this->anonymous_name ?: 'Anonymous User'),
             ];
         }
 

@@ -38,14 +38,24 @@ class LeaderboardController extends Controller
 
         $rank = 1;
         $data = $attempts->map(function ($attempt) use (&$rank) {
-            $userName = $attempt->user ? $attempt->user->name : ($attempt->is_anonymous ? 'Anonymous' : 'Guest');
+            $userName = $attempt->user ? $attempt->user->name : ($attempt->is_anonymous ? ($attempt->anonymous_name ?: 'Anonymous') : 'Guest');
+            
+            $avatar = null;
+            if ($attempt->user && $attempt->user->avatar) {
+                $avatar = $attempt->user->avatar;
+            } elseif ($attempt->is_anonymous || !$attempt->user) {
+                $avatar = 'https://api.dicebear.com/7.x/adventurer/svg?seed=' . urlencode($userName);
+            } else {
+                $avatar = strtoupper(substr($userName, 0, 1));
+            }
+            
             return [
                 'id' => $attempt->id,
                 'userId' => $attempt->user_id,
                 'rank' => $rank++,
                 'name' => $userName,
                 'userRole' => $attempt->user?->role?->name ?: 'Learner',
-                'avatar' => strtoupper(substr($userName, 0, 1)),
+                'avatar' => $avatar,
                 'is_anonymous' => (bool)$attempt->is_anonymous,
                 'quizName' => $attempt->quiz->title,
                 'score' => $attempt->score,
