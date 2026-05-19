@@ -456,7 +456,9 @@ export default function QuizReview({ isPublic = false }) {
                                             const res = await getResultShareLink(review.submission_id);
                                             url = getCleanUrl(res.data.share_url || res.data.frontend_url);
                                         } else if (shareMode === 'review') {
-                                            url = `${window.location.origin}/public/attempts/${attemptId}/review`;
+                                            const searchParams = new URLSearchParams(window.location.search);
+                                            const challengeToken = searchParams.get("challenge");
+                                            url = `${window.location.origin}/public/attempts/${attemptId}/review${challengeToken ? '?challenge=' + challengeToken : ''}`;
                                         } else {
                                             const res = await (await import('./services/shareService')).getQuizShareLink(review.quiz_id);
                                             url = getCleanUrl(res.data.share_url);
@@ -480,7 +482,9 @@ export default function QuizReview({ isPublic = false }) {
                                             const res = await getResultShareLink(review.submission_id);
                                             url = getCleanUrl(res.data.share_url || res.data.frontend_url);
                                         } else if (shareMode === 'review') {
-                                            url = `${window.location.origin}/public/attempts/${attemptId}/review`;
+                                            const searchParams = new URLSearchParams(window.location.search);
+                                            const challengeToken = searchParams.get("challenge");
+                                            url = `${window.location.origin}/public/attempts/${attemptId}/review${challengeToken ? '?challenge=' + challengeToken : ''}`;
                                         } else {
                                             const res = await (await import('./services/shareService')).getQuizShareLink(review.quiz_id);
                                             url = getCleanUrl(res.data.share_url);
@@ -504,7 +508,9 @@ export default function QuizReview({ isPublic = false }) {
                                             const res = await getResultShareLink(review.submission_id);
                                             url = getCleanUrl(res.data.share_url || res.data.frontend_url);
                                         } else if (shareMode === 'review') {
-                                            url = `${window.location.origin}/public/attempts/${attemptId}/review`;
+                                            const searchParams = new URLSearchParams(window.location.search);
+                                            const challengeToken = searchParams.get("challenge");
+                                            url = `${window.location.origin}/public/attempts/${attemptId}/review${challengeToken ? '?challenge=' + challengeToken : ''}`;
                                         } else {
                                             const res = await (await import('./services/shareService')).getQuizShareLink(review.quiz_id);
                                             url = getCleanUrl(res.data.share_url);
@@ -537,7 +543,9 @@ export default function QuizReview({ isPublic = false }) {
                                             const res = await getResultShareLink(review.submission_id);
                                             url = getCleanUrl(res.data.frontend_url || res.data.share_url);
                                         } else if (shareMode === 'review') {
-                                            url = `${window.location.origin}/public/attempts/${attemptId}/review`;
+                                            const searchParams = new URLSearchParams(window.location.search);
+                                            const challengeToken = searchParams.get("challenge");
+                                            url = `${window.location.origin}/public/attempts/${attemptId}/review${challengeToken ? '?challenge=' + challengeToken : ''}`;
                                         } else {
                                             const res = await (await import('./services/shareService')).getQuizShareLink(review.quiz_id);
                                             url = getCleanUrl(res.data.share_url);
