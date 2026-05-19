@@ -199,7 +199,7 @@ class QuizAttemptController extends Controller
                 }
             }
 
-            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers.question.shortAnswer']));
+            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers.question.shortAnswer', 'submission']));
         });
     }
 
@@ -590,7 +590,7 @@ class QuizAttemptController extends Controller
                 ]);
             }
 
-            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers.question.shortAnswer']));
+            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers.question.shortAnswer', 'submission']));
         });
     }
 
@@ -605,6 +605,20 @@ class QuizAttemptController extends Controller
 
         $attempt->load(['quiz.questions.options', 'answers.question.options', 'answers.question.shortAnswer']);
         return new QuizAttemptDetailResource($attempt);
+    }
+
+    /**
+     * Get public guest attempts for a quiz (Scoreboard)
+     */
+    public function publicGuestAttempts(Quiz $quiz)
+    {
+        $attempts = QuizAttempt::where('quiz_id', $quiz->id)
+            ->where('status', 'submitted')
+            ->where('is_anonymous', true)
+            ->latest('completed_at')
+            ->get();
+
+        return QuizAttemptResource::collection($attempts);
     }
 }
 

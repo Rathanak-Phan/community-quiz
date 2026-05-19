@@ -42,7 +42,9 @@ export default function QuizDetail() {
 
     const fetchQuiz = async () => {
         try {
-            const res = await getQuizById(quizId);
+            const searchParams = new URLSearchParams(window.location.search);
+            const challengeToken = searchParams.get("challenge");
+            const res = await getQuizById(quizId, challengeToken);
             setQuiz(res.data.data || res.data);
         } catch (error) {
             setToast({ show: true, message: "Failed to load quiz details", type: "error" });

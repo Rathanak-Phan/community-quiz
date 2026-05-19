@@ -11,8 +11,8 @@ export const getQuizzes = (params = {}) =>
 export const getMyQuizzes = () =>
   apiClient.get("/quizzes/my");
 
-export const getQuizById = (id) =>
-  apiClient.get(`/quizzes/${id}`);
+export const getQuizById = (id, challengeToken = null) =>
+  apiClient.get(`/quizzes/${id}`, { params: { challenge_token: challengeToken } });
 
 export const createQuiz = (data) => {
   if (data instanceof FormData) {
@@ -48,6 +48,9 @@ export const applyDefaultTimer = (id) =>
 
 export const getQuizAttempts = (id) =>
   apiClient.get(`/quizzes/${id}/attempts`);
+
+export const getPublicGuestAttempts = (id) =>
+  apiClient.get(`/public/quizzes/${id}/guest-attempts`);
 
 export const resetGuestAttempts = (id, challengeToken = null) =>
   apiClient.post(`/quizzes/${id}/attempts/reset`, { challenge_token: challengeToken });
