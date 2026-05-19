@@ -102,6 +102,13 @@ Route::get('/submissions/{id}/share', [ShareController::class, 'shareResult']);
 Route::get('/share/result/{id}', [ShareController::class, 'showSharePreview'])->name('share.result.preview');
 Route::get('/share/quiz/{id}', [ShareController::class, 'showQuizPreview'])->name('share.quiz.preview');
 
+// Public Quiz Attempt Routes (No auth required)
+Route::post('/public/quizzes/{quiz}/start', [QuizAttemptController::class, 'startPublic']);
+Route::get('/public/attempts/{attempt}', [QuizAttemptController::class, 'showPublic']);
+Route::post('/public/attempts/{attempt}/answer', [QuizAttemptController::class, 'submitAnswerPublic']);
+Route::post('/public/attempts/{attempt}/submit', [QuizAttemptController::class, 'submitPublic']);
+Route::get('/public/attempts/{attempt}/review', [QuizAttemptController::class, 'reviewPublic']);
+
 // Public Browsing
 Route::get('/communities', [CommunityController::class, 'index']);
 Route::get('/communities/{community}', [CommunityController::class, 'show']);
@@ -207,6 +214,7 @@ Route::middleware(['auth:sanctum', 'role:admin,quiz_maker'])->group(function () 
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']);
     Route::post('/quizzes/{quiz}/apply-default-timer', [QuizController::class, 'applyDefaultTimer']);
     Route::get('/quizzes/{quiz}/attempts', [QuizAttemptController::class, 'indexByQuiz']);
+    Route::post('/quizzes/{quiz}/attempts/reset', [QuizAttemptController::class, 'resetGuests']);
 
     // Questions & Options
     Route::get('/quizzes/{quiz}/questions', [QuestionController::class, 'index']);

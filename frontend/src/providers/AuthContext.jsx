@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { login as loginApi, register as registerApi, getProfile } from "../services/authService";
+import { login as loginApi, register as registerApi, getProfile } from "../features/auth/services/authService";
 import apiClient from "../config/api";
 
 const AuthContext = createContext();

@@ -16,7 +16,7 @@ class LeaderboardResource extends JsonResource
     {
         return [
             'rank' => $this->rank,
-            'username' => $this->is_anonymous ? 'Anonymous' : $this->user->name,
+            'username' => $this->is_anonymous ? 'Anonymous' : ($this->user ? $this->user->name : 'Guest'),
             'score' => $this->score,
             'submitted_at' => $this->completed_at,
         ];

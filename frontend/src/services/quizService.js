@@ -48,3 +48,6 @@ export const applyDefaultTimer = (id) =>
 
 export const getQuizAttempts = (id) =>
   apiClient.get(`/quizzes/${id}/attempts`);
+
+export const resetGuestAttempts = (id, challengeToken = null) =>
+  apiClient.post(`/quizzes/${id}/attempts/reset`, { challenge_token: challengeToken });

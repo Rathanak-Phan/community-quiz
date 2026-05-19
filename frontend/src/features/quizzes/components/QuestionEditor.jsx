@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Trash2, Image as ImageIcon, Save, AlertCircle, CheckCircle2, HelpCircle, Check, Copy, Loader2, GripVertical, Type } from 'lucide-react';
-import { createMcq, createTrueFalse, createShortAnswer, updateQuestion } from '../../../services/questionService';
+import { createMcq, createTrueFalse, createShortAnswer, updateQuestion } from '../services/questionService';
 
 const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasTimer = false, defaultTimeLimit = 30 }) => {
   const [loading, setLoading] = useState(false);
@@ -20,6 +20,12 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
     time_limit: defaultTimeLimit || 30
   });
 
+  const presets = [10, 20, 30, 60, 90, 120, 180, 300];
+  const [isCustomTimer, setIsCustomTimer] = useState(() => {
+    const limit = editData?.time_limit || defaultTimeLimit || 30;
+    return limit !== 0 && !presets.includes(limit);
+  });
+
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -29,6 +35,9 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
       const correctIndices = type === 'multiple_choice' 
         ? editData.options?.map((o, i) => o.is_correct ? i : null).filter(i => i !== null) || [0]
         : [0];
+
+      const limit = editData.time_limit || 30;
+      setIsCustomTimer(limit !== 0 && !presets.includes(limit));
 
       setFormData({
         question_type: type,
@@ -41,7 +50,7 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
         is_manual_grading: type === 'short_answer' ? editData.short_answer?.is_manual_grading || false : false,
         question_text: editData.isDuplicate ? `Copy of ${editData.question_text}` : (editData.question_text || ''),
         allow_multiple: type === 'multiple_choice' ? (correctIndices.length > 1) : false,
-        time_limit: editData.time_limit || 30
+        time_limit: limit
       });
       setImagePreview(editData.image ? `${import.meta.env.VITE_STORAGE_URL}/${editData.image}` : null);
     }
@@ -156,20 +165,20 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
          <GripVertical size={14} className="text-slate-300" />
       </div>
 
-      <div className="p-8 space-y-8">
+      <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-100 rounded text-rose-600 text-sm flex items-center gap-3">
+          <div className="p-3 sm:p-4 bg-rose-50 border border-rose-100 rounded text-rose-600 text-sm flex items-center gap-3">
             <AlertCircle size={18} />
             {error}
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
             <div className="flex-1 space-y-4">
                 <input
                     required
                     placeholder="Question"
-                    className="w-full px-4 py-4 bg-slate-50 border-b-2 border-slate-100 focus:border-[#673ab7] outline-none transition-all text-xl text-slate-900 placeholder:text-slate-400"
+                    className="w-full px-3 py-3 sm:px-4 sm:py-4 bg-slate-50 border-b-2 border-slate-100 focus:border-[#673ab7] outline-none transition-all text-lg sm:text-xl text-slate-900 placeholder:text-slate-400"
                     value={formData.question_text}
                     onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
                 />
@@ -187,7 +196,7 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
                             handleTypeChange(val);
                         }
                     }}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#673ab7]/20 focus:border-[#673ab7] transition-all cursor-pointer shadow-sm"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#673ab7]/20 focus:border-[#673ab7] transition-all cursor-pointer shadow-sm"
                 >
                     <option value="multiple_choice">Multiple Choice</option>
                     <option value="checkboxes">Checkboxes</option>
@@ -329,39 +338,67 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
         )}
 
         {/* Advanced Settings */}
-        <div className="pt-8 border-t border-slate-100 flex flex-wrap items-center justify-between gap-6">
-           <div className="flex items-center gap-8">
+        <div className="pt-6 sm:pt-8 border-t border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
+           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 w-full lg:w-auto">
               <div className="flex items-center gap-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Points</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">Points</label>
                   <input 
                       type="number"
                       value={formData.points}
                       onChange={(e) => setFormData({ ...formData, points: e.target.value })}
-                      className="w-20 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none shadow-inner"
+                      className="w-20 px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs sm:text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none shadow-inner"
                   />
               </div>
-              <div className="flex items-center gap-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Timer</label>
+              <div className="flex flex-wrap items-center gap-3 flex-1 sm:flex-initial">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">Timer</label>
                   <select
-                      value={formData.time_limit}
-                      onChange={(e) => setFormData({ ...formData, time_limit: parseInt(e.target.value) })}
-                      className="px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none cursor-pointer shadow-inner"
+                      value={isCustomTimer ? "custom" : formData.time_limit}
+                      onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === 'custom') {
+                              setIsCustomTimer(true);
+                              if (presets.includes(formData.time_limit) || formData.time_limit === 0) {
+                                  setFormData({ ...formData, time_limit: 45 });
+                              }
+                          } else {
+                              setIsCustomTimer(false);
+                              setFormData({ ...formData, time_limit: parseInt(val) });
+                          }
+                      }}
+                      className="px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs sm:text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none cursor-pointer shadow-inner"
                   >
                       <option value={0}>No Timer</option>
-                      {[10, 20, 30, 60, 90, 120, 180, 300].map(s => (
+                      {presets.map(s => (
                           <option key={s} value={s}>{s < 60 ? `${s}s` : `${s/60}m`}</option>
                       ))}
+                      <option value="custom">Custom (Manual)</option>
                   </select>
+                  {isCustomTimer && (
+                      <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                          <input 
+                              type="number"
+                              min={0}
+                              value={formData.time_limit}
+                              onChange={(e) => {
+                                  const val = parseInt(e.target.value);
+                                  setFormData({ ...formData, time_limit: isNaN(val) ? 0 : val });
+                              }}
+                              className="w-24 px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs sm:text-sm font-black focus:bg-white focus:border-[#673ab7] outline-none shadow-inner"
+                              placeholder="Seconds"
+                          />
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">seconds</span>
+                      </div>
+                  )}
               </div>
            </div>
            
-           <div className="flex items-center gap-4">
+           <div className="flex items-center gap-4 w-full lg:w-auto justify-end">
                 <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-500 hover:text-[#673ab7] hover:bg-slate-50 transition font-bold text-xs uppercase tracking-widest"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-500 hover:text-[#673ab7] hover:bg-slate-50 transition font-bold text-xs uppercase tracking-widest"
                 >
-                    <ImageIcon size={18} />
+                    <ImageIcon size={16} />
                     {imagePreview ? 'Change Image' : 'Add Image'}
                 </button>
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" accept="image/*" />
@@ -369,63 +406,63 @@ const QuestionEditor = ({ quizId, editData = null, onCancel, onSuccess, quizHasT
         </div>
 
         {/* Card Footer Actions */}
-        <div className="pt-8 mt-8 border-t border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
+        <div className="pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-start">
                 <button 
                     type="button"
-                    className="p-3 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition shadow-sm" 
+                    className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition shadow-sm" 
                     title="Duplicate"
                 >
-                    <Copy size={20} />
+                    <Copy size={18} />
                 </button>
                 <button 
                     type="button"
                     onClick={onCancel}
-                    className="p-3 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition shadow-sm" 
+                    className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition shadow-sm" 
                     title="Delete"
                 >
-                    <Trash2 size={20} />
+                    <Trash2 size={18} />
                 </button>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-4 sm:gap-6 w-full sm:w-auto">
                 {formData.question_type === 'short_answer' && (
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1">Grading Mode</span>
-                        <div className="flex bg-slate-100 p-1 rounded-xl">
+                    <div className="flex items-center justify-between xs:justify-end gap-3 shrink-0">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Grading</span>
+                        <div className="flex bg-slate-100 p-0.5 rounded-xl">
                             <button 
                                 type="button"
                                 onClick={() => setFormData({...formData, is_manual_grading: false})}
-                                className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${!formData.is_manual_grading ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`px-3 py-1 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${!formData.is_manual_grading ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                             >
                                 Auto
                             </button>
                             <button 
                                 type="button"
                                 onClick={() => setFormData({...formData, is_manual_grading: true})}
-                                className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${formData.is_manual_grading ? 'bg-white text-[#673ab7] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`px-3 py-1 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all ${formData.is_manual_grading ? 'bg-white text-[#673ab7] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                             >
                                 Manual
                             </button>
                         </div>
                     </div>
                 )}
-                <div className="w-px h-6 bg-slate-100"></div>
-                <div className="flex gap-3">
+                <div className="hidden xs:block w-px h-6 bg-slate-100 shrink-0"></div>
+                <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto">
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="px-6 py-3 rounded-xl text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition"
+                        className="flex-1 sm:flex-initial px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-slate-500 font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:bg-slate-50 transition border border-transparent hover:border-slate-100 text-center"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="bg-slate-900 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition shadow-xl shadow-slate-900/10 active:scale-95 flex items-center gap-3 disabled:opacity-50"
+                        className="flex-1 sm:flex-initial bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 sm:px-8 sm:py-3 rounded-xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                        {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                        {editData ? 'Update Question' : 'Save Question'}
+                        {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                        {editData ? 'Update' : 'Save'}
                     </button>
                 </div>
             </div>

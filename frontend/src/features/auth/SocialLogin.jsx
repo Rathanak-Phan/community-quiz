@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
 import { Loader2 } from "lucide-react";
+import SEO from "../../components/common/SEO";
 
 const SocialLogin = () => {
     const navigate = useNavigate();
@@ -51,6 +52,11 @@ const SocialLogin = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+            <SEO 
+                title="Authenticating secure login session..."
+                description="Synchronizing secure federated OAuth session credentials."
+                url="/social-login"
+            />
             <div className="text-center bg-white p-12 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
                 <div className="flex justify-center mb-6">
                     <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">

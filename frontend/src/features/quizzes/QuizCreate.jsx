@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import QuizFormModal from "./components/QuizFormModal";
+import SEO from "../../components/common/SEO";
 
 export default function QuizCreate() {
   const navigate = useNavigate();
@@ -19,6 +20,11 @@ export default function QuizCreate() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <SEO 
+            title="Create New Quiz"
+            description="Design, customize, and publish your own interactive quiz on QuizSphere."
+            url="/quizzes/create"
+        />
         <QuizFormModal 
             isOpen={isOpen}
             onClose={handleClose}

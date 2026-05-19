@@ -11,7 +11,7 @@ import { Helmet } from 'react-helmet-async';
 const SEO = ({ title, description, image, url = '' }) => {
   const siteName = "QuizSphere";
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
-  const siteUrl = "https://quizsphere.store";
+  const siteUrl = typeof window !== "undefined" && window.location.origin ? window.location.origin : "https://quizsphere.store";
   const defaultDescription = "Community Quiz - A platform for interactive learning and community-driven quizzes.";
   const defaultImage = `${siteUrl}/logo.png`;
 

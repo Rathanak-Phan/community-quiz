@@ -13,7 +13,7 @@ class SubmissionResource extends JsonResource
             'id' => $this->id,
             'quiz' => new QuizResource($this->whenLoaded('quiz')),
             'user' => [
-                'name' => $this->is_anonymous ? 'Anonymous' : $this->user->name,
+                'name' => $this->is_anonymous ? ($this->anonymous_name ?: 'Anonymous') : ($this->user ? $this->user->name : 'Anonymous'),
             ],
             'score' => $this->score,
             'max_score' => $this->max_score,

@@ -1,59 +1,51 @@
-##################################
-# Global
-##################################
-
+# Global ignores
 .DS_Store
 Thumbs.db
 *.log
 *.lock
+*.bak
 
-##################################
-# Environment Files
-##################################
-
+# Environment files (MUST BE IGNORED FOR SECURITY)
 .env
 .env.local
+.env.production
+.env.production.local
 .env.*.local
-!.env.example
 
-##################################
-# Frontend (Vue / React / Vite)
-##################################
-
+# Frontend specific
 frontend/node_modules/
 frontend/dist/
 frontend/build/
 frontend/.vite/
-frontend/.cache/
 frontend/.env
 frontend/.env.*
 !frontend/.env.example
 
-##################################
-# Backend (Laravel)
-##################################
-
+# Backend specific
 backend/vendor/
 backend/node_modules/
-
 backend/public/storage
-
+backend/public/build
+backend/public/hot
 backend/storage/app/*
+!backend/storage/app/public/
 backend/storage/framework/*
 backend/storage/logs/*
 backend/storage/*.key
-
 backend/bootstrap/cache/*
-
 backend/.env
 backend/.env.*
 !backend/.env.example
+backend/.phpunit.cache
+backend/auth.json
+backend/Homestead.json
+backend/Homestead.yaml
 
-backend/*.log
-
-##################################
-# IDE Files
-##################################
-
+# IDE files
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

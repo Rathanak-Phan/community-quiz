@@ -17,6 +17,8 @@ class Submission extends Model
         'max_score',
         'grading_status',
         'is_anonymous',
+        'anonymous_name',
+        'challenge_token',
         'submitted_at',
     ];
 

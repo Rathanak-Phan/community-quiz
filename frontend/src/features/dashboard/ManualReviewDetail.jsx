@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getAttempt, gradeAnswer } from "../../services/attemptService";
+import { getAttempt, gradeAnswer } from "../quizzes/services/attemptService";
 import { ClipboardCheck, User, Clock, ChevronLeft, Save, MessageSquare, Star, CheckCircle2, XCircle } from "lucide-react";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 
 export default function ManualReviewDetail() {
     const { attemptId } = useParams();
@@ -121,6 +122,11 @@ export default function ManualReviewDetail() {
 
     return (
         <div className="max-w-5xl mx-auto space-y-12 pb-20">
+            <SEO 
+                title={`Reviewing Attempt: ${attempt?.user_name || 'Student'}`}
+                description="Assess student responses, assign points, and provide constructive feedback on short-answer questions."
+                url={`/reviews/${attemptId}`}
+            />
             {/* Header */}
             <div className="flex items-center justify-between">
                 <button 

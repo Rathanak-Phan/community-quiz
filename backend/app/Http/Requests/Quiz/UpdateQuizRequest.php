@@ -46,7 +46,7 @@ class UpdateQuizRequest extends FormRequest
             'cover_image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048',
             'status' => 'sometimes|nullable|string|in:draft,published',
             'has_timer' => 'sometimes|nullable|boolean',
-            'default_time_limit' => 'sometimes|nullable|integer|min:5',
+            'default_time_limit' => 'sometimes|nullable|integer|min:0',
         ];
     }
 }

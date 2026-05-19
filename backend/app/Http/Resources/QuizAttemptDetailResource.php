@@ -18,12 +18,46 @@ class QuizAttemptDetailResource extends JsonResource
         $lastAnswer = $this->answers()->orderBy('updated_at', 'desc')->first();
         $lastQuestionId = $lastAnswer ? $lastAnswer->question_id : null;
 
+        // Calculate Rank and Total Participants (separated: anonymous guest vs registered real users, and by challenge token)
+        $submissions = \App\Models\Submission::where('quiz_id', $this->quiz_id)
+            ->where('is_anonymous', $this->is_anonymous)
+            ->where('challenge_token', $this->challenge_token)
+            ->orderBy('score', 'desc')
+            ->orderBy('submitted_at', 'asc')
+            ->get();
+
+        $rank = 1;
+        $totalParticipants = $submissions->count();
+        if ($totalParticipants == 0 && $this->status === 'submitted') {
+            $totalParticipants = 1;
+            $rank = 1;
+        } else {
+            $found = false;
+            foreach ($submissions as $index => $s) {
+                if ($s->quiz_attempt_id == $this->id) {
+                    $rank = $index + 1;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found && $this->status === 'submitted') {
+                $rank = \App\Models\Submission::where('quiz_id', $this->quiz_id)
+                    ->where('is_anonymous', $this->is_anonymous)
+                    ->where('challenge_token', $this->challenge_token)
+                    ->where('score', '>', $this->score)
+                    ->count() + 1;
+                $totalParticipants += 1;
+            }
+        }
+
         return [
             'id' => $this->id,
             'quiz_id' => $this->quiz_id,
             'user_id' => $this->user_id,
             'mode' => $this->mode,
             'is_anonymous' => $this->is_anonymous,
+            'anonymous_name' => $this->anonymous_name,
+            'challenge_token' => $this->challenge_token,
             'status' => $this->status,
             'started_at' => $this->started_at,
             'completed_at' => $this->completed_at,
@@ -37,6 +71,8 @@ class QuizAttemptDetailResource extends JsonResource
                 return $this->quiz->has_timer ? ($this->quiz->default_time_limit ?: 30) : 3600; // Default 1 hour if no timer
             })) : null,
             'submission_id' => $this->submission?->id,
+            'rank' => $rank,
+            'total_participants' => $totalParticipants,
 
             // Relations
             'quiz' => new QuizResource($this->whenLoaded('quiz')),

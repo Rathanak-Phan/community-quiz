@@ -75,6 +75,7 @@ const FavoritesPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {favorites.map((fav) => {
             const isQuiz = fav.target_type === 'quiz';
+            const isCommunity = fav.target_type === 'community';
             const details = fav.details;
             
             return (
@@ -87,28 +88,30 @@ const FavoritesPage = () => {
                 </button>
   
                 <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center mb-6 group-hover:text-white transition-colors ${
-                  isQuiz ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600' : 'bg-violet-50 text-violet-600 group-hover:bg-violet-600'
+                  isQuiz ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600' : isCommunity ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600' : 'bg-violet-50 text-violet-600 group-hover:bg-violet-600'
                 }`}>
                   <BookOpen size={24} />
                 </div>
   
                 <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 line-clamp-2 min-h-[56px]">
-                  {isQuiz ? details?.title : details?.name}
+                  {details?.name || details?.title}
                 </h3>
                 
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">
                   {isQuiz ? (
                     <>Category: <span className="text-blue-600">{details?.category?.name || 'General'}</span></>
+                  ) : isCommunity ? (
+                    <><span className="text-emerald-600">Community</span></>
                   ) : (
                     <><span className="text-violet-600">Category Domain</span></>
                   )}
                 </p>
   
                 <button 
-                  onClick={() => navigate(isQuiz ? `/quizzes/${fav.target_id}` : `/communities?category=${fav.target_id}`)}
+                  onClick={() => navigate(isQuiz ? `/quizzes/${fav.target_id}` : isCommunity ? `/communities` : `/communities?category=${fav.target_id}`)}
                   className="mt-auto w-full flex items-center justify-center gap-3 py-4 bg-slate-50 text-slate-900 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all group/btn active:scale-95"
                 >
-                  {isQuiz ? 'Start Quiz' : 'Explore Category'} 
+                  {isQuiz ? 'Start Quiz' : isCommunity ? 'View Community' : 'Explore Category'} 
                   <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
                 </button>
               </div>

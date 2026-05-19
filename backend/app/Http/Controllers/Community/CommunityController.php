@@ -462,8 +462,8 @@ class CommunityController extends Controller
     {
         $member = CommunityMember::findOrFail($id);
 
-        // Only owner can approve
-        if ($member->community->created_by !== auth()->id()) {
+        // Only owner or admin can approve
+        if ($member->community->created_by !== auth()->id() && !auth()->user()->isAdmin()) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 403);
@@ -501,7 +501,7 @@ class CommunityController extends Controller
     {
         $member = CommunityMember::findOrFail($id);
 
-        if ($member->community->created_by !== auth()->id()) {
+        if ($member->community->created_by !== auth()->id() && !auth()->user()->isAdmin()) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 403);
@@ -518,8 +518,8 @@ class CommunityController extends Controller
 
     public function pendingMembers(Community $community)
     {
-        // Only owner can see pending members
-        if ($community->created_by !== auth()->id()) {
+        // Only owner or admin can see pending members
+        if ($community->created_by !== auth()->id() && !auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

@@ -4,12 +4,13 @@ import {
   Layout, Calendar, User, ChevronRight, Hash, Heart
 } from "lucide-react";
 import { getCategories, deleteCategory } from "../../api/categoryApi";
-import { addFavorite, removeFavorite } from "../../services/favoriteService";
+import { addFavorite, removeFavorite } from "../favorites/services/favoriteService";
 import api from "../../config/api";
 import CategoryFormModal from "./components/CategoryFormModal";
 import ConfirmModal from "../../components/ui/ConfirmModal";
 import Pagination from "../admin/components/Pagination";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 
 function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -111,6 +112,11 @@ function CategoryList() {
 
   return (
     <div className="space-y-12 pb-20">
+      <SEO 
+        title="System Categories"
+        description="Browse and manage the global system classification and taxonomy system on QuizSphere."
+        url="/categories"
+      />
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}

@@ -26,7 +26,7 @@ class StoreShortAnswerRequest extends FormRequest
             'question_text' => 'required|string',
             'correct_answer' => 'required_if:is_manual_grading,0,false|nullable|string',
             'is_manual_grading' => 'nullable|boolean',
-            'time_limit' => 'required|integer|min:5',
+            'time_limit' => 'required|integer|min:0',
         ];
     }
 }

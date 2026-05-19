@@ -31,7 +31,7 @@ class StoreMcqRequest extends FormRequest
             'correct_option' => 'nullable|integer|min:0' . ($optionsCount > 0 ? '|max:' . ($optionsCount - 1) : ''),
             'correct_options' => 'nullable|array',
             'correct_options.*' => 'integer|min:0' . ($optionsCount > 0 ? '|max:' . ($optionsCount - 1) : ''),
-            'time_limit' => 'required|integer|min:5',
+            'time_limit' => 'required|integer|min:0',
         ];
     }
 }
