@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { getQuizAttempts, getQuizById, resetGuestAttempts } from "./services/quizService";
+import { getPublicGuestAttempts, getQuizById, resetGuestAttempts } from "./services/quizService";
 import { getSettings } from "../admin/services/settingService";
 import { STORAGE_URL } from "../../config/api";
 import { 
@@ -44,8 +44,8 @@ export default function QuizGuestScoreboard() {
             if (!quizId || quizId === 'undefined') return;
             try {
                 const [quizRes, attemptsRes, settingsRes] = await Promise.all([
-                    getQuizById(quizId),
-                    getQuizAttempts(quizId),
+                    getQuizById(quizId, challengeToken),
+                    getPublicGuestAttempts(quizId),
                     getSettings().catch(() => ({ data: {} }))
                 ]);
                 setQuiz(quizRes.data.data || quizRes.data);

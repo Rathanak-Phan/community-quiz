@@ -52,8 +52,15 @@ class QuizController extends Controller
             }
         }
 
-        if (\Illuminate\Support\Facades\Gate::forUser($user)->denies('view', $quiz)) {
-            abort(403);
+        if ($user) {
+            if (\Illuminate\Support\Facades\Gate::forUser($user)->denies('view', $quiz)) {
+                abort(403, 'Unauthorized');
+            }
+        } else {
+            $policy = new \App\Policies\QuizPolicy();
+            if (!$policy->view(null, $quiz)) {
+                abort(403, 'Unauthorized');
+            }
         }
 
         return new QuizResource($quiz->loadMissing(['community', 'category', 'creator.role']));

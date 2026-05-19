@@ -104,6 +104,7 @@ Route::get('/share/quiz/{id}', [ShareController::class, 'showQuizPreview'])->nam
 
 // Public Quiz Attempt Routes (No auth required)
 Route::post('/public/quizzes/{quiz}/start', [QuizAttemptController::class, 'startPublic']);
+Route::get('/public/quizzes/{quiz}/guest-attempts', [QuizAttemptController::class, 'publicGuestAttempts']);
 Route::get('/public/attempts/{attempt}', [QuizAttemptController::class, 'showPublic']);
 Route::post('/public/attempts/{attempt}/answer', [QuizAttemptController::class, 'submitAnswerPublic']);
 Route::post('/public/attempts/{attempt}/submit', [QuizAttemptController::class, 'submitPublic']);
