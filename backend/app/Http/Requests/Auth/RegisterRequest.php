@@ -12,6 +12,7 @@ class RegisterRequest extends FormRequest{
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|in:user,quiz_maker',
+            'recaptcha_token' => ['required', new \App\Rules\Recaptcha()],
         ];
     }
 }

@@ -524,13 +524,15 @@ class QuizAttemptController extends Controller
         $request->validate([
             'question_id' => 'required|integer|exists:questions,id',
             'selected_option_id' => 'nullable|integer|exists:question_options,id',
+            'selected_options' => 'nullable|array',
+            'selected_options.*' => 'exists:question_options,id',
             'answer_boolean' => 'nullable|boolean',
             'answer_text' => 'nullable|string',
         ]);
 
         $answer = AttemptAnswer::updateOrCreate(
             ['quiz_attempt_id' => $attempt->id, 'question_id' => $request->question_id],
-            $request->only(['selected_option_id', 'answer_boolean', 'answer_text'])
+            $request->only(['selected_option_id', 'selected_options', 'answer_boolean', 'answer_text'])
         );
 
         return new AttemptAnswerResource($answer);

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
 import SEO from "../../components/common/SEO";
+import RecaptchaWidget from "../../components/common/RecaptchaWidget";
 import { 
   GraduationCap, 
   Mail, 
@@ -34,6 +35,20 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [settings, setSettings] = useState({});
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   useEffect(() => {
     import('../admin/services/settingService').then(m => m.getSettings()).then(res => {
@@ -79,11 +94,17 @@ function Register() {
       return;
     }
 
+    if (settings.recaptcha_site_key && !recaptchaToken) {
+      setError("Please verify that you are not a robot.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await register(formData);
+      await register({ ...formData, recaptcha_token: recaptchaToken });
       setSuccess(true);
+      setResendTimer(60); // Start 60s countdown
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Check your details.");
       setLoading(false);
@@ -107,6 +128,7 @@ function Register() {
       });
       const data = await response.json();
       setResendMessage(data.message || "Verification link sent!");
+      setResendTimer(60); // Start 60s countdown
     } catch (err) {
       setResendMessage("Failed to resend link. Please try again.");
     } finally {
@@ -187,10 +209,23 @@ function Register() {
              <button
                type="button"
                onClick={handleResendVerification}
-               disabled={resendLoading}
-               className="text-[11px] font-bold text-blue-600 hover:text-blue-800 underline disabled:opacity-50"
+               disabled={resendLoading || resendTimer > 0}
+               className="transition-colors flex items-center justify-center gap-1.5 mx-auto"
              >
-               {resendLoading ? "Sending..." : "Didn't get the email? Resend"}
+               {resendLoading ? (
+                  <span className="text-slate-400 font-medium text-xs">Sending...</span>
+                ) : resendTimer > 0 ? (
+                  <span className="flex items-center gap-2 text-slate-400 font-medium text-[11px] bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+                    Didn't get the email? Resend in 
+                    <span className="text-[#2563EB] font-black bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full text-[10px] animate-pulse">
+                      {resendTimer}s
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-blue-600 hover:text-blue-800 underline cursor-pointer">
+                    Didn't get the email? Resend
+                  </span>
+                )}
              </button>
              {resendMessage && (
                <p className="text-[10px] text-emerald-600 font-bold">{resendMessage}</p>
@@ -402,6 +437,15 @@ function Register() {
                     I agree to the <Link to="/terms" className="text-blue-600 font-bold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-blue-600 font-bold hover:underline">Privacy Policy</Link>.
                   </p>
                 </div>
+
+                {/* reCAPTCHA Widget */}
+                {settings.recaptcha_site_key && (
+                  <RecaptchaWidget
+                    siteKey={settings.recaptcha_site_key}
+                    onVerify={setRecaptchaToken}
+                    onExpire={() => setRecaptchaToken("")}
+                  />
+                )}
               </div>
             )}
 

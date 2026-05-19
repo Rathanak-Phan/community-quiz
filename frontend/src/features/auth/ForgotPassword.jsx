@@ -5,6 +5,7 @@ import { getSettings } from "../admin/services/settingService";
 import { useEffect } from "react";
 import { STORAGE_URL, BASE_URL } from "../../config/api";
 import SEO from "../../components/common/SEO";
+import RecaptchaWidget from "../../components/common/RecaptchaWidget";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -14,17 +15,37 @@ function ForgotPassword() {
   const [settings, setSettings] = useState({});
   const [code, setCode] = useState("");
   const [codeLoading, setCodeLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   useEffect(() => {
     getSettings().then(res => setSettings(res.data)).catch(() => {});
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+    if (e && e.preventDefault) e.preventDefault();
     setError("");
+    setMessage("");
+
+    if (settings.recaptcha_site_key && !recaptchaToken) {
+      setError("Please verify that you are not a robot.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch(`${BASE_URL}/api/forgot-password`, {
@@ -33,13 +54,14 @@ function ForgotPassword() {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, recaptcha_token: recaptchaToken }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setMessage(data.message);
+        setResendTimer(60); // Start 60s countdown
       } else {
         setError(data.message || "Failed to send reset link.");
       }
@@ -151,13 +173,28 @@ function ForgotPassword() {
               </form>
 
               <div className="text-center pt-4">
-                <p className="text-xs text-slate-500 mb-2">Didn't get the code?</p>
                 <button 
                   onClick={handleSubmit} 
-                  disabled={loading}
-                  className="text-blue-600 font-bold text-xs hover:underline disabled:opacity-50"
+                  disabled={loading || resendTimer > 0}
+                  className="transition-colors flex items-center justify-center gap-1.5 mx-auto"
                 >
-                  {loading ? "Sending..." : "Resend Email"}
+                  {loading ? (
+                    <span className="text-slate-400 font-medium text-xs">Sending...</span>
+                  ) : resendTimer > 0 ? (
+                    <span className="flex items-center gap-2 text-slate-400 font-medium text-xs bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+                      Didn't get the code? Resend in 
+                      <span className="text-[#2563EB] font-black bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full text-[10px] animate-pulse">
+                        {resendTimer}s
+                      </span>
+                    </span>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <p className="text-xs text-slate-500 mb-2">Didn't get the code?</p>
+                      <span className="text-blue-600 font-bold text-xs hover:text-blue-800 underline cursor-pointer">
+                        Resend Email
+                      </span>
+                    </div>
+                  )}
                 </button>
               </div>
 
@@ -184,6 +221,15 @@ function ForgotPassword() {
                     />
                   </div>
                 </div>
+
+                {/* reCAPTCHA Widget */}
+                {settings.recaptcha_site_key && (
+                  <RecaptchaWidget
+                    siteKey={settings.recaptcha_site_key}
+                    onVerify={setRecaptchaToken}
+                    onExpire={() => setRecaptchaToken("")}
+                  />
+                )}
 
                 <button
                   type="submit"

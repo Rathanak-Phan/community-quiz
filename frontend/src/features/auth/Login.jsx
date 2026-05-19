@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
 import SEO from "../../components/common/SEO";
+import RecaptchaWidget from "../../components/common/RecaptchaWidget";
 import { 
   GraduationCap, 
   Mail, 
@@ -30,6 +31,20 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [settings, setSettings] = useState({});
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   useEffect(() => {
     getSettings().then(res => {
@@ -78,10 +93,16 @@ function Login() {
     e.preventDefault();
     setError("");
     setResendMessage("");
+
+    if (settings.recaptcha_site_key && !recaptchaToken) {
+      setError("Please verify that you are not a robot.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await login({ email, password });
+      const res = await login({ email, password, recaptcha_token: recaptchaToken });
       const from = location.state?.from || redirectPath;
       
       if (from) {
@@ -123,6 +144,7 @@ function Login() {
       });
       const data = await response.json();
       setResendMessage(data.message || "Verification link sent!");
+      setResendTimer(60); // Start 60s countdown
     } catch (err) {
       setResendMessage("Failed to resend link. Please try again.");
     } finally {
@@ -175,10 +197,23 @@ function Login() {
                   <button
                     type="button"
                     onClick={handleResendVerification}
-                    disabled={resendLoading}
-                    className="text-blue-600 hover:text-blue-800 underline disabled:opacity-50 transition-colors"
+                    disabled={resendLoading || resendTimer > 0}
+                    className="transition-colors flex items-center gap-1.5 ml-2 shrink-0"
                   >
-                    {resendLoading ? "Sending..." : "Resend Link"}
+                    {resendLoading ? (
+                      <span className="text-slate-400 font-medium text-[10px]">Sending...</span>
+                    ) : resendTimer > 0 ? (
+                      <span className="flex items-center gap-1.5 text-slate-500 font-semibold text-[10px] bg-white border border-rose-100 px-2 py-1 rounded-lg shadow-sm">
+                        Resend in 
+                        <span className="text-[#2563EB] font-black bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full text-[9px] animate-pulse">
+                          {resendTimer}s
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-blue-600 hover:text-blue-800 underline font-bold text-xs">
+                        Resend Link
+                      </span>
+                    )}
                   </button>
                 )}
               </div>
@@ -242,6 +277,15 @@ function Login() {
               />
               <label htmlFor="remember" className="text-xs font-medium text-[#64748B] cursor-pointer">Remember me for 30 days</label>
             </div>
+
+            {/* reCAPTCHA Widget */}
+            {settings.recaptcha_site_key && (
+              <RecaptchaWidget
+                siteKey={settings.recaptcha_site_key}
+                onVerify={setRecaptchaToken}
+                onExpire={() => setRecaptchaToken("")}
+              />
+            )}
 
             {/* Submit Button */}
             <button

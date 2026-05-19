@@ -56,8 +56,10 @@ class QuizModerationController extends Controller
     {
         $quiz = Quiz::findOrFail($id);
         
-        // Log deletion if needed
-        // \Log::info("Quiz ID {$id} deleted by Admin ID " . auth()->id());
+        \App\Models\ActivityLog::log(
+            'quiz_deleted_by_admin',
+            "Deleted quiz '{$quiz->title}' (ID: {$quiz->id}) created by " . ($quiz->creator ? $quiz->creator->name : 'Unknown')
+        );
 
         $quiz->delete();
 

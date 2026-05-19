@@ -252,5 +252,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/maker-requests/{id}/approve', [\App\Http\Controllers\Admin\MakerRequestController::class, 'approve']);
     Route::post('/maker-requests/{id}/reject', [\App\Http\Controllers\Admin\MakerRequestController::class, 'reject']);
     Route::post('/settings', [SiteSettingController::class, 'update']);
+    Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index']);
+    Route::delete('/activity-logs/clear', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clear']);
 });
 

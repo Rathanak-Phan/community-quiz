@@ -74,6 +74,11 @@ class CategoryController extends Controller
             'user_id' => $request->user()->id
         ]);
 
+        \App\Models\ActivityLog::log(
+            'category_created',
+            "Created a new quiz category: '{$category->name}' (ID: {$category->id})."
+        );
+
         return response()->json($category, 201);
     }
 
@@ -152,6 +157,11 @@ class CategoryController extends Controller
             'color' => $request->color,
         ]);
 
+        \App\Models\ActivityLog::log(
+            'category_updated',
+            "Updated quiz category '{$category->name}' (ID: {$category->id})."
+        );
+
         return response()->json($category);
     }
 
@@ -179,7 +189,14 @@ class CategoryController extends Controller
     {
         $this->authorize('delete', $category);
 
+        $categoryName = $category->name;
+        $categoryId = $category->id;
         $category->delete();
+
+        \App\Models\ActivityLog::log(
+            'category_deleted',
+            "Deleted quiz category '{$categoryName}' (ID: {$categoryId})."
+        );
 
         return response()->json([
             'message' => 'Deleted successfully'

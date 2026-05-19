@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Toast from "../../components/ui/Toast";
 import SEO from "../../components/common/SEO";
+import UserAvatar from "../../components/ui/UserAvatar";
 
 export default function QuizAttempts() {
     const { quizId } = useParams();
@@ -598,17 +599,21 @@ export default function QuizAttempts() {
                                 <tr key={attempt.id} className="group hover:bg-slate-50/50 transition-colors">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border overflow-hidden shrink-0 ${
-                                                attempt.is_anonymous 
-                                                ? 'bg-slate-50 border-slate-200' 
-                                                : 'bg-blue-50 border-blue-100'
-                                            }`}>
-                                                <img 
-                                                    src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(attempt.user?.name || attempt.anonymous_name || "Guest")}`} 
-                                                    alt="Challenger Avatar" 
-                                                    className="w-full h-full object-cover"
+                                            {!attempt.is_anonymous ? (
+                                                <UserAvatar 
+                                                    user={attempt.user} 
+                                                    size="md" 
+                                                    className="rounded-xl border border-blue-100 shadow-sm" 
                                                 />
-                                            </div>
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border border-slate-200 overflow-hidden shrink-0 bg-slate-50">
+                                                    <img 
+                                                        src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(attempt.anonymous_name || "Guest")}`} 
+                                                        alt="Challenger Avatar" 
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            )}
                                             <div>
                                                 <div className="flex items-center gap-2">
                                                     <p className="font-black text-slate-900 leading-tight">

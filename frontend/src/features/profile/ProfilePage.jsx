@@ -109,7 +109,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-32 pt-12">
+    <div className="min-h-screen bg-[#f8fafc] pb-24 sm:pb-32 pt-6 sm:pt-12">
       <SEO 
         title="My Profile Settings" 
         description="Manage your personal information, profile picture, and social links on QuizSphere."
@@ -124,15 +124,15 @@ export default function ProfilePage() {
       )}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6 sm:mb-12">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
                <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
-               <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase">Settings</h1>
+               <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight uppercase">Settings</h1>
             </div>
-            <p className="text-slate-500 font-medium ml-5">Customize your appearance and professional presence on the platform.</p>
+            <p className="text-slate-500 font-medium ml-5 text-xs sm:text-sm">Customize your appearance and professional presence on the platform.</p>
           </div>
-          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
              <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${loading ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}`}>
                 {loading ? 'Synchronizing...' : 'All changes saved'}
              </div>
@@ -142,23 +142,24 @@ export default function ProfilePage() {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Left Column: Avatar & Quick Info */}
-          <div className="lg:col-span-4 space-y-8">
-            <div className="bg-white rounded-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] border border-slate-100 p-10 relative overflow-hidden group">
+          <div className="lg:col-span-4 space-y-6 sm:space-y-8">
+            <div className="bg-white rounded-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] border border-slate-100 p-5 sm:p-8 md:p-10 relative overflow-hidden group">
                <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700">
                   <User size={120} />
                </div>
                
                <div className="flex flex-col items-center text-center relative z-10">
-                  <div className="relative mb-10">
-                    <div className="w-40 h-40 rounded-2xl overflow-hidden bg-slate-50 border-8 border-white shadow-2xl relative z-10 transition-transform duration-700 group-hover:scale-105">
+                  <div className="relative mb-6 sm:mb-10">
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-slate-50 border-4 sm:border-8 border-white shadow-2xl relative z-10 transition-transform duration-700 group-hover:scale-105">
                       <UserAvatar user={{...user, avatar: formData.avatar, name: formData.name}} size="full" className="w-full h-full object-cover" />
                     </div>
                     <button 
                       type="button"
                       onClick={() => document.getElementById('avatar-input').click()}
-                      className="absolute -bottom-2 -right-2 w-14 h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center border-4 border-white shadow-xl z-20 hover:bg-blue-600 transition-colors active:scale-90"
+                      className="absolute -bottom-2 -right-2 w-10 h-10 sm:w-14 sm:h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center border-2 sm:border-4 border-white shadow-xl z-20 hover:bg-blue-600 transition-colors active:scale-90 animate-bounce"
                     >
-                      <Camera size={24} />
+                      <Camera size={16} className="sm:hidden" />
+                      <Camera size={24} className="hidden sm:block" />
                     </button>
                     <input id="avatar-input" type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
                   </div>
@@ -173,7 +174,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div className="w-full h-px bg-slate-50 my-10"></div>
+                  <div className="w-full h-px bg-slate-50 my-6 sm:my-10"></div>
 
                   <div className="w-full space-y-4">
                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
@@ -190,7 +191,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Danger Zone or Account Info Card */}
-            <div className="bg-rose-50/50 rounded-[2rem] border border-rose-100 p-8 space-y-4">
+            <div className="bg-rose-50/50 rounded-[2rem] border border-rose-100 p-5 sm:p-8 space-y-4">
                <h3 className="text-[10px] font-black text-rose-600 uppercase tracking-widest flex items-center gap-2">
                   <AlertCircle size={14} /> Security Notice
                </h3>
@@ -204,18 +205,19 @@ export default function ProfilePage() {
           <div className="lg:col-span-8 space-y-8">
             
             {/* Section: Professional Identity */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 space-y-10">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-10">
                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                     <Briefcase size={24} />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                     <Briefcase size={20} className="sm:hidden" />
+                     <Briefcase size={24} className="hidden sm:block" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Professional Identity</h3>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">How people see you on the platform</p>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">Professional Identity</h3>
+                    <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">How people see you on the platform</p>
                   </div>
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                   <InputField 
                     label="Public Display Name" 
                     icon={<User size={18} />} 
@@ -249,14 +251,15 @@ export default function ProfilePage() {
             </div>
 
             {/* Section: Reach & Socials */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                {/* Location & Web */}
-               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 space-y-10">
+               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-10">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-                      <Globe size={24} />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
+                      <Globe size={20} className="sm:hidden" />
+                      <Globe size={24} className="hidden sm:block" />
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Reach</h3>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">Reach</h3>
                   </div>
                   <div className="space-y-6">
                      <InputField 
@@ -279,12 +282,13 @@ export default function ProfilePage() {
                </div>
 
                {/* Social Channels */}
-               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-10 space-y-10">
+               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-10">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
-                      <Users size={24} />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+                      <Users size={20} className="sm:hidden" />
+                      <Users size={24} className="hidden sm:block" />
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Socials</h3>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">Socials</h3>
                   </div>
                   <div className="space-y-6">
                      <InputField 
@@ -316,16 +320,16 @@ export default function ProfilePage() {
             </div>
 
             {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 p-10 bg-slate-900 rounded-2xl shadow-2xl shadow-slate-900/20 text-white relative overflow-hidden group">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 p-5 sm:p-8 md:p-10 bg-slate-900 rounded-2xl shadow-2xl shadow-slate-900/20 text-white relative overflow-hidden group">
                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                <div className="relative z-10 space-y-1 text-center sm:text-left">
                   <p className="text-xs font-black uppercase tracking-widest text-blue-400">Ready to go?</p>
-                  <p className="text-sm font-medium text-slate-400">Synchronize your profile across the platform.</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-400">Synchronize your profile across the platform.</p>
                </div>
                <button 
                  type="submit"
                  disabled={loading}
-                 className="relative z-10 px-12 py-5 bg-white text-slate-900 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 disabled:opacity-50 flex items-center gap-3 shrink-0"
+                 className="relative z-10 w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-5 bg-white text-slate-900 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-600 hover:text-white transition-all shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 shrink-0"
                >
                  {loading ? "Processing..." : "Save Settings"}
                  {!loading && <CheckCircle2 size={18} />}

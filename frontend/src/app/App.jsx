@@ -38,6 +38,7 @@ import BecomeCreatorPage from "../features/profile/BecomeCreatorPage";
 import ProfilePage from "../features/profile/ProfilePage";
 import MyCommunities from "../features/communities/MyCommunities";
 import SettingsPage from "../features/admin/SettingsPage";
+import ActivityLogsPage from "../features/admin/ActivityLogsPage";
 import HelpCenter from "../features/help/HelpCenter";
 import PublicProfile from "../features/profile/PublicProfile";
 
@@ -120,6 +121,14 @@ function App() {
               element={
                 <ProtectedRoute roles={["admin"]}>
                   <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/activity-logs"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <ActivityLogsPage />
                 </ProtectedRoute>
               }
             />

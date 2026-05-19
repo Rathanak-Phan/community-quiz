@@ -7,7 +7,8 @@ import {
   LogOut, 
   ShieldCheck,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Activity
 } from 'lucide-react';
 
 import { useAuth } from '../../../providers/AuthContext';
@@ -22,6 +23,7 @@ const AdminSidebar = () => {
     { icon: <Tag size={20} />, label: 'Categories', path: '/admin/categories' },
     { icon: <AlertTriangle size={20} />, label: 'Moderate Quizzes', path: '/admin/moderation/quizzes' },
     { icon: <Users size={20} />, label: 'Moderate Communities', path: '/admin/moderation/communities' },
+    { icon: <Activity size={20} />, label: 'Activity Logs', path: '/admin/activity-logs' },
   ];
 
   return (
