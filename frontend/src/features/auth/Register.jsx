@@ -36,7 +36,7 @@ function Register() {
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
-    import('../../services/settingService').then(m => m.getSettings()).then(res => {
+    import('../admin/services/settingService').then(m => m.getSettings()).then(res => {
       setSettings(res.data);
       if (res.data.site_name) {
         document.title = `${res.data.site_name} | Create Account`;

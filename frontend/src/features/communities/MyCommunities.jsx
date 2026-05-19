@@ -6,6 +6,7 @@ import CommunityCard from "./components/CommunityCard";
 import CommunityFormModal from "./components/CommunityFormModal";
 import JoinModal from "./components/JoinModal";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 import { deleteCommunity } from "../../api/communityApi";
 import { useAuth } from "../../providers/AuthContext";
 
@@ -72,6 +73,11 @@ export default function MyCommunities() {
 
   return (
     <div className="space-y-12 pb-20">
+      <SEO 
+        title="My Communities"
+        description="The social learning circles and community hubs you've joined or created on QuizSphere."
+        url="/communities/my"
+      />
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
         <div className="space-y-4">

@@ -16,9 +16,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 import api, { STORAGE_URL } from '../../config/api';
-import adminService from '../../services/adminService';
+import adminService from './services/adminService';
 import Toast from '../../components/ui/Toast';
 import Pagination from './components/Pagination';
+import SEO from '../../components/common/SEO';
 
 const AdminCommunitiesPage = () => {
   const [communities, setCommunities] = useState([]);
@@ -84,6 +85,11 @@ const AdminCommunitiesPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-16 py-8 md:py-16 pb-32 overflow-x-hidden">
+      <SEO 
+        title="Group Moderation | Administrative Portal"
+        description="Monitor community hub growths and enforce platform-wide safety standards on QuizSphere."
+        url="/admin/moderation/communities"
+      />
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 md:gap-12">
         <div className="space-y-4 md:space-y-6">

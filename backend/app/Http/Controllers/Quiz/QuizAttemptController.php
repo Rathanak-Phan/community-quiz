@@ -179,6 +179,8 @@ class QuizAttemptController extends Controller
                     'max_score' => $results['max_score'],
                     'grading_status' => $results['grading_status'],
                     'is_anonymous' => $attempt->is_anonymous,
+                    'anonymous_name' => $attempt->anonymous_name,
+                    'challenge_token' => $attempt->challenge_token,
                     'submitted_at' => now(),
                 ]);
 
@@ -425,6 +427,184 @@ class QuizAttemptController extends Controller
             ->get();
 
         return QuizAttemptResource::collection($attempts);
+    }
+
+    /**
+     * Delete all attempts and submissions from guest/anonymous accounts for a specific quiz,
+     * optionally filtered by a specific challenge token.
+     */
+    public function resetGuests(Request $request, Quiz $quiz)
+    {
+        $user = auth()->user();
+
+        // Authorization: Admin or Quiz Creator
+        if (!$user->isAdmin() && $quiz->created_by !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        $challengeToken = $request->input('challenge_token');
+
+        // Query guest attempts for this quiz
+        $attemptsQuery = QuizAttempt::where('quiz_id', $quiz->id)
+            ->where('is_anonymous', true);
+
+        // Query guest submissions for this quiz
+        $submissionsQuery = Submission::where('quiz_id', $quiz->id)
+            ->where('is_anonymous', true);
+
+        if ($challengeToken) {
+            $attemptsQuery->where('challenge_token', $challengeToken);
+            $submissionsQuery->where('challenge_token', $challengeToken);
+        }
+
+        // Delete them
+        $deletedAttempts = $attemptsQuery->delete();
+        $deletedSubmissions = $submissionsQuery->delete();
+
+        return response()->json([
+            'message' => 'Guest results reset successfully',
+            'deleted_attempts' => $deletedAttempts,
+            'deleted_submissions' => $deletedSubmissions
+        ]);
+    }
+
+    /**
+     * Start a public anonymous quiz attempt.
+     */
+    public function startPublic(Request $request, Quiz $quiz)
+    {
+        $request->validate([
+            'anonymous_name' => 'required|string|max:255',
+            'challenge_token' => 'nullable|string|max:255',
+        ]);
+
+        // Create anonymous attempt
+        $attempt = QuizAttempt::create([
+            'user_id' => null,
+            'quiz_id' => $quiz->id,
+            'mode' => 'scored',
+            'is_anonymous' => true,
+            'anonymous_name' => $request->anonymous_name,
+            'challenge_token' => $request->challenge_token,
+            'status' => 'in_progress',
+            'started_at' => now(),
+        ]);
+
+        return (new QuizAttemptResource($attempt))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    /**
+     * Show public anonymous attempt details.
+     */
+    public function showPublic(QuizAttempt $attempt)
+    {
+        if (!$attempt->is_anonymous) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        $attempt->load(['quiz.questions.options', 'answers.question.shortAnswer']);
+        return new QuizAttemptDetailResource($attempt);
+    }
+
+    /**
+     * Save an answer for public anonymous attempt.
+     */
+    public function submitAnswerPublic(Request $request, QuizAttempt $attempt)
+    {
+        if (!$attempt->is_anonymous) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        if ($attempt->status !== 'in_progress') {
+            return response()->json(['message' => 'This attempt is not active.'], Response::HTTP_FORBIDDEN);
+        }
+
+        $request->validate([
+            'question_id' => 'required|integer|exists:questions,id',
+            'selected_option_id' => 'nullable|integer|exists:question_options,id',
+            'answer_boolean' => 'nullable|boolean',
+            'answer_text' => 'nullable|string',
+        ]);
+
+        $answer = AttemptAnswer::updateOrCreate(
+            ['quiz_attempt_id' => $attempt->id, 'question_id' => $request->question_id],
+            $request->only(['selected_option_id', 'answer_boolean', 'answer_text'])
+        );
+
+        return new AttemptAnswerResource($answer);
+    }
+
+    /**
+     * Submit a public anonymous quiz attempt.
+     */
+    public function submitPublic(Request $request, QuizAttempt $attempt)
+    {
+        if (!$attempt->is_anonymous) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        if ($attempt->status !== 'in_progress') {
+            return response()->json(['message' => 'This attempt is already submitted.'], Response::HTTP_FORBIDDEN);
+        }
+
+        return DB::transaction(function () use ($attempt) {
+            // 1. Calculate score
+            $results = $this->scoringService->calculateScore($attempt);
+
+            // 2. Update attempt status
+            $attempt->update([
+                'status' => 'submitted',
+                'score' => $results['total_score'],
+                'max_score' => $results['max_score'],
+                'grading_status' => $results['grading_status'],
+                'completed_at' => now(),
+            ]);
+
+            // 3. Create permanent Submission record
+            $submission = Submission::create([
+                'quiz_id' => $attempt->quiz_id,
+                'user_id' => null,
+                'quiz_attempt_id' => $attempt->id,
+                'score' => $results['total_score'],
+                'max_score' => $results['max_score'],
+                'grading_status' => $results['grading_status'],
+                'is_anonymous' => true,
+                'anonymous_name' => $attempt->anonymous_name,
+                'challenge_token' => $attempt->challenge_token,
+                'submitted_at' => now(),
+            ]);
+
+            // 4. Save individual answers to permanent table
+            foreach ($attempt->answers as $attemptAnswer) {
+                Answer::create([
+                    'submission_id' => $submission->id,
+                    'question_id' => $attemptAnswer->question_id,
+                    'selected_option_id' => $attemptAnswer->selected_option_id,
+                    'selected_options' => $attemptAnswer->selected_options,
+                    'answer_boolean' => $attemptAnswer->answer_boolean,
+                    'answer_text' => $attemptAnswer->answer_text,
+                    'is_correct' => $attemptAnswer->is_correct,
+                    'score' => $attemptAnswer->score,
+                ]);
+            }
+
+            return new QuizAttemptDetailResource($attempt->load(['quiz.questions.options', 'answers.question.shortAnswer']));
+        });
+    }
+
+    /**
+     * Show review details for completed public anonymous attempt.
+     */
+    public function reviewPublic(QuizAttempt $attempt)
+    {
+        if (!$attempt->is_anonymous) {
+            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+
+        $attempt->load(['quiz.questions.options', 'answers.question.options', 'answers.question.shortAnswer']);
+        return new QuizAttemptDetailResource($attempt);
     }
 }
 

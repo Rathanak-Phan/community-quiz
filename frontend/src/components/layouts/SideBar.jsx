@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
@@ -9,8 +9,8 @@ import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
 import RoleBadge from "../ui/RoleBadge";
 import RoleNavigator from "../ui/RoleNavigator";
-import adminService from "../../services/adminService";
-import { getSettings } from "../../services/settingService";
+import adminService from "../../features/admin/services/adminService";
+import { getSettings } from "../../features/admin/services/settingService";
 import { STORAGE_URL } from "../../config/api";
 
 const navItems = [
@@ -41,10 +41,14 @@ const navItems = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [settings, setSettings] = useState({});
+
+  // Check if it's the active quiz attempt page
+  const isQuizAttemptPage = location.pathname.match(/^\/attempts\/[^/]+$/);
 
   useEffect(() => {
     getSettings().then(res => {
@@ -128,7 +132,7 @@ export default function Sidebar() {
       {/* Background decoration */}
       <div className={`fixed inset-0 bg-gradient-to-br ${theme.gradient} pointer-events-none z-0`}></div>
       {/* Mobile Backdrop */}
-      {isMobileMenuOpen && (
+      {isMobileMenuOpen && !isQuizAttemptPage && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
@@ -136,10 +140,11 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar */}
-      <aside className={`
-        fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
-        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
-      `}>
+      {!isQuizAttemptPage && (
+        <aside className={`
+          fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+        `}>
         <div className="p-8 flex items-center justify-between border-b border-slate-50">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
@@ -229,55 +234,58 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
         {/* Top Header */}
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-10 shrink-0">
-          <div className="flex items-center gap-4">
-            <button 
-              className="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu size={24} />
-            </button>
-            <div className="hidden sm:relative sm:block w-64 lg:w-96 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search everything..." 
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-full outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all font-medium text-sm"
-              />
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4 lg:gap-8">
-            <div className="hidden xs:flex items-center gap-2">
-              <button className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition relative">
-                <Bell size={20} />
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white shadow-sm"></span>
+        {!isQuizAttemptPage && (
+          <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-10 shrink-0">
+            <div className="flex items-center gap-4">
+              <button 
+                className="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl"
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <Menu size={24} />
               </button>
+              <div className="hidden sm:relative sm:block w-64 lg:w-96 group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Search everything..." 
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-full outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all font-medium text-sm"
+                />
+              </div>
             </div>
             
-            <div className="flex items-center gap-3 lg:gap-4 lg:pl-8 lg:border-l lg:border-slate-100">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-black text-slate-900 tracking-tight">{user?.name || "Anonymous"}</p>
-                <RoleBadge role={roleName} />
+            <div className="flex items-center gap-4 lg:gap-8">
+              <div className="hidden xs:flex items-center gap-2">
+                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition relative">
+                  <Bell size={20} />
+                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white shadow-sm"></span>
+                </button>
               </div>
-              <UserAvatar user={user} size="md" className="lg:w-12 lg:h-12 border-2 border-white" />
+              
+              <div className="flex items-center gap-3 lg:gap-4 lg:pl-8 lg:border-l lg:border-slate-100">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-black text-slate-900 tracking-tight">{user?.name || "Anonymous"}</p>
+                  <RoleBadge role={roleName} />
+                </div>
+                <UserAvatar user={user} size="md" className="lg:w-12 lg:h-12 border-2 border-white" />
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-10 bg-slate-50/50">
-          <div className="max-w-6xl mx-auto">
+        <main className={`flex-1 overflow-y-auto ${isQuizAttemptPage ? 'p-0' : 'p-3 sm:p-6 lg:p-10'} bg-slate-50/50`}>
+          <div className={isQuizAttemptPage ? '' : 'max-w-6xl mx-auto'}>
             <Outlet />
           </div>
         </main>
         
         {/* Role Navigator for Demo Context */}
-        <RoleNavigator role={roleName} />
+        {!isQuizAttemptPage && <RoleNavigator role={roleName} />}
       </div>
     </div>
   );

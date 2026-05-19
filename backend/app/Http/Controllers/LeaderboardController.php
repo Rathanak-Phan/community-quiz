@@ -22,6 +22,7 @@ class LeaderboardController extends Controller
 
         $query = QuizAttempt::where('status', 'submitted')
             ->where('grading_status', 'graded')
+            ->whereNotNull('user_id')
             ->with(['user.role', 'quiz']);
 
         if ($period === 'month') {
@@ -37,13 +38,14 @@ class LeaderboardController extends Controller
 
         $rank = 1;
         $data = $attempts->map(function ($attempt) use (&$rank) {
+            $userName = $attempt->user ? $attempt->user->name : ($attempt->is_anonymous ? 'Anonymous' : 'Guest');
             return [
                 'id' => $attempt->id,
                 'userId' => $attempt->user_id,
                 'rank' => $rank++,
-                'name' => $attempt->user->name,
-                'userRole' => $attempt->user->role?->name,
-                'avatar' => strtoupper(substr($attempt->user->name, 0, 1)),
+                'name' => $userName,
+                'userRole' => $attempt->user?->role?->name ?: 'Learner',
+                'avatar' => strtoupper(substr($userName, 0, 1)),
                 'is_anonymous' => (bool)$attempt->is_anonymous,
                 'quizName' => $attempt->quiz->title,
                 'score' => $attempt->score,

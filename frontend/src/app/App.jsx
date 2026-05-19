@@ -23,6 +23,7 @@ import MyQuizzes from "../features/quizzes/MyQuizzes";
 import MyActivity from "../features/quizzes/MyActivity";
 import QuizAttempts from "../features/quizzes/QuizAttempts";
 import SharedResult from "../features/quizzes/SharedResult";
+import QuizGuestScoreboard from "../features/quizzes/QuizGuestScoreboard";
 import MainLayout from "../components/layouts/MainLayout";
 import Sidebar from "../components/layouts/SideBar";
 import CommunityDetail from "../features/communities/CommunityDetail";
@@ -36,8 +37,8 @@ import FavoritesPage from "../features/favorites/FavoritesPage";
 import BecomeCreatorPage from "../features/profile/BecomeCreatorPage";
 import ProfilePage from "../features/profile/ProfilePage";
 import MyCommunities from "../features/communities/MyCommunities";
-import SettingsPage from "../page/admin/SettingsPage";
-import HelpCenter from "../page/HelpCenter";
+import SettingsPage from "../features/admin/SettingsPage";
+import HelpCenter from "../features/help/HelpCenter";
 import PublicProfile from "../features/profile/PublicProfile";
 
 import { AuthProvider } from "../providers/AuthContext";
@@ -64,8 +65,11 @@ function App() {
             <Route path="/quizzes/:quizId" element={<QuizDetail />} />
             <Route path="/quiz/:quizId" element={<QuizDetail />} /> {/* Alias for share links */}
             <Route path="/result/:submissionId" element={<SharedResult />} />
+            <Route path="/quizzes/:quizId/scoreboard" element={<QuizGuestScoreboard />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile/:id" element={<PublicProfile />} />
+            <Route path="/public/attempts/:attemptId" element={<QuizAttempt isPublic={true} />} />
+            <Route path="/public/attempts/:attemptId/review" element={<QuizReview isPublic={true} />} />
           </Route>
 
           {/* PROTECTED DASHBOARD - Always uses Sidebar */}

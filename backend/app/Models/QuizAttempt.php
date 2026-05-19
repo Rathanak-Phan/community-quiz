@@ -14,6 +14,8 @@ class QuizAttempt extends Model
         'user_id',
         'mode',
         'is_anonymous',
+        'anonymous_name',
+        'challenge_token',
         'status',
         'started_at',
         'completed_at',

@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles, HelpCircle, BarChart2, MoreVertical, Eye } from "lucide-react";
-import { getMyQuizzes, deleteQuiz } from "../../services/quizService";
+import { getMyQuizzes, deleteQuiz } from "./services/quizService";
 import Toast from "../../components/ui/Toast";
 import QuizFormModal from "./components/QuizFormModal";
 import { STORAGE_URL } from "../../config/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
 import ConfirmModal from "../../components/ui/ConfirmModal";
+import SEO from "../../components/common/SEO";
 
 export default function MyQuizzes() {
     const navigate = useNavigate();
@@ -74,6 +75,11 @@ export default function MyQuizzes() {
 
     return (
         <div className="space-y-12">
+            <SEO 
+                title="My Created Quizzes"
+                description="Manage, edit, analyze, and build interactive quizzes on the QuizSphere creator dashboard."
+                url="/quizzes/my"
+            />
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                 <div className="space-y-2">

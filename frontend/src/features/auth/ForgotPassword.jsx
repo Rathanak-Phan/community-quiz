@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, Loader2, CheckCircle, GraduationCap } from "lucide-react";
-import { getSettings } from "../../services/settingService";
+import { getSettings } from "../admin/services/settingService";
 import { useEffect } from "react";
 import { STORAGE_URL, BASE_URL } from "../../config/api";
+import SEO from "../../components/common/SEO";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -80,6 +81,11 @@ function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 md:p-8 font-sans">
+      <SEO 
+        title="Forgot Password"
+        description="Recover system access. Receive verification instructions to reset your account password securely."
+        url="/forgot-password"
+      />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>
         <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-float" style={{ animationDelay: '-1.5s' }}></div>

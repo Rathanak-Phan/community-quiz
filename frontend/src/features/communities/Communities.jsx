@@ -160,6 +160,14 @@ export default function Communities() {
     }
   };
 
+  const handleFavoriteToggle = useCallback((communityId, isFavorited) => {
+    setCommunities((prev) =>
+      prev.map((c) =>
+        c.id === communityId ? { ...c, is_favorited: isFavorited } : c
+      )
+    );
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-20 pb-32 overflow-x-hidden">
       <SEO 
@@ -251,6 +259,7 @@ export default function Communities() {
               onEdit={(c) => { setEditData(c); setIsModalOpen(true); }}
               onDelete={handleDelete}
               onApprove={(c) => navigate(`/communities/${c.id}/requests`)}
+              onFavoriteToggle={handleFavoriteToggle}
             />
           ))}
         </div>

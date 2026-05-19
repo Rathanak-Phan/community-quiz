@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Lock, ArrowLeft, Loader2, CheckCircle, GraduationCap, ShieldCheck } from "lucide-react";
-import { getSettings } from "../../services/settingService";
+import { getSettings } from "../admin/services/settingService";
 import { STORAGE_URL, BASE_URL } from "../../config/api";
+import SEO from "../../components/common/SEO";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -62,6 +63,11 @@ function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 md:p-8 font-sans">
+      <SEO 
+        title="Reset Password"
+        description="Choose a strong, secure new password for your QuizSphere account to update your credentials."
+        url="/reset-password"
+      />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>
         <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-float" style={{ animationDelay: '-1.5s' }}></div>

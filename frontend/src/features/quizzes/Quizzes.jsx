@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search, BookOpen, Clock, Users, ChevronRight, Edit3, Trash2, Heart, Play, Sparkles, HelpCircle } from "lucide-react";
-import { getQuizzes, deleteQuiz } from "../../services/quizService";
-import { toggleFavorite } from "../../services/favoriteService";
+import { getQuizzes, deleteQuiz } from "./services/quizService";
+import { toggleFavorite } from "../favorites/services/favoriteService";
 import Toast from "../../components/ui/Toast";
 import QuizFormModal from "./components/QuizFormModal";
 import { STORAGE_URL } from "../../config/api";

@@ -308,6 +308,7 @@ class QuizController extends Controller
         $attempts = QuizAttempt::where('quiz_id', $quiz->id)
             ->where('status', 'submitted')
             ->where('grading_status', 'graded')
+            ->whereNotNull('user_id')
             ->with('user')
             ->orderByDesc('score')
             ->orderByDesc('completed_at') // Tie-breaker: latest submission first per scope

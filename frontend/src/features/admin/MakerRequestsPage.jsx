@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, CheckCircle2, XCircle, Clock, Search, ShieldCheck } from 'lucide-react';
 import api from '../../config/api';
-import adminService from '../../services/adminService';
+import adminService from './services/adminService';
 import Toast from '../../components/ui/Toast';
 import Pagination from './components/Pagination';
+import SEO from '../../components/common/SEO';
 
 const MakerRequestsPage = () => {
     const [requests, setRequests] = useState([]);
@@ -56,6 +57,11 @@ const MakerRequestsPage = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-16 py-8 md:py-12 overflow-x-hidden">
+            <SEO 
+                title="Maker Applications | Administrative Portal"
+                description="Review and authorize creator permissions and applications on QuizSphere."
+                url="/admin/maker-requests"
+            />
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">

@@ -14,7 +14,7 @@ import {
 
 import googleLogo from "../../assets/images/google_logo.png";
 import githubLogo from "../../assets/images/github_logo.png";
-import { getSettings } from "../../services/settingService";
+import { getSettings } from "../admin/services/settingService";
 import { STORAGE_URL, BASE_URL } from "../../config/api";
 
 function Login() {

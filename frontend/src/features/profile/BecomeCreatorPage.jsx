@@ -65,7 +65,7 @@ const BecomeCreatorPage = () => {
       )}
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-[#0f172a] rounded-[2.5rem] p-12 md:p-24 text-white mb-16 shadow-2xl shadow-slate-900/40">
+      <div className="relative overflow-hidden bg-[#0f172a] rounded-2xl p-12 md:p-24 text-white mb-16 shadow-2xl shadow-slate-900/40">
         <div className="absolute top-0 right-0 w-full h-full opacity-20 pointer-events-none">
            <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[120%] bg-blue-600 rounded-full blur-[120px] opacity-30 animate-pulse"></div>
            <div className="absolute bottom-[-20%] left-[-10%] w-[40%] h-[80%] bg-indigo-600 rounded-full blur-[100px] opacity-20 animate-pulse-slow"></div>
@@ -123,7 +123,7 @@ const BecomeCreatorPage = () => {
 
       {/* Rejection Alert */}
       {status === 'rejected' && (
-        <div className="mb-12 p-8 bg-rose-50 border-2 border-rose-100 rounded-3xl flex flex-col md:flex-row items-center gap-6">
+        <div className="mb-12 p-8 bg-rose-50 border-2 border-rose-100 rounded-2xl flex flex-col md:flex-row items-center gap-6">
           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm shrink-0">
             <Shield size={32} />
           </div>
@@ -179,7 +179,7 @@ const BecomeCreatorPage = () => {
       </div>
 
       {/* FAQ / Trust Section */}
-      <div className="mt-20 p-12 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm">
+      <div className="mt-20 p-12 bg-white border border-slate-100 rounded-2xl shadow-sm">
         <h2 className="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tight text-center">Frequently Asked Questions</h2>
         <div className="grid md:grid-cols-2 gap-10">
           <div className="space-y-4">
@@ -197,7 +197,7 @@ const BecomeCreatorPage = () => {
 };
 
 const BenefitCard = ({ icon, title, description }) => (
-  <div className="p-8 bg-white border border-slate-100 rounded-3xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group">
+  <div className="p-8 bg-white border border-slate-100 rounded-2xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group">
     <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
       {icon}
     </div>

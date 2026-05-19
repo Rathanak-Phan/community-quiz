@@ -101,6 +101,71 @@ const ShareQuizModal = ({ isOpen, onClose, quizId, quizTitle }) => {
                 </div>
             </div>
 
+            {/* QR Code Container */}
+            <div className="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-100 rounded-2xl gap-3">
+                <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-200/60">
+                    <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}`} 
+                        alt="Quiz QR Code" 
+                        className="w-[180px] h-[180px] object-contain"
+                    />
+                </div>
+                <div className="text-center">
+                    <p className="text-xs font-black text-slate-900 uppercase tracking-wide">
+                        Scan QR Code
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-bold mt-0.5 leading-snug">
+                        Guests can scan to attempt instantly without an account
+                    </p>
+                </div>
+                <button
+                    onClick={() => {
+                        const url = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(shareUrl)}`;
+                        window.open(url, '_blank');
+                    }}
+                    className="px-4 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg font-bold text-[10px] uppercase tracking-wider transition-colors active:scale-95 cursor-pointer hover:bg-slate-50"
+                >
+                    Open Full QR
+                </button>
+            </div>
+            
+            {/* Social Buttons */}
+            <div className="space-y-3 pt-2 text-left">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                    Share directly to
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                    <button 
+                        onClick={() => {
+                            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+                        }}
+                        className="py-3 bg-[#1877F2]/10 hover:bg-[#1877F2] text-[#1877F2] hover:text-white border border-[#1877F2]/20 hover:border-transparent rounded-xl font-bold text-[10px] uppercase tracking-wider flex flex-col items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                    >
+                        <FacebookIcon size={16} />
+                        <span>Facebook</span>
+                    </button>
+                    <button 
+                        onClick={() => {
+                            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                        }}
+                        className="py-3 bg-[#0A66C2]/10 hover:bg-[#0A66C2] text-[#0A66C2] hover:text-white border border-[#0A66C2]/20 hover:border-transparent rounded-xl font-bold text-[10px] uppercase tracking-wider flex flex-col items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                    >
+                        <LinkedInIcon size={16} />
+                        <span>LinkedIn</span>
+                    </button>
+                    <button 
+                        onClick={() => {
+                            let text = `Check out this awesome quiz: "${quizTitle}"!`;
+                            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`, '_blank');
+                        }}
+                        className="py-3 bg-slate-100 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200 hover:border-transparent rounded-xl font-bold text-[10px] uppercase tracking-wider flex flex-col items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                    >
+                        <XIcon size={16} />
+                        <span>X</span>
+                    </button>
+                </div>
+            </div>
+
             <div className="pt-4 flex gap-4">
                 <button
                     onClick={onClose}
@@ -122,5 +187,23 @@ const ShareQuizModal = ({ isOpen, onClose, quizId, quizTitle }) => {
     </div>
   );
 };
+
+const FacebookIcon = ({ size = 24 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+    </svg>
+);
+
+const LinkedInIcon = ({ size = 24 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    </svg>
+);
+
+const XIcon = ({ size = 24 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+    </svg>
+);
 
 export default ShareQuizModal;

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -98,12 +99,14 @@ class SocialAuthController extends Controller
             $email = $socialUser->getId() . "@{$provider}.com";
         }
 
+        $userRole = Role::where('name', 'user')->first();
+
         return User::firstOrCreate(
             ['email' => $email],
             [
                 'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Social User',
                 'password' => Hash::make(Str::random(24)),
-                'role_id' => 3, // Default: User
+                'role_id' => $userRole?->id ?? 3, // Default: User
                 'email_verified_at' => now(),
             ]
         );

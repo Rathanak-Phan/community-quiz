@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '../components/common/SEO';
 import { 
   Search, 
   Book, 
@@ -67,6 +68,11 @@ export default function HelpCenter() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 pb-20">
+      <SEO 
+        title="Help Center"
+        description="Search our knowledge base, browse articles and guides, or get in touch with live support at the QuizSphere Help Center."
+        url="/help"
+      />
       {/* External Help Center Notice */}
       {settings.help_center_type === 'external' && (
         <div className="bg-blue-600 p-8 rounded-2xl text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-blue-600/20 animate-in slide-in-from-top-4 duration-700">

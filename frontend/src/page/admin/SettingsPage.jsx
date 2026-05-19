@@ -15,6 +15,7 @@ import {
 import { getSettings, updateSettings } from '../../services/settingService';
 import { STORAGE_URL } from '../../config/api';
 import Toast from '../../components/ui/Toast';
+import SEO from '../../components/common/SEO';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
@@ -186,6 +187,11 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 pb-20">
+      <SEO 
+        title="Site Settings | Administrative Portal"
+        description="Configure global platform settings, features, maintenance mode, and support options on QuizSphere."
+        url="/admin/settings"
+      />
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
           <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase">Site <span className="text-blue-600">Settings.</span></h1>

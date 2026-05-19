@@ -7,12 +7,12 @@ import {
 } from 'lucide-react';
 import api from "../../config/api";
 import { useAuth } from "../../providers/AuthContext";
-import { getCommunities } from "../../services/communityService";
-import { getTopUsers, getSystemStats } from "../../services/leaderboardService";
-import { getTrendingQuizzes } from "../../services/quizService";
-import { toggleFavorite } from "../../services/favoriteService";
+import { getCommunities } from "../communities/services/communityService";
+import { getTopUsers, getSystemStats } from "../leaderboard/services/leaderboardService";
+import { getTrendingQuizzes } from "../quizzes/services/quizService";
+import { toggleFavorite } from "../favorites/services/favoriteService";
 import Toast from "../../components/ui/Toast";
-import { getSettings } from "../../services/settingService";
+import { getSettings } from "../admin/services/settingService";
 import { STORAGE_URL } from "../../config/api";
 import SEO from "../../components/common/SEO";
 

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPendingReviews } from "../../services/attemptService";
+import { getPendingReviews } from "../quizzes/services/attemptService";
 import { ClipboardCheck, User, Clock, ChevronRight, AlertCircle, Sparkles } from "lucide-react";
 import Pagination from "../admin/components/Pagination";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 
 export default function ManualReviewList() {
     const [reviews, setReviews] = useState([]);
@@ -31,6 +32,11 @@ export default function ManualReviewList() {
 
     return (
         <div className="max-w-7xl mx-auto px-6 space-y-12 pb-20">
+            <SEO 
+                title="Pending Reviews | Assessment Center"
+                description="Grade short-answer submissions, review student responses, and provide dynamic performance feedback on QuizSphere."
+                url="/reviews/pending"
+            />
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
                 <div className="space-y-4">

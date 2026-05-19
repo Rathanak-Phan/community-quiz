@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import api from "../../config/api";
 import Toast from "../../components/ui/Toast";
+import SEO from "../../components/common/SEO";
 
 export default function MyActivity() {
     const navigate = useNavigate();
@@ -63,6 +64,11 @@ export default function MyActivity() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-12 pb-20">
+            <SEO 
+                title="My Learning Activity"
+                description="Track your quiz progress, performance scores, global leaderboards, and accuracy statistics on QuizSphere."
+                url="/activity"
+            />
             {/* Header & Stats Section */}
             <div className="space-y-8">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">

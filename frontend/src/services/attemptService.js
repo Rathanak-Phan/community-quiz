@@ -20,6 +20,22 @@ export const submitAttempt = (attemptId, data = {}) =>
 export const getReview = (attemptId) =>
   apiClient.get(`/attempts/${attemptId}/review`);
 
+// Public / Guest attempt endpoints (Unauthenticated)
+export const startAttemptPublic = (quizId, data = { mode: 'practice', anonymous_name: '' }) =>
+  apiClient.post(`/public/quizzes/${quizId}/start`, data);
+
+export const getAttemptPublic = (attemptId) =>
+  apiClient.get(`/public/attempts/${attemptId}`);
+
+export const submitAnswerPublic = (attemptId, data) =>
+  apiClient.post(`/public/attempts/${attemptId}/answer`, data);
+
+export const submitAttemptPublic = (attemptId, data = {}) =>
+  apiClient.post(`/public/attempts/${attemptId}/submit`, data);
+
+export const getReviewPublic = (attemptId) =>
+  apiClient.get(`/public/attempts/${attemptId}/review`);
+
 export const gradeAnswer = (answerId, data) =>
   apiClient.put(`/answers/${answerId}/grade`, data);
 

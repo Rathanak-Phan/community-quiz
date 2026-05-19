@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import api from '../../config/api';
 import Toast from '../../components/ui/Toast';
+import SEO from '../../components/common/SEO';
 import UserFormModal from './components/UserFormModal';
 import Pagination from './components/Pagination';
 import ConfirmModal from '../../components/ui/ConfirmModal';
@@ -123,6 +124,11 @@ const UserManagement = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-16 py-8 md:py-16 pb-32 overflow-x-hidden">
+      <SEO 
+        title="User Registry | Administrative Portal"
+        description="Monitor system access, manage permissions, and oversee platform participants."
+        url="/admin/users"
+      />
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 md:gap-12">
         <div className="space-y-4 md:space-y-6">

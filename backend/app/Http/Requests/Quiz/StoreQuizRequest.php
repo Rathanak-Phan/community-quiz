@@ -45,7 +45,7 @@ class StoreQuizRequest extends FormRequest
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'status' => 'nullable|string|in:draft,published',
             'has_timer' => 'nullable|boolean',
-            'default_time_limit' => 'nullable|integer|min:5',
+            'default_time_limit' => 'nullable|integer|min:0',
         ];
     }
 }

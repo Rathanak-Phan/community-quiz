@@ -8,20 +8,20 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $submission->is_anonymous ? 'Someone' : $submission->user->name }} just scored {{ $submission->score }}/{{ $submission->max_score }}!">
+    <meta property="og:title" content="{{ $submission->is_anonymous ? 'Someone' : ($submission->user?->name ?? 'Unknown User') }} just scored {{ $submission->score }}/{{ $submission->max_score }}!">
     <meta property="og:description" content="Check out the results for the '{{ $submission->quiz->title }}' quiz on Community Quiz platform.">
     <meta property="og:image" content="{{ $submission->quiz->cover_image ? asset('storage/' . $submission->quiz->cover_image) : asset('favicon.ico') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="{{ $submission->is_anonymous ? 'Someone' : $submission->user->name }} just scored {{ $submission->score }}/{{ $submission->max_score }}!">
+    <meta property="twitter:title" content="{{ $submission->is_anonymous ? 'Someone' : ($submission->user?->name ?? 'Unknown User') }} just scored {{ $submission->score }}/{{ $submission->max_score }}!">
     <meta property="twitter:description" content="Check out the results for the '{{ $submission->quiz->title }}' quiz on Community Quiz platform.">
 
     <!-- Auto-redirect to Frontend for real users -->
     <script>
         setTimeout(function() {
-            window.location.href = "{{ $frontendUrl }}";
+            window.location.href = "{{ $frontend_url }}";
         }, 1000);
     </script>
 
@@ -35,11 +35,12 @@
 <body>
     <div class="card">
         <h2>Quiz Result</h2>
-        <p>{{ $submission->is_anonymous ? 'Anonymous User' : $submission->user->name }} completed</p>
+        <p>{{ $submission->is_anonymous ? 'Anonymous User' : ($submission->user?->name ?? 'Unknown User') }} completed</p>
         <div class="quiz-title"><strong>{{ $submission->quiz->title }}</strong></div>
         <div class="score">{{ $submission->score }} / {{ $submission->max_score }}</div>
         <p>Redirecting you to the results page...</p>
-        <a href="{{ $frontendUrl }}" class="btn">View Full Results</a>
+        <a href="{{ $frontend_url }}" class="btn">View Full Results</a>
     </div>
 </body>
 </html>
+

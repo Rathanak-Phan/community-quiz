@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User, Menu, X, GraduationCap } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
 import UserAvatar from "../ui/UserAvatar";
-import { getSettings } from "../../services/settingService";
+import { getSettings } from "../../features/admin/services/settingService";
 import { STORAGE_URL } from "../../config/api";
 
 export default function MainLayout() {
@@ -71,10 +71,10 @@ export default function MainLayout() {
                 {user?.role?.name === 'user' && (
                   <button 
                     onClick={() => navigate("/become-creator")}
-                    className="group relative flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-[10px] md:text-sm hover:shadow-xl hover:shadow-blue-600/20 transition-all active:scale-95 overflow-hidden"
+                    className="group relative hidden md:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-blue-600/20 transition-all active:scale-95 overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                    <UserPlus size={16} className="hidden sm:block relative z-10" />
+                    <UserPlus size={16} className="relative z-10" />
                     <span className="relative z-10">Become a Creator</span>
                   </button>
                 )}

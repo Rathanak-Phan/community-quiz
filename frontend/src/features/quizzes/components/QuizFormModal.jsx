@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { createQuiz, updateQuiz, applyDefaultTimer } from "../../../services/quizService";
-import { getCategories } from "../../../api/categoryApi";
-import { getMyCommunities } from "../../../api/communityApi";
+import { createQuiz, updateQuiz, applyDefaultTimer } from "../services/quizService";
+import { getCategories } from "../../categories/services/categoryService";
+import { getMyCommunities } from "../../communities/services/communityService";
 import { STORAGE_URL } from "../../../config/api";
 import { Cloud, X, Loader2 } from "lucide-react";
 

@@ -119,262 +119,275 @@ function CommunityFormModal({ isOpen, onClose, onSuccess, editData }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 p-8 z-10 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {isEditMode ? "Edit Community" : "Create New Community"}
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            {isEditMode
-              ? "Update your community details."
-              : "Establish a new space for experts and learners to share knowledge."}
-          </p>
+      {/* Modal Wrapper */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        {/* Header (Fixed) */}
+        <div className="p-5 sm:p-6 border-b border-slate-100 shrink-0">
+          <div className="flex justify-between items-start gap-4">
+            <div>
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-none uppercase">
+                {isEditMode ? "Edit Community" : "Create New Community"}
+              </h2>
+              <p className="mt-1.5 text-xs text-slate-500 font-medium leading-relaxed">
+                {isEditMode
+                  ? "Update your community details and publication preferences."
+                  : "Establish a new space for experts and learners to share knowledge."}
+              </p>
+            </div>
+            <button 
+              onClick={onClose} 
+              type="button"
+              className="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-50 rounded-lg transition shrink-0"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* API Error */}
-        {apiError && (
-          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-            {apiError}
-          </div>
-        )}
+        {/* Scrollable Form Body (Flex-1) */}
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
+          {/* API Error */}
+          {apiError && (
+            <div className="px-4 py-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-xs font-bold uppercase tracking-wider">
+              {apiError}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} noValidate>
-          {/* Name */}
-          <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Community Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (errors.name) setErrors((p) => ({ ...p, name: "" }));
-              }}
-              placeholder="Enter community name"
-              className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-gray-50 ${
-                errors.name ? "border-red-400" : "border-gray-300"
-              }`}
-            />
-            {errors.name && (
-              <p className="mt-1 text-xs text-red-500">{errors.name}</p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => {
-                setDescription(e.target.value);
-                if (errors.description) setErrors((p) => ({ ...p, description: "" }));
-              }}
-              placeholder="Describe your community"
-              rows={3}
-              className={`w-full border rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-gray-50 ${
-                errors.description ? "border-red-400" : "border-gray-300"
-              }`}
-            />
-            {errors.description && (
-              <p className="mt-1 text-xs text-red-500">{errors.description}</p>
-            )}
-          </div>
-
-          {/* Visibility */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-900 mb-3">
-              Visibility
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setVisibility("public")}
-                className={`p-4 rounded-xl border-2 transition text-left ${
-                  visibility === "public"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
+          <form onSubmit={handleSubmit} id="community-form" noValidate className="space-y-5">
+            {/* Name */}
+            <div>
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+                Community Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (errors.name) setErrors((p) => ({ ...p, name: "" }));
+                }}
+                placeholder="Enter community name"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-slate-50/50 font-medium ${
+                  errors.name ? "border-red-400" : "border-slate-200"
                 }`}
-              >
-                <div className="flex items-center gap-3">
+              />
+              {errors.name && (
+                <p className="mt-1.5 text-xs font-bold text-red-500">{errors.name}</p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  if (errors.description) setErrors((p) => ({ ...p, description: "" }));
+                }}
+                placeholder="Describe your community circle"
+                rows={3}
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-slate-50/50 font-medium ${
+                  errors.description ? "border-red-400" : "border-slate-200"
+                }`}
+              />
+              {errors.description && (
+                <p className="mt-1.5 text-xs font-bold text-red-500">{errors.description}</p>
+              )}
+            </div>
+
+            {/* Visibility */}
+            <div>
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-3">
+                Visibility
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setVisibility("public")}
+                  className={`p-4 rounded-xl border-2 transition text-left flex items-start gap-3.5 ${
+                    visibility === "public"
+                      ? "border-blue-600 bg-blue-50/30"
+                      : "border-slate-200 bg-white hover:border-slate-350"
+                  }`}
+                >
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0 ${
                       visibility === "public"
-                        ? "border-blue-500 bg-blue-500"
-                        : "border-gray-300"
+                        ? "border-blue-600 bg-blue-600"
+                        : "border-slate-300"
                     }`}
                   >
                     {visibility === "public" && (
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                     )}
                   </div>
-                </div>
-                <p className={`text-sm font-semibold mt-2 ${
-                  visibility === "public" ? "text-gray-900" : "text-gray-700"
-                }`}>
-                  Public
-                </p>
-                <p className="text-xs text-gray-600 mt-1">Anyone can join</p>
-              </button>
+                  <div>
+                    <p className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                      Public
+                    </p>
+                    <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-snug">Anyone can search, discover, and join this community.</p>
+                  </div>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setVisibility("private")}
-                className={`p-4 rounded-xl border-2 transition text-left ${
-                  visibility === "private"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setVisibility("private")}
+                  className={`p-4 rounded-xl border-2 transition text-left flex items-start gap-3.5 ${
+                    visibility === "private"
+                      ? "border-blue-600 bg-blue-50/30"
+                      : "border-slate-200 bg-white hover:border-slate-350"
+                  }`}
+                >
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0 ${
                       visibility === "private"
-                        ? "border-blue-500 bg-blue-500"
-                        : "border-gray-300"
+                        ? "border-blue-600 bg-blue-600"
+                        : "border-slate-300"
                     }`}
                   >
                     {visibility === "private" && (
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                     )}
                   </div>
-                </div>
-                <p className={`text-sm font-semibold mt-2 ${
-                  visibility === "private" ? "text-gray-900" : "text-gray-700"
-                }`}>
-                  Private
-                </p>
-                <p className="text-xs text-gray-600 mt-1">Requires approval</p>
-              </button>
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-900 mb-3">
-              Publication Status
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input
-                  type="radio"
-                  name="status"
-                  value="published"
-                  checked={status === "published"}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                />
-                <span className={`text-sm font-medium ${status === "published" ? "text-blue-600" : "text-gray-600 group-hover:text-gray-900"}`}>
-                  Published
-                </span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input
-                  type="radio"
-                  name="status"
-                  value="draft"
-                  checked={status === "draft"}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                />
-                <span className={`text-sm font-medium ${status === "draft" ? "text-blue-600" : "text-gray-600 group-hover:text-gray-900"}`}>
-                  Draft
-                </span>
-              </label>
-            </div>
-            <p className="mt-2 text-xs text-gray-500">
-              {status === "published" 
-                ? "Visible to everyone (or members if private)." 
-                : "Only visible to you and admins. Use this while you're still setting things up."}
-            </p>
-          </div>
-
-          {/* Cover Image */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-900 mb-3">
-              Cover Image
-            </label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png"
-              onChange={handleCoverImageChange}
-              className="hidden"
-            />
-            <div
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition"
-            >
-              {coverImagePreview ? (
-                <div className="space-y-3">
-                  <img
-                    src={coverImagePreview}
-                    alt="Cover preview"
-                    className="w-full h-32 object-cover rounded-xl"
-                  />
-                  <p className="text-xs text-gray-500">Click to change image</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex justify-center">
-                    <Cloud className="text-gray-400" size={32} />
+                  <div>
+                    <p className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                      Private
+                    </p>
+                    <p className="text-[10px] font-medium text-slate-500 mt-0.5 leading-snug">Membership requires applicant approval from you.</p>
                   </div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Click or drag to upload cover image
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    JPG or PNG. Max size 2MB (1600x400 recommended)
-                  </p>
-                </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-3">
+                Publication Status
+              </label>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="published"
+                    checked={status === "published"}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="w-4 h-4 text-blue-600 border-slate-350 focus:ring-blue-500"
+                  />
+                  <span className={`text-xs font-black uppercase tracking-widest ${status === "published" ? "text-blue-600" : "text-slate-500 group-hover:text-slate-900"}`}>
+                    Published
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="draft"
+                    checked={status === "draft"}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="w-4 h-4 text-blue-600 border-slate-350 focus:ring-blue-500"
+                  />
+                  <span className={`text-xs font-black uppercase tracking-widest ${status === "draft" ? "text-blue-600" : "text-slate-500 group-hover:text-slate-900"}`}>
+                    Draft
+                  </span>
+                </label>
+              </div>
+              <p className="mt-2 text-[10px] font-medium text-slate-400 leading-snug">
+                {status === "published" 
+                  ? "Circle is immediately visible in explore directory." 
+                  : "Private staging. Invisible to standard members until published."}
+              </p>
+            </div>
+
+            {/* Cover Image */}
+            <div>
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-3">
+                Cover Image
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png"
+                onChange={handleCoverImageChange}
+                className="hidden"
+              />
+              <div
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/10 transition"
+              >
+                {coverImagePreview ? (
+                  <div className="space-y-2">
+                    <img
+                      src={coverImagePreview}
+                      alt="Cover preview"
+                      className="w-full h-28 object-cover rounded-lg border border-slate-100"
+                    />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Click to change cover</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex justify-center">
+                      <Cloud className="text-slate-400" size={28} />
+                    </div>
+                    <p className="text-xs font-black text-slate-900 uppercase tracking-widest">
+                      Upload Banner
+                    </p>
+                    <p className="text-[10px] font-medium text-slate-400">
+                      JPG/PNG up to 2MB (1600x400 recommended)
+                    </p>
+                  </div>
+                )}
+              </div>
+              {errors.coverImage && (
+                <p className="mt-1.5 text-xs font-bold text-red-500">{errors.coverImage}</p>
               )}
             </div>
-            {errors.coverImage && (
-              <p className="mt-1 text-xs text-red-500">{errors.coverImage}</p>
-            )}
-          </div>
+          </form>
+        </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-6 py-2.5 rounded-xl text-sm font-medium text-white transition ${
-                loading
-                  ? "bg-blue-300 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-            >
-              {loading
-                ? isEditMode
-                  ? "Saving..."
-                  : "Creating..."
-                : isEditMode
-                ? "Save Changes"
-                : "Create Community"}
-            </button>
-          </div>
-        </form>
+        {/* Footer (Fixed) */}
+        <div className="p-5 sm:p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3 justify-end shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 border-2 border-slate-200 bg-white hover:bg-slate-50 transition active:scale-95 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="community-form"
+            disabled={loading}
+            className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition active:scale-95 ${
+              loading
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-slate-900 hover:bg-blue-600 shadow-md hover:shadow-blue-600/15"
+            }`}
+          >
+            {loading
+              ? isEditMode
+                ? "Saving..."
+                : "Creating..."
+              : isEditMode
+              ? "Save Changes"
+              : "Create Circle"}
+          </button>
+        </div>
       </div>
     </div>
   );
