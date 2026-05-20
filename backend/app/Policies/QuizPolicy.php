@@ -22,6 +22,11 @@ class QuizPolicy
 
     public function view(?User $user, Quiz $quiz)
     {
+        // If the quiz is published, allow direct viewing for guests or users holding the link/challenge
+        if ($quiz->status === 'published') {
+            return true;
+        }
+
         $community = $quiz->community;
 
         if (!$community) {

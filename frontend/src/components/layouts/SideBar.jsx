@@ -3,9 +3,10 @@ import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Grid2X2, Users, BookOpen,
   BarChart2, Heart, User, LogOut, Search, Bell, Settings, HelpCircle, Menu, X,
-  Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap, Award, Activity
+  Shield, AlertTriangle, ShieldCheck, Home, ClipboardCheck, GraduationCap, Award, Activity, Sun, Moon
 } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
+import { useTheme } from "../../providers/ThemeContext";
 import UserAvatar from "../ui/UserAvatar";
 import RoleBadge from "../ui/RoleBadge";
 import RoleNavigator from "../ui/RoleNavigator";
@@ -44,6 +45,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { theme: appTheme, toggleTheme, isDark } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [settings, setSettings] = useState({});
@@ -129,13 +131,13 @@ export default function Sidebar() {
   };
 
   return (
-    <div className={`flex min-h-screen ${theme.bg} font-sans selection:bg-blue-100 selection:text-blue-700 transition-colors duration-700`}>
+    <div className={`flex min-h-screen ${theme.bg} dark:bg-slate-950 font-sans selection:bg-blue-100 dark:selection:bg-blue-900/40 selection:text-blue-700 dark:selection:text-blue-300 transition-colors duration-700`}>
       {/* Background decoration */}
-      <div className={`fixed inset-0 bg-gradient-to-br ${theme.gradient} pointer-events-none z-0`}></div>
+      <div className={`fixed inset-0 bg-gradient-to-br ${theme.gradient} dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 pointer-events-none z-0`}></div>
       {/* Mobile Backdrop */}
       {isMobileMenuOpen && !isQuizAttemptPage && (
         <div 
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         ></div>
       )}
@@ -143,10 +145,10 @@ export default function Sidebar() {
       {/* Sidebar */}
       {!isQuizAttemptPage && (
         <aside className={`
-          fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
+          fixed inset-y-0 left-0 w-72 bg-white dark:bg-slate-900 shadow-md border-slate-100 dark:border-slate-800/80 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
           ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
         `}>
-        <div className="p-8 flex items-center justify-between border-b border-slate-50">
+        <div className="h-20 px-8 flex items-center justify-between shadow-md border-slate-100 dark:border-slate-800/50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex items-center justify-center overflow-hidden">
                {settings.logo ? (
@@ -161,10 +163,10 @@ export default function Sidebar() {
                  </div>
                )}
             </div>
-            <span className="font-black text-2xl tracking-tighter text-slate-900 uppercase">{settings.site_name || "Quizly"}</span>
+            <span className="font-black text-2xl tracking-tighter text-slate-900 dark:text-white uppercase">{settings.site_name || "Quizly"}</span>
           </div>
           <button 
-            className="lg:hidden p-2 text-slate-400 hover:text-slate-600"
+            className="lg:hidden p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <X size={24} />
@@ -172,18 +174,18 @@ export default function Sidebar() {
         </div>
 
         {/* User Profile in Sidebar (especially for mobile) */}
-        <div className="px-8 py-6 bg-slate-50/50 lg:hidden">
+        <div className="px-8 py-6 bg-slate-50/50 dark:bg-slate-800/30 lg:hidden">
           <div className="flex items-center gap-4">
-            <UserAvatar user={user} size="md" className="border-2 border-white shadow-sm" />
+            <UserAvatar user={user} size="md" className="border-2 border-white dark:border-slate-850 shadow-sm" />
             <div>
-              <p className="text-sm font-black text-slate-900">{user?.name || "Guest"}</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white">{user?.name || "Guest"}</p>
               <RoleBadge role={roleName} className="mt-1" />
             </div>
           </div>
         </div>
 
         <div className="px-6 py-4 flex-1 overflow-y-auto">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Main Menu</p>
+          <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-2">Main Menu</p>
           <nav className="space-y-1">
             {filteredNavItems.map(({ to, label, icon: Icon }) => (
               <NavLink
@@ -195,7 +197,7 @@ export default function Sidebar() {
                   `flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
                     isActive
                       ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
-                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                      : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white"
                   }`
                 }
               >
@@ -212,22 +214,23 @@ export default function Sidebar() {
         </div>
 
         <div className="px-6 py-4 mt-auto">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Support</p>
+          <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-2">Support</p>
           <nav className="space-y-1">
-            <SideLink to="/profile" icon={<Settings size={18}/>} label="Settings" onClick={() => setIsMobileMenuOpen(false)} />
+            <SideLink to="/profile" icon={<Settings size={18}/>} label="Settings" onClick={() => setIsMobileMenuOpen(false)} dark={isDark} />
             <SideLink 
               to={settings.help_center_type === 'external' ? settings.help_center_url : "/help"} 
               icon={<HelpCircle size={18}/>} 
               label="Help Center" 
               onClick={() => setIsMobileMenuOpen(false)} 
               isExternal={settings.help_center_type === 'external'}
+              dark={isDark}
             />
           </nav>
           
-          <div className="mt-8 pt-6 border-t border-slate-100">
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/50">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all duration-300 group font-bold"
+              className="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400 transition-all duration-300 group font-bold"
             >
               <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm">Logout</span>
@@ -241,10 +244,10 @@ export default function Sidebar() {
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
         {/* Top Header */}
         {!isQuizAttemptPage && (
-          <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-10 shrink-0">
+          <header className="h-20 premium-header backdrop-blur-md shadow-md border-slate-100 dark:border-slate-800/50 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-10 shrink-0">
             <div className="flex items-center gap-4">
               <button 
-                className="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl"
+                className="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
                 <Menu size={24} />
@@ -254,32 +257,45 @@ export default function Sidebar() {
                 <input 
                   type="text" 
                   placeholder="Search everything..." 
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-full outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all font-medium text-sm"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-full outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-200 dark:focus:border-blue-800 transition-all font-medium text-sm text-slate-900 dark:text-white"
                 />
               </div>
             </div>
             
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="hidden xs:flex items-center gap-2">
-                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition relative">
+                {/* Beautiful Premium Theme Toggle Button in Dashboard Header */}
+                <button
+                  onClick={toggleTheme}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent dark:border-slate-800/40 transition relative cursor-pointer group"
+                  aria-label="Toggle theme"
+                >
+                  {isDark ? (
+                    <Sun size={20} className="rotate-0 transition-transform duration-500 group-hover:rotate-45" />
+                  ) : (
+                    <Moon size={20} className="rotate-0 transition-transform duration-500 group-hover:-rotate-12" />
+                  )}
+                </button>
+
+                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition relative">
                   <Bell size={20} />
-                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white shadow-sm"></span>
+                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white dark:border-slate-900 shadow-sm"></span>
                 </button>
               </div>
               
-              <div className="flex items-center gap-3 lg:gap-4 lg:pl-8 lg:border-l lg:border-slate-100">
+              <div className="flex items-center gap-3 lg:gap-4 lg:pl-8 lg:border-l lg:border-slate-100 dark:border-slate-800">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-black text-slate-900 tracking-tight">{user?.name || "Anonymous"}</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{user?.name || "Anonymous"}</p>
                   <RoleBadge role={roleName} />
                 </div>
-                <UserAvatar user={user} size="md" className="lg:w-12 lg:h-12 border-2 border-white" />
+                <UserAvatar user={user} size="md" className="lg:w-12 lg:h-12 border-2 border-white dark:border-slate-800" />
               </div>
             </div>
           </header>
         )}
 
         {/* Content */}
-        <main className={`flex-1 overflow-y-auto ${isQuizAttemptPage ? 'p-0' : 'p-3 sm:p-6 lg:p-10'} bg-slate-50/50`}>
+        <main className={`flex-1 overflow-y-auto ${isQuizAttemptPage ? 'p-0' : 'p-3 sm:p-6 lg:p-10'} bg-slate-50/50 dark:bg-slate-950/40`}>
           <div className={isQuizAttemptPage ? '' : 'max-w-6xl mx-auto'}>
             <Outlet />
           </div>
@@ -292,7 +308,7 @@ export default function Sidebar() {
   );
 }
 
-function SideLink({ icon, label, to, onClick, isExternal }) {
+function SideLink({ icon, label, to, onClick, isExternal, dark }) {
   const content = (
     <>
       <span className="transition-transform group-hover:scale-110">{icon}</span>
@@ -304,7 +320,7 @@ function SideLink({ icon, label, to, onClick, isExternal }) {
     `flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
       isActive
         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold"
-        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+        : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white"
     }`;
 
   if (isExternal) {

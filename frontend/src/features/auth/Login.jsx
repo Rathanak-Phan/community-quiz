@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
+import { useTheme } from "../../providers/ThemeContext";
 import SEO from "../../components/common/SEO";
 import RecaptchaWidget from "../../components/common/RecaptchaWidget";
 import { 
@@ -10,7 +11,9 @@ import {
   Eye, 
   EyeOff, 
   LogIn, 
-  Loader2 
+  Loader2,
+  Sun,
+  Moon
 } from "lucide-react";
 
 import googleLogo from "../../assets/images/google_logo.png";
@@ -25,6 +28,7 @@ function Login() {
   const redirectPath = queryParams.get("redirect");
 
   const { login, token, loading: authLoading } = useAuth();
+  const { toggleTheme, isDark } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -159,6 +163,17 @@ function Login() {
         description="Sign in to QuizSphere to access your quizzes, communities, and track your learning progress."
         url="/login"
       />
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-6 right-6 z-50">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all duration-300 active:scale-95 cursor-pointer shadow-sm"
+          aria-label="Toggle Theme"
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
       {/* Background blobs for depth */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>

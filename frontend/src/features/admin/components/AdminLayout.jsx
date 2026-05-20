@@ -13,7 +13,7 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-['Inter']">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 font-['Inter'] text-slate-900 dark:text-slate-150 transition-colors duration-300">
       <AdminSidebar />
       <main className="flex-1 overflow-x-hidden">
         <div className="p-12 max-w-[1600px] mx-auto">

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
-import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User, Menu, X, GraduationCap } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogIn, UserPlus, LogOut, Heart, User, Menu, X, GraduationCap, Sun, Moon } from "lucide-react";
 import { useAuth } from "../../providers/AuthContext";
+import { useTheme } from "../../providers/ThemeContext";
 import UserAvatar from "../ui/UserAvatar";
 import { getSettings } from "../../features/admin/services/settingService";
 import { STORAGE_URL } from "../../config/api";
@@ -10,6 +11,7 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, token, logout } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,9 +36,9 @@ export default function MainLayout() {
   const isHomePage = location.pathname === "/";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       {/* Premium Glassmorphism Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 premium-header backdrop-blur-md shadow-md border-slate-100 dark:border-slate-800/50">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
@@ -53,19 +55,32 @@ export default function MainLayout() {
                  </div>
                )}
             </div>
-            <span className="font-black text-2xl tracking-tighter text-slate-900">{settings.site_name || "Quizly"}</span>
+            <span className="font-black text-2xl tracking-tighter text-slate-900 dark:text-white">{settings.site_name || "Quizly"}</span>
           </Link>
 
           {/* Navigation - Desktop */}
           <div className="hidden md:flex items-center gap-10">
-            <NavLink to="/" active={isActive("/")}>Home</NavLink>
-            <NavLink to="/leaderboard" active={isActive("/leaderboard")}>Leaderboard</NavLink>
-            <NavLink to="/communities" active={isActive("/communities")}>Communities</NavLink>
-            {token && <NavLink to="/dashboard" active={isActive("/dashboard")}>Dashboard</NavLink>}
+            <NavLink to="/" active={isActive("/")} dark={isDark}>Home</NavLink>
+            <NavLink to="/leaderboard" active={isActive("/leaderboard")} dark={isDark}>Leaderboard</NavLink>
+            <NavLink to="/communities" active={isActive("/communities")} dark={isDark}>Communities</NavLink>
+            {token && <NavLink to="/dashboard" active={isActive("/dashboard")} dark={isDark}>Dashboard</NavLink>}
           </div>
 
           {/* Auth Actions & Mobile Toggle */}
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Beautiful Premium Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all duration-300 active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm dark:shadow-none"
+              aria-label="Toggle theme"
+            >
+              {isDark ? (
+                <Sun size={18} className="rotate-0 transition-transform duration-500 group-hover:rotate-45" />
+              ) : (
+                <Moon size={18} className="rotate-0 transition-transform duration-500 group-hover:-rotate-12" />
+              )}
+            </button>
+
             {token ? (
               <div className="relative flex items-center gap-2 md:gap-4">
                 {user?.role?.name === 'user' && (
@@ -90,15 +105,15 @@ export default function MainLayout() {
                   {isDropdownOpen && (
                     <>
                       <div className="fixed inset-0 z-50" onClick={() => setIsDropdownOpen(false)}></div>
-                      <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-slate-50 py-3 z-[60] animate-in fade-in zoom-in duration-200">
-                        <div className="px-5 py-3 border-b border-slate-50 mb-2">
-                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest text-left">Signed in as</p>
-                          <p className="text-sm font-bold text-slate-900 truncate text-left">{user?.name}</p>
+                      <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-50 dark:border-slate-800/80 py-3 z-[60] animate-in fade-in zoom-in duration-200">
+                        <div className="px-5 py-3 border-b border-slate-50 dark:border-slate-800/50 mb-2">
+                          <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-left">Signed in as</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white truncate text-left">{user?.name}</p>
                         </div>
                         
-                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/dashboard"); }} icon={<LayoutDashboard size={16}/>} label="Dashboard" />
-                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/profile"); }} icon={<User size={16}/>} label="My Profile" />
-                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/favorites"); }} icon={<Heart size={16}/>} label="My Favorites" />
+                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/dashboard"); }} icon={<LayoutDashboard size={16}/>} label="Dashboard" dark={isDark} />
+                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/profile"); }} icon={<User size={16}/>} label="My Profile" dark={isDark} />
+                        <DropdownItem onClick={() => { setIsDropdownOpen(false); navigate("/favorites"); }} icon={<Heart size={16}/>} label="My Favorites" dark={isDark} />
                         
                         {user?.role?.name === 'user' && (
                           <DropdownItem 
@@ -106,15 +121,17 @@ export default function MainLayout() {
                             icon={<UserPlus size={16}/>} 
                             label="Become a Creator" 
                             highlight 
+                            dark={isDark}
                           />
                         )}
                         
-                        <div className="border-t border-slate-50 mt-2 pt-2">
+                        <div className="border-t border-slate-50 dark:border-slate-800/50 mt-2 pt-2">
                           <DropdownItem 
                             onClick={() => { setIsDropdownOpen(false); logout(); }} 
                             icon={<LogOut size={16}/>} 
                             label="Sign Out" 
                             danger 
+                            dark={isDark}
                           />
                         </div>
                       </div>
@@ -126,7 +143,7 @@ export default function MainLayout() {
               <div className="hidden md:flex items-center gap-2 md:gap-3">
                 <Link 
                   to="/login" 
-                  className="text-[10px] md:text-sm font-bold text-slate-600 hover:text-slate-900 px-2 md:px-4 py-2 flex items-center gap-2 transition"
+                  className="text-[10px] md:text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2 md:px-4 py-2 flex items-center gap-2 transition"
                 >
                   <LogIn size={16} className="hidden sm:block" />
                   Login
@@ -144,7 +161,7 @@ export default function MainLayout() {
             {/* Mobile Menu Toggle */}
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl transition"
+              className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -154,23 +171,23 @@ export default function MainLayout() {
         {/* Mobile Menu Drawer */}
         {isMobileMenuOpen && (
           <>
-            <div className="fixed inset-0 top-20 bg-slate-900/20 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>
-            <div className="fixed top-20 left-0 right-0 bg-white border-b border-slate-100 z-50 md:hidden animate-in slide-in-from-top duration-300">
+            <div className="fixed inset-0 top-20 bg-slate-900/20 dark:bg-slate-950/40 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>
+            <div className="fixed top-20 left-0 right-0 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800/50 z-50 md:hidden animate-in slide-in-from-top duration-300">
               <div className="p-6 flex flex-col gap-2">
-                <MobileNavLink to="/" active={isActive("/")} onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>
-                <MobileNavLink to="/leaderboard" active={isActive("/leaderboard")} onClick={() => setIsMobileMenuOpen(false)}>Leaderboard</MobileNavLink>
-                <MobileNavLink to="/communities" active={isActive("/communities")} onClick={() => setIsMobileMenuOpen(false)}>Communities</MobileNavLink>
-                {token && <MobileNavLink to="/dashboard" active={isActive("/dashboard")} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</MobileNavLink>}
+                <MobileNavLink to="/" active={isActive("/")} onClick={() => setIsMobileMenuOpen(false)} dark={isDark}>Home</MobileNavLink>
+                <MobileNavLink to="/leaderboard" active={isActive("/leaderboard")} onClick={() => setIsMobileMenuOpen(false)} dark={isDark}>Leaderboard</MobileNavLink>
+                <MobileNavLink to="/communities" active={isActive("/communities")} onClick={() => setIsMobileMenuOpen(false)} dark={isDark}>Communities</MobileNavLink>
+                {token && <MobileNavLink to="/dashboard" active={isActive("/dashboard")} onClick={() => setIsMobileMenuOpen(false)} dark={isDark}>Dashboard</MobileNavLink>}
                 {token && user?.role?.name === 'user' && (
-                  <MobileNavLink to="/become-creator" active={isActive("/become-creator")} onClick={() => setIsMobileMenuOpen(false)} highlight>Become a Creator</MobileNavLink>
+                  <MobileNavLink to="/become-creator" active={isActive("/become-creator")} onClick={() => setIsMobileMenuOpen(false)} highlight dark={isDark}>Become a Creator</MobileNavLink>
                 )}
                 
                 {!token && (
-                  <div className="flex flex-col gap-3 pt-4 border-t border-slate-50 mt-2">
+                  <div className="flex flex-col gap-3 pt-4 border-t border-slate-50 dark:border-slate-800/50 mt-2">
                     <Link 
                       to="/login" 
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 text-center font-black text-slate-900 uppercase tracking-widest text-[10px]"
+                      className="w-full py-4 text-center font-black text-slate-900 dark:text-white uppercase tracking-widest text-[10px]"
                     >
                       Login
                     </Link>
@@ -195,7 +212,7 @@ export default function MainLayout() {
       </main>
 
       {/* Modern Footer */}
-      <footer className="bg-slate-50 border-t border-slate-100 py-10 md:py-16">
+      <footer className="bg-slate-50 dark:bg-slate-900/20 border-t border-slate-100 dark:border-slate-900 py-10 md:py-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-12">
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-3">
@@ -206,16 +223,16 @@ export default function MainLayout() {
                    className="w-full h-full object-contain"
                  />
               </div>
-              <span className="font-black text-xl tracking-tighter text-slate-900 uppercase">{settings.site_name || "Quizly"}</span>
+              <span className="font-black text-xl tracking-tighter text-slate-900 dark:text-white uppercase">{settings.site_name || "Quizly"}</span>
             </Link>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Empowering communities through shared knowledge and competitive learning. Join thousands of creators worldwide.
             </p>
           </div>
           
           <div>
-            <h4 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs text-left">Platform</h4>
-            <ul className="space-y-4 text-sm text-slate-500 text-left">
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-xs text-left">Platform</h4>
+            <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400 text-left">
               <li><Link to="/quizzes" className="hover:text-blue-600 transition">Explore Quizzes</Link></li>
               <li><Link to="/communities" className="hover:text-blue-600 transition">Communities</Link></li>
               <li><Link to="/leaderboard" className="hover:text-blue-600 transition">Global Ranking</Link></li>
@@ -223,8 +240,8 @@ export default function MainLayout() {
           </div>
 
           <div>
-            <h4 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs text-left">Resources</h4>
-            <ul className="space-y-4 text-sm text-slate-500 text-left">
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-xs text-left">Resources</h4>
+            <ul className="space-y-4 text-sm text-slate-500 dark:text-slate-400 text-left">
               <li><Link to="/help" className="hover:text-blue-600 transition">Help Center</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition">API Documentation</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition">Community Guidelines</Link></li>
@@ -232,22 +249,22 @@ export default function MainLayout() {
           </div>
 
           <div>
-            <h4 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs text-left">Newsletter</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-xs text-left">Newsletter</h4>
             <div className="space-y-4">
-              <input type="text" placeholder="your@email.com" className="w-full bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition outline-none" />
-              <button className="w-full bg-slate-900 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-blue-600 transition">Subscribe</button>
+              <input type="text" placeholder="your@email.com" className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition outline-none text-slate-900 dark:text-white" />
+              <button className="w-full bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-blue-600 transition">Subscribe</button>
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200/50 dark:border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
             <span>&copy; {new Date().getFullYear()} {settings.site_name || "QuizSphere"}. All rights reserved.</span>
-            <span className="hidden md:block text-slate-200">|</span>
-            <span>Developed by <span className="text-slate-900">Rathanak Phan</span></span>
+            <span className="hidden md:block text-slate-200 dark:text-slate-800">|</span>
+            <span>Developed by <span className="text-slate-900 dark:text-white">Rathanak Phan</span></span>
           </div>
           <div className="flex gap-6">
-            <Link to="#" className="hover:text-slate-900 transition">Privacy</Link>
-            <Link to="#" className="hover:text-slate-900 transition">Terms</Link>
+            <Link to="#" className="hover:text-slate-900 dark:hover:text-white transition">Privacy</Link>
+            <Link to="#" className="hover:text-slate-900 dark:hover:text-white transition">Terms</Link>
           </div>
         </div>
       </footer>
@@ -275,19 +292,19 @@ function NavLink({ to, children, active, dark }) {
   );
 }
 
-function DropdownItem({ icon, label, onClick, danger = false, highlight = false }) {
+function DropdownItem({ icon, label, onClick, danger = false, highlight = false, dark }) {
   return (
     <button 
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-bold transition-all duration-200 text-left ${
         danger 
-          ? "text-rose-500 hover:bg-rose-50" 
+          ? "text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20" 
           : highlight
-            ? "text-blue-600 hover:bg-blue-50 bg-blue-50/30"
-            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            ? "text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 bg-blue-50/30 dark:bg-blue-950/10"
+            : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
       }`}
     >
-      <span className={danger ? "text-rose-500" : highlight ? "text-blue-600" : "text-slate-400"}>
+      <span className={danger ? "text-rose-500" : highlight ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}>
         {icon}
       </span>
       {label}
@@ -295,7 +312,7 @@ function DropdownItem({ icon, label, onClick, danger = false, highlight = false 
   );
 }
 
-function MobileNavLink({ to, children, active, onClick, highlight }) {
+function MobileNavLink({ to, children, active, onClick, highlight, dark }) {
   return (
     <Link 
       to={to} 
@@ -304,8 +321,8 @@ function MobileNavLink({ to, children, active, onClick, highlight }) {
         active 
           ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
           : highlight
-            ? 'bg-blue-50 text-blue-600 border border-blue-100'
-            : 'text-slate-500 hover:bg-slate-50'
+            ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900'
+            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
       }`}
     >
       {children}

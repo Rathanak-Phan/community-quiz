@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, ArrowLeft, Loader2, CheckCircle, GraduationCap } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, CheckCircle, GraduationCap, Sun, Moon } from "lucide-react";
 import { getSettings } from "../admin/services/settingService";
 import { useEffect } from "react";
+import { useTheme } from "../../providers/ThemeContext";
 import { STORAGE_URL, BASE_URL } from "../../config/api";
 import SEO from "../../components/common/SEO";
 import RecaptchaWidget from "../../components/common/RecaptchaWidget";
 
 function ForgotPassword() {
+  const { toggleTheme, isDark } = useTheme();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -108,6 +110,17 @@ function ForgotPassword() {
         description="Recover system access. Receive verification instructions to reset your account password securely."
         url="/forgot-password"
       />
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-6 right-6 z-50">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all duration-300 active:scale-95 cursor-pointer shadow-sm"
+          aria-label="Toggle Theme"
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>
         <div className="absolute -bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-float" style={{ animationDelay: '-1.5s' }}></div>

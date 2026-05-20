@@ -8,14 +8,18 @@ import {
   ShieldCheck,
   ChevronRight,
   AlertTriangle,
-  Activity
+  Activity,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 import { useAuth } from '../../../providers/AuthContext';
+import { useTheme } from '../../../providers/ThemeContext';
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { toggleTheme, isDark } = useTheme();
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Overview', path: '/admin/dashboard' },
@@ -27,15 +31,15 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <div className="w-80 bg-white border-r border-slate-100 flex flex-col h-screen sticky top-0">
+    <div className="w-80 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col h-screen sticky top-0 transition-colors duration-300">
       <div className="p-8 pb-12">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 animate-pulse-slow">
             <ShieldCheck size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Admin <span className="text-blue-600">Panel</span></h1>
-            <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Management Console</p>
+            <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Admin <span className="text-blue-600">Panel</span></h1>
+            <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Management Console</p>
           </div>
         </div>
       </div>
@@ -49,7 +53,7 @@ const AdminSidebar = () => {
               flex items-center justify-between px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 group
               ${isActive 
                 ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 translate-x-2' 
-                : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900 hover:translate-x-1'
+                : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white hover:translate-x-1'
               }
             `}
           >
@@ -62,12 +66,19 @@ const AdminSidebar = () => {
         ))}
       </nav>
 
-      <div className="p-6 mt-auto border-t border-slate-50">
+      <div className="p-6 mt-auto border-t border-slate-50 dark:border-slate-800/50 flex items-center gap-2">
+        <button
+          onClick={toggleTheme}
+          className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white transition duration-300 active:scale-95 cursor-pointer"
+          aria-label="Toggle theme"
+        >
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
         <button 
           onClick={() => {
             logout();
           }}
-          className="w-full flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all duration-300 font-black uppercase text-[10px] tracking-widest"
+          className="flex-1 flex items-center gap-4 px-6 py-4 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl transition-all duration-300 font-black uppercase text-[10px] tracking-widest"
         >
           <LogOut size={20} />
           Logout
