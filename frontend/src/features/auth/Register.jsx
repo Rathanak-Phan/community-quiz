@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../providers/AuthContext";
+import { useTheme } from "../../providers/ThemeContext";
 import SEO from "../../components/common/SEO";
 import RecaptchaWidget from "../../components/common/RecaptchaWidget";
 import { 
@@ -14,7 +15,9 @@ import {
   ShieldCheck, 
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Sun,
+  Moon
 } from "lucide-react";
 import { STORAGE_URL, BASE_URL } from "../../config/api";
 
@@ -24,6 +27,7 @@ import githubLogo from "../../assets/images/github_logo.png";
 function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { toggleTheme, isDark } = useTheme();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -169,7 +173,18 @@ function Register() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-6 relative">
+        {/* Floating Theme Toggle */}
+        <div className="absolute top-6 right-6 z-50">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all duration-300 active:scale-95 cursor-pointer shadow-sm"
+            aria-label="Toggle Theme"
+          >
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
         <div className="bg-white w-full max-w-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-12 text-center border border-slate-100 animate-slide-up">
            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mx-auto mb-6">
              <Mail size={32} />
@@ -252,6 +267,17 @@ function Register() {
         description="Join QuizSphere today! Create your account to start taking quizzes, joining communities, and sharing your knowledge."
         url="/register"
       />
+      {/* Floating Theme Toggle */}
+      <div className="absolute top-6 right-6 z-50">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950 transition-all duration-300 active:scale-95 cursor-pointer shadow-sm"
+          aria-label="Toggle Theme"
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -right-[5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60 animate-float"></div>

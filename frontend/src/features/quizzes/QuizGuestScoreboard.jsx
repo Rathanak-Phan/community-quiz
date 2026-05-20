@@ -30,6 +30,7 @@ export default function QuizGuestScoreboard() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+    const [allChallengeTokens, setAllChallengeTokens] = useState([]);
 
     const formatDuration = (started, completed) => {
         if (!started || !completed) return null;
@@ -53,8 +54,27 @@ export default function QuizGuestScoreboard() {
                 
                 // Get ONLY anonymous/guest attempts matching this specific challenge
                 const allAttempts = attemptsRes.data.data || attemptsRes.data;
+                
+                // Extract unique challenge tokens from all attempts
+                const tokens = [...new Set(allAttempts.map(att => att.challenge_token).filter(Boolean))];
+                setAllChallengeTokens(tokens);
+
+                // Auto-select latest challenge session if none is selected in URL
+                let activeToken = challengeToken;
+                if (!activeToken && tokens.length > 0) {
+                    const latestWithToken = allAttempts
+                        .filter(att => att.is_anonymous && att.challenge_token)
+                        .sort((a, b) => new Date(b.completed_at || b.created_at) - new Date(a.completed_at || a.created_at))[0];
+                    
+                    if (latestWithToken) {
+                        activeToken = latestWithToken.challenge_token;
+                        navigate(`/quizzes/${quizId}/scoreboard?challenge=${activeToken}`, { replace: true });
+                        return;
+                    }
+                }
+
                 const guestAttempts = allAttempts
-                    .filter(att => att.is_anonymous && att.challenge_token === challengeToken)
+                    .filter(att => att.is_anonymous && att.challenge_token === activeToken)
                     // Ensure the rank is correctly calculated on the guest pool
                     .sort((a, b) => {
                         // First tie-breaker: Score descending
@@ -80,7 +100,7 @@ export default function QuizGuestScoreboard() {
             }
         };
         fetchData();
-    }, [quizId]);
+    }, [quizId, challengeToken]);
 
     // Handle search query
     const filteredAttempts = attempts.filter(att => {
@@ -594,6 +614,29 @@ export default function QuizGuestScoreboard() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
+                        
+                        {allChallengeTokens.length > 0 && (
+                            <div className="flex items-center gap-2 bg-slate-50 px-4 py-3.5 rounded-2xl border border-slate-200/60 shadow-inner w-full sm:w-auto">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Session:</span>
+                                <select
+                                    value={challengeToken || ""}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val) {
+                                            navigate(`/quizzes/${quizId}/scoreboard?challenge=${val}`);
+                                        } else {
+                                            navigate(`/quizzes/${quizId}/scoreboard`);
+                                        }
+                                    }}
+                                    className="text-xs font-black text-slate-700 bg-transparent border-none outline-none cursor-pointer uppercase tracking-wider w-full sm:w-auto"
+                                >
+                                    <option value="">Global Arena (No Challenge)</option>
+                                    {allChallengeTokens.map(token => (
+                                        <option key={token} value={token}>{token}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     {/* Runner ups scroll view */}

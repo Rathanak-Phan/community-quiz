@@ -429,9 +429,21 @@ export default function QuizDetail() {
                                         </button>
                                     </div>
                                     {challengeToken && (
-                                        <div className="flex items-center justify-between bg-white border border-yellow-200/40 rounded-xl px-4 py-2">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Active Token:</p>
-                                            <p className="text-xs font-black text-yellow-600">{challengeToken}</p>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex items-center justify-between bg-white border border-yellow-200/40 rounded-xl px-4 py-2">
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Active Token:</p>
+                                                <p className="text-xs font-black text-yellow-600">{challengeToken}</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setShowShareModal(false);
+                                                    navigate(`/quizzes/${quizId}/scoreboard?challenge=${challengeToken}`);
+                                                }}
+                                                className="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-slate-950 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-md shadow-yellow-500/10 flex items-center justify-center gap-1.5"
+                                            >
+                                                <Trophy size={12} /> View Scoreboard
+                                            </button>
                                         </div>
                                     )}
                                 </div>

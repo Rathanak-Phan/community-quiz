@@ -1,6 +1,214 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode toggle in Tailwind CSS v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Enforce solid light-mode background across all layouts when dark mode is inactive */
+html:not(.dark) body,
+html:not(.dark) .min-h-screen,
+html:not(.dark) main,
+html:not(.dark) .flex-1.flex.flex-col.h-screen {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Guarantee Light Mode Inputs and containers have White/Light Grey Backgrounds across all pages */
+html:not(.dark) input:not([type="submit"]):not([type="button"]),
+html:not(.dark) select,
+html:not(.dark) textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) input.bg-slate-50 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .bg-white {
+  background-color: #ffffff !important;
+}
+
+
+/* Global Dark Mode Overrides for Absolute Visual Excellence across All Pages */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #020617; /* slate-950 */
+  color: #f8fafc; /* slate-50 */
+}
+
+/* Card and container backgrounds */
+.premium-header {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+html.dark body .premium-header,
+html.dark .premium-header {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+}
+
+html.dark body .bg-white,
+html.dark .bg-white {
+  background-color: #0f172a !important; /* slate-900 */
+  color: #f8fafc;
+}
+
+html.dark body .bg-slate-50,
+html.dark .bg-slate-50 {
+  background-color: #0f172a !important; /* slate-900 */
+}
+
+html.dark body .bg-slate-50\/50,
+html.dark .bg-slate-50\/50 {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+}
+
+
+html.dark body .border-white\/50,
+html.dark body .border-white\/10,
+html.dark .border-white\/50,
+html.dark .border-white\/10 {
+  border-color: rgba(30, 41, 59, 0.5) !important; /* translucent slate-800 border */
+}
+
+html.dark body .bg-slate-100,
+html.dark .bg-slate-100 {
+  background-color: #1e293b !important; /* slate-800 */
+}
+
+/* Text color overrides */
+html.dark body .text-slate-900,
+html.dark body .text-slate-800,
+html.dark body .text-slate-700,
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+html.dark body .text-slate-600,
+html.dark body .text-slate-500,
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #cbd5e1 !important; /* slate-300 */
+}
+
+html.dark body .text-slate-400,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+/* Border overrides */
+html.dark body .border-slate-100,
+html.dark body .border-slate-200,
+html.dark body .border-slate-50,
+html.dark body .border-slate-200\/60,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-50,
+html.dark .border-slate-200\/60 {
+  border-color: #1e293b !important; /* slate-800 */
+}
+
+/* Input elements */
+html.dark body input:not([type="submit"]):not([type="button"]),
+html.dark body select,
+html.dark body textarea,
+html.dark input:not([type="submit"]):not([type="button"]),
+html.dark select,
+html.dark textarea {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+/* Interactive elements */
+html.dark body .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-50:hover {
+  background-color: #1e293b !important;
+}
+
+html.dark body .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-slate-100:hover {
+  background-color: #334155 !important;
+}
+
+html.dark body .hover\:bg-rose-50:hover,
+html.dark .hover\:bg-rose-50:hover {
+  background-color: rgba(244, 63, 94, 0.15) !important; /* premium translucent rose-500 hover */
+}
+
+html.dark body .hover\:text-slate-900:hover,
+html.dark .hover\:text-slate-900:hover {
+  color: #ffffff !important;
+}
+
+/* Custom Auth Page Hex-Code Dark Mode Overrides */
+html.dark body .bg-\[\#F8FAFC\],
+html.dark body .bg-\[\#f8fafc\],
+html.dark .bg-\[\#F8FAFC\],
+html.dark .bg-\[\#f8fafc\] {
+  background-color: #020617 !important; /* slate-950 */
+}
+
+html.dark body .bg-\[\#2563EB\],
+html.dark .bg-\[\#2563EB\] {
+  background-color: #3b82f6 !important; /* custom dark-mode blue accent */
+}
+
+html.dark body .text-\[\#0F172A\],
+html.dark .text-\[\#0F172A\] {
+  color: #f8fafc !important; /* white */
+}
+
+html.dark body .text-\[\#334155\],
+html.dark .text-\[\#334155\] {
+  color: #cbd5e1 !important; /* slate-300 */
+}
+
+html.dark body .text-\[\#64748B\],
+html.dark .text-\[\#64748B\] {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+html.dark body .text-\[\#94A3B8\],
+html.dark .text-\[\#94A3B8\] {
+  color: #64748b !important;
+}
+
+html.dark body .border-\[\#E2E8F0\],
+html.dark .border-\[\#E2E8F0\] {
+  border-color: #1e293b !important; /* slate-800 */
+}
+
+html.dark body .bg-slate-50 input,
+html.dark body .bg-\[\#F8FAFC\] input,
+html.dark body .bg-\[\#f8fafc\] input,
+html.dark .bg-slate-50 input,
+html.dark .bg-\[\#F8FAFC\] input,
+html.dark .bg-\[\#f8fafc\] input {
+  background-color: #0f172a !important; /* slate-900 inputs */
+  color: #f8fafc !important;
+}
+
 @theme {
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --animate-spin-slow: spin 8s linear infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-float: float 6s ease-in-out infinite;
@@ -45,3 +253,42 @@
     to { transform: translateY(0); }
   }
 }
+
+/* Premium Minimalist Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2); /* very subtle slate-400 */
+  border-radius: 99px;
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+/* Enforce ultra-thin sidebar scrollbar for Chrome/Firefox/Safari */
+aside .overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+}
+
+aside .overflow-y-auto::-webkit-scrollbar {
+  width: 4px; /* ultra-thin inside sidebar */
+}
+
+aside .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+aside .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.35);
+}
+
