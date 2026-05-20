@@ -166,7 +166,7 @@ export default function Sidebar() {
             <span className="font-black text-2xl tracking-tighter text-slate-900 dark:text-white uppercase">{settings.site_name || "Quizly"}</span>
           </div>
           <button 
-            className="lg:hidden p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350"
+            className="lg:hidden p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <X size={24} />

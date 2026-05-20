@@ -160,6 +160,7 @@ const PublicProfile = () => {
         description={user.bio || `Check out ${user.name || user.email}'s profile on QuizSphere. See their quizzes, communities, and achievements.`}
         image={user.avatar}
         url={`/profile/${id}`}
+        type="profile"
       />
       {/* SaaS Style Header */}
       <div className="h-[240px] sm:h-[280px] md:h-[350px] relative overflow-hidden bg-slate-900">

@@ -117,65 +117,73 @@ const QuestionList = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f0ebf8]">
+    <div className="min-h-screen flex items-center justify-center bg-[#f0ebf8] dark:bg-[#0f0a1c]">
       <div className="w-16 h-16 border-4 border-[#673ab7] border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#f0ebf8] pb-32">
+    <div className="min-h-screen bg-[#f0ebf8] dark:bg-[#0f0a1c] pb-32 transition-colors duration-300">
       <SEO 
         title={`Quiz Builder: ${quiz?.title || 'Quiz'}`}
         description={`Configure questions, time limits, categories, and settings for "${quiz?.title || 'Quiz'}" in the QuizSphere Quiz Builder.`}
         url={`/quizzes/${quizId}/questions`}
       />
       {/* Google Forms Style Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm transition-colors duration-300">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button 
               onClick={() => navigate('/dashboard')}
-              className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-full transition text-slate-600 shrink-0"
+              className="p-1.5 sm:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition text-slate-600 dark:text-slate-300 shrink-0"
             >
               <ArrowLeft size={20} />
             </button>
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-base sm:text-xl font-medium text-slate-700 truncate max-w-[120px] xs:max-w-[180px] sm:max-w-[300px]">{quiz?.title}</span>
-              <div className="hidden sm:block w-1 h-1 rounded-full bg-slate-300 shrink-0"></div>
-              <span className="hidden sm:inline-block text-xs font-medium text-slate-400 uppercase tracking-widest shrink-0">Questions</span>
+              <span className="text-base sm:text-xl font-medium text-slate-700 dark:text-slate-200 truncate max-w-[120px] xs:max-w-[180px] sm:max-w-[300px]">{quiz?.title}</span>
+              <div className="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700 shrink-0"></div>
+              <span className="hidden sm:inline-block text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">Questions</span>
             </div>
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
              {/* Mode Toggle */}
-             <div className="flex bg-slate-100 p-0.5 sm:p-1 rounded-xl">
+             <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 sm:p-1 rounded-xl">
                 <button 
                   onClick={() => setIsInlineMode(false)}
-                  className={`px-2 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${!isInlineMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-2 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
+                    !isInlineMode 
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' 
+                      : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350'
+                  }`}
                 >
                   Modal
                 </button>
                 <button 
                   onClick={() => setIsInlineMode(true)}
-                  className={`px-2 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${isInlineMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-2 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
+                    isInlineMode 
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' 
+                      : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350'
+                  }`}
                 >
                   Inline
                 </button>
              </div>
-
-             <div className="hidden sm:block h-6 w-px bg-slate-200"></div>
-
+ 
+             <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+ 
              <div className="flex items-center gap-1.5 sm:gap-3">
                 <button 
                     onClick={() => navigate(`/quizzes/${quizId}`)}
-                    className="p-1.5 sm:p-2.5 hover:bg-slate-100 rounded-full text-slate-600 transition"
+                    className="p-1.5 sm:p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition"
                     title="Preview Quiz"
                 >
                     <Eye size={18} className="sm:w-5 sm:h-5" />
                 </button>
                 <button 
                     onClick={() => setIsQuizModalOpen(true)}
-                    className="p-1.5 sm:p-2.5 hover:bg-slate-100 rounded-full text-slate-600 transition"
+                    className="p-1.5 sm:p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 transition"
                 >
                     <Settings size={18} className="sm:w-5 sm:h-5" />
                 </button>
@@ -194,22 +202,22 @@ const QuestionList = () => {
       <div className="max-w-3xl mx-auto mt-4 sm:mt-8 px-3 sm:px-4 space-y-4">
         
         {/* Quiz Title Card */}
-        <div className="bg-white rounded-xl border-t-[10px] border-[#673ab7] shadow-md p-4 sm:p-8 relative overflow-hidden group/header">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border-t-[10px] border-[#673ab7] shadow-md p-4 sm:p-8 relative overflow-hidden group/header transition-colors duration-300">
              <button 
                 onClick={() => setIsQuizModalOpen(true)}
-                className="absolute top-3 right-3 p-1.5 sm:p-2 bg-slate-50 text-slate-400 rounded-xl opacity-0 group-hover/header:opacity-100 transition hover:text-[#673ab7] hover:bg-white border border-transparent hover:border-slate-100"
+                className="absolute top-3 right-3 p-1.5 sm:p-2 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl opacity-0 group-hover/header:opacity-100 transition hover:text-[#673ab7] dark:hover:text-[#673ab7] hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-slate-100 dark:hover:border-slate-800"
              >
                 <Edit3 size={16} />
              </button>
              <div className="space-y-3 sm:space-y-4">
-                <h1 className="text-2xl sm:text-4xl font-normal text-slate-900 leading-tight">
+                <h1 className="text-2xl sm:text-4xl font-normal text-slate-900 dark:text-white leading-tight">
                     {quiz?.title}
                 </h1>
-                <p className="text-slate-600 text-xs sm:text-sm border-b border-slate-100 pb-3 sm:pb-4">
+                <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm border-b border-slate-100 dark:border-slate-800 pb-3 sm:pb-4">
                     {quiz?.description || 'No description provided'}
                 </p>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-1 sm:pt-2">
-                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-slate-100 rounded-md text-[8px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-slate-100 dark:bg-slate-800 rounded-md text-[8px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                         {quiz?.category?.name || 'General'}
                     </span>
                     {(() => {
@@ -220,9 +228,9 @@ const QuestionList = () => {
                         }, 0);
                         
                         if (totalSeconds <= 0) return null;
-
+ 
                         return (
-                            <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 sm:gap-2">
+                            <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 sm:gap-2">
                                 <Clock size={10} className="text-[#673ab7] sm:w-3 sm:h-3" />
                                 {(() => {
                                     const mins = Math.floor(totalSeconds / 60);
@@ -232,27 +240,27 @@ const QuestionList = () => {
                             </span>
                         );
                     })()}
-                    <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 border-l border-slate-200 pl-2 sm:pl-4">
+                    <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 border-l border-slate-200 dark:border-slate-800 pl-2 sm:pl-4">
                         <HelpCircle size={10} className="text-[#673ab7] sm:w-3 sm:h-3" />
                         {questions.length} Questions
                     </span>
                 </div>
              </div>
         </div>
-
+ 
         {error ? (
-          <div className="p-12 bg-white rounded-xl shadow-md border border-rose-100 text-center space-y-4">
+          <div className="p-12 bg-white dark:bg-slate-900 rounded-xl shadow-md border border-rose-100 dark:border-rose-950/40 text-center space-y-4">
              <XCircle size={48} className="text-rose-500 mx-auto" />
-             <h3 className="text-xl font-bold text-slate-900">Configuration Error</h3>
-             <p className="text-slate-500">{error}</p>
+             <h3 className="text-xl font-bold text-slate-900 dark:text-white">Configuration Error</h3>
+             <p className="text-slate-500 dark:text-slate-400">{error}</p>
           </div>
         ) : (
           <div className="space-y-4 pb-40">
             {questions.length === 0 && inlineEditingId !== 'new' ? (
-              <div className="p-20 bg-white rounded-xl shadow-md border border-dashed border-slate-200 text-center space-y-6">
+              <div className="p-20 bg-white dark:bg-slate-900 rounded-xl shadow-md border border-dashed border-slate-200 dark:border-slate-800 text-center space-y-6">
                  <Sparkles size={64} className="text-[#673ab7]/20 mx-auto" />
-                 <h3 className="text-2xl font-medium text-slate-900">Start Building Your Quiz</h3>
-                 <p className="text-slate-500 max-w-sm mx-auto">Create your first question using the floating menu on the right.</p>
+                 <h3 className="text-2xl font-medium text-slate-900 dark:text-white">Start Building Your Quiz</h3>
+                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Create your first question using the floating menu on the right.</p>
               </div>
             ) : (
               <>
@@ -274,20 +282,22 @@ const QuestionList = () => {
                     ) : (
                       <div 
                         onClick={() => setActiveQuestionId(q.id)}
-                        className={`bg-white rounded-xl shadow-md p-4 sm:p-8 transition-all duration-300 relative group border-l-4 ${
-                          activeQuestionId === q.id ? 'border-blue-500 scale-[1.01]' : 'border-transparent'
+                        className={`bg-white dark:bg-slate-900 rounded-xl shadow-md p-4 sm:p-8 transition-all duration-300 relative group border-l-4 ${
+                          activeQuestionId === q.id 
+                            ? 'border-blue-500 scale-[1.01]' 
+                            : 'border-transparent'
                         }`}
                       >
                         {/* Active Sidebar Actions - Google Forms Style */}
                         {activeQuestionId === q.id && (
                             <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex gap-1 z-10">
-                                <button onClick={() => handleEdit(q)} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Edit">
+                                <button onClick={() => handleEdit(q)} className="p-1.5 sm:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 dark:text-slate-500 transition" title="Edit">
                                     <Edit3 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                 </button>
-                                <button onClick={() => handleDeleteClick(q.id)} className="p-1.5 sm:p-2 hover:bg-rose-50 rounded-full text-slate-400 hover:text-rose-500 transition" title="Delete">
+                                <button onClick={() => handleDeleteClick(q.id)} className="p-1.5 sm:p-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-full text-slate-400 dark:text-slate-500 hover:text-rose-500 transition" title="Delete">
                                     <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                 </button>
-                                <button onClick={() => handleDuplicate(q)} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-full text-slate-400 transition" title="Duplicate">
+                                <button onClick={() => handleDuplicate(q)} className="p-1.5 sm:p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 dark:text-slate-500 transition" title="Duplicate">
                                     <Copy size={16} className="sm:w-[18px] sm:h-[18px]" />
                                 </button>
                             </div>
@@ -296,9 +306,9 @@ const QuestionList = () => {
                         <div className="space-y-4 sm:space-y-6">
                           {/* Question Header */}
                           <div className="flex items-start gap-3 sm:gap-6">
-                            <span className="text-slate-400 font-medium text-base sm:text-lg pt-1">{idx + 1}.</span>
+                            <span className="text-slate-400 dark:text-slate-500 font-medium text-base sm:text-lg pt-1">{idx + 1}.</span>
                             <div className="flex-1 space-y-4 pr-16 sm:pr-0">
-                                <h3 className="text-base sm:text-xl font-normal text-slate-900 leading-snug">
+                                <h3 className="text-base sm:text-xl font-normal text-slate-900 dark:text-white leading-snug">
                                     {q.question_text}
                                 </h3>
                                 
@@ -310,12 +320,12 @@ const QuestionList = () => {
                                                 const correctCount = q.options?.filter(o => o.is_correct).length || 0;
                                                 const isMultiple = q.allow_multiple || correctCount > 1;
                                                 return (
-                                                    <div className={`w-5 h-5 border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${isMultiple ? 'rounded-md' : 'rounded-full'} ${opt.is_correct ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                                                    <div className={`w-5 h-5 border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${isMultiple ? 'rounded-md' : 'rounded-full'} ${opt.is_correct ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 dark:border-slate-700'}`}>
                                                         {opt.is_correct && <Check size={12} className="text-white" strokeWidth={4} />}
                                                     </div>
                                                 );
                                             })()}
-                                            <span className={`text-xs sm:text-sm leading-normal ${opt.is_correct ? 'text-emerald-700 font-semibold' : 'text-slate-600'}`}>
+                                            <span className={`text-xs sm:text-sm leading-normal ${opt.is_correct ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-slate-600 dark:text-slate-300'}`}>
                                                 {opt.option_text}
                                             </span>
                                         </div>
@@ -324,24 +334,24 @@ const QuestionList = () => {
                                     {q.question_type === 'true_false' && (
                                         <div className="flex flex-wrap gap-4 sm:gap-8">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${q.correct_answer === 'true' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${q.correct_answer === 'true' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 dark:border-slate-700'}`}>
                                                     {q.correct_answer === 'true' && <Check size={12} className="text-white" />}
                                                 </div>
-                                                <span className="text-xs sm:text-sm font-medium text-slate-600 uppercase tracking-widest">True</span>
+                                                <span className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-widest">True</span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${q.correct_answer === 'false' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${q.correct_answer === 'false' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 dark:border-slate-700'}`}>
                                                     {q.correct_answer === 'false' && <Check size={12} className="text-white" />}
                                                 </div>
-                                                <span className="text-xs sm:text-sm font-medium text-slate-600 uppercase tracking-widest">False</span>
+                                                <span className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-widest">False</span>
                                             </div>
                                         </div>
                                     )}
 
                                     {q.question_type === 'short_answer' && (
-                                        <div className="max-w-md p-3 sm:p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3 sm:gap-4">
-                                            <Type size={16} className="text-slate-400 shrink-0" />
-                                            <span className="text-xs sm:text-sm text-slate-500 italic">Expected: {q.short_answer?.answer_text}</span>
+                                        <div className="max-w-md p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded-xl flex items-center gap-3 sm:gap-4">
+                                            <Type size={16} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                                            <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 italic">Expected: {q.short_answer?.answer_text}</span>
                                         </div>
                                     )}
                                 </div>
@@ -349,22 +359,22 @@ const QuestionList = () => {
                           </div>
 
                           {/* Question Footer Info */}
-                          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 sm:pt-6 border-t border-slate-100">
+                          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 sm:pt-6 border-t border-slate-100 dark:border-slate-800">
                              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                                <div className="px-2 py-0.5 bg-[#673ab7]/10 text-[#673ab7] rounded text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
+                                <div className="px-2 py-0.5 bg-[#673ab7]/10 dark:bg-[#673ab7]/20 text-[#673ab7] rounded text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                                     {(() => {
                                         const correctCount = q.options?.filter(o => o.is_correct).length || 0;
                                         const isMultiple = q.allow_multiple || correctCount > 1;
                                         return isMultiple ? 'Checkboxes' : q.question_type.replace('_', ' ');
                                     })()}
                                 </div>
-                                <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{q.points || 1} Points</span>
-                                <div className="hidden xs:block w-1 h-1 rounded-full bg-slate-200"></div>
+                                <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{q.points || 1} Points</span>
+                                <div className="hidden xs:block w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></div>
                                 {(() => {
                                     const limit = parseInt(q.time_limit) > 0 ? parseInt(q.time_limit) : (quiz?.has_timer ? (quiz?.default_time_limit || 30) : 0);
                                     if (limit <= 0) return null;
                                     return (
-                                        <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1 sm:gap-1.5">
+                                        <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1 sm:gap-1.5">
                                             <Clock size={10} className="text-blue-500 sm:w-3 sm:h-3" />
                                             {limit}s Limit
                                         </span>
@@ -373,10 +383,10 @@ const QuestionList = () => {
                              </div>
                              {!activeQuestionId && (
                                  <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleEdit(q)} className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 transition">
+                                    <button onClick={() => handleEdit(q)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 dark:text-slate-500 transition">
                                         <Edit3 size={15} />
                                     </button>
-                                    <button onClick={() => handleDeleteClick(q.id)} className="p-1.5 hover:bg-rose-50 rounded-full text-rose-300 hover:text-rose-500 transition">
+                                    <button onClick={() => handleDeleteClick(q.id)} className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-full text-rose-300 hover:text-rose-500 transition">
                                         <Trash2 size={15} />
                                     </button>
                                  </div>
@@ -413,40 +423,40 @@ const QuestionList = () => {
       </div>
 
       {/* Floating Action Menu - Google Forms Style */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 md:top-1/2 md:-translate-y-1/2 flex flex-row md:flex-col items-center gap-2 p-2.5 bg-white/95 backdrop-blur-md rounded-2xl md:rounded-xl shadow-[0_16px_40px_rgba(0,0,0,0.15)] md:shadow-lg border border-slate-200/80 z-40 max-w-[calc(100vw-32px)] overflow-x-auto">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 md:top-1/2 md:-translate-y-1/2 flex flex-row md:flex-col items-center gap-2 p-2.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl md:rounded-xl shadow-[0_16px_40px_rgba(0,0,0,0.15)] md:shadow-lg border border-slate-200/80 dark:border-slate-800 z-40 max-w-[calc(100vw-32px)] overflow-x-auto transition-colors duration-300">
         <button 
             onClick={handleCreate}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition shadow-sm group relative shrink-0"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition shadow-sm group relative shrink-0"
         >
             <Plus size={22} className="sm:w-6 sm:h-6" />
             <span className="hidden md:block absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Add Question</span>
         </button>
-        <div className="hidden md:block w-full h-px bg-slate-100 my-1"></div>
-        <div className="md:hidden w-px h-8 bg-slate-100 mx-1 shrink-0"></div>
+        <div className="hidden md:block w-full h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
+        <div className="md:hidden w-px h-8 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0"></div>
         <button 
             onClick={() => handleActionStub('Import')}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#673ab7] dark:hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
         >
             <Copy size={18} className="sm:w-5 sm:h-5" />
             <span className="hidden md:block absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Import Questions</span>
         </button>
         <button 
             onClick={() => handleActionStub('Title & Description')}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#673ab7] dark:hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
         >
             <Type size={18} className="sm:w-5 sm:h-5" />
             <span className="hidden md:block absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Add Title/Description</span>
         </button>
         <button 
             onClick={handleCreate}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#673ab7] dark:hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
         >
             <ImageIcon size={18} className="sm:w-5 sm:h-5" />
             <span className="hidden md:block absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">Add Image</span>
         </button>
         <button 
             onClick={() => handleActionStub('Video')}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-[#673ab7] dark:hover:text-[#673ab7] transition shadow-sm group relative shrink-0"
         >
             <Sparkles size={18} className="sm:w-5 sm:h-5" />
             <span className="hidden md:block absolute right-full mr-4 px-3 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none uppercase tracking-widest">AI Generate</span>
