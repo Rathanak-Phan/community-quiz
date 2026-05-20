@@ -127,6 +127,7 @@ const CommunityDetail = () => {
         description={community.description || `Join the ${community.name} community on QuizSphere and participate in interactive quizzes!`}
         image={community.cover_image ? `${STORAGE_URL}/${community.cover_image}` : null}
         url={`/communities/${id}`}
+        type="community"
       />
       {/* Hero Header */}
       <div className="relative min-h-[380px] md:h-[450px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-end pt-20">

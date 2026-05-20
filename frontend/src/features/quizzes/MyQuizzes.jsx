@@ -83,15 +83,15 @@ export default function MyQuizzes() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                 <div className="space-y-2">
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">My <span className="text-blue-600">Quizzes.</span></h1>
-                    <p className="text-slate-500 font-medium max-w-lg">Manage your creations, update questions, and track community engagement.</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">My <span className="text-blue-600">Quizzes.</span></h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium max-w-lg">Manage your creations, update questions, and track community engagement.</p>
                 </div>
                 <button 
                     onClick={() => {
                         setEditData(null);
                         setIsModalOpen(true);
                     }}
-                    className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black flex items-center gap-3 hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
+                    className="bg-slate-900 dark:bg-slate-800 text-white px-8 py-4 rounded-xl font-black flex items-center gap-3 hover:bg-blue-600 dark:hover:bg-blue-600 transition-all duration-300 shadow-xl shadow-slate-900/10 hover:shadow-blue-600/20 active:scale-95 group"
                 >
                     <div className="w-6 h-6 bg-white/20 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white/40">
                       <Plus size={16} />
@@ -101,13 +101,13 @@ export default function MyQuizzes() {
             </div>
 
             {/* Search */}
-            <div className="bg-white p-6 rounded-xl shadow-xl shadow-slate-200/40 border border-slate-100">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800">
                 <div className="relative group w-full">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-600 transition-colors" size={20} />
                     <input 
                         type="text" 
                         placeholder="Search your quizzes..." 
-                        className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-50 rounded-full outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold"
+                        className="w-full pl-16 pr-6 py-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-50 dark:border-slate-700 rounded-full outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold dark:text-white dark:placeholder:text-slate-500"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -118,7 +118,7 @@ export default function MyQuizzes() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-[420px] bg-white rounded-xl animate-pulse border border-slate-100"></div>
+                        <div key={i} className="h-[420px] bg-white dark:bg-slate-900 rounded-xl animate-pulse border border-slate-100 dark:border-slate-800"></div>
                     ))}
                 </div>
             ) : filteredQuizzes.length > 0 ? (
@@ -137,12 +137,12 @@ export default function MyQuizzes() {
                 </div>
             ) : (
                 <div className="py-32 flex flex-col items-center text-center space-y-6">
-                   <div className="w-24 h-24 bg-slate-100 rounded-xl flex items-center justify-center text-slate-300">
+                   <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-600">
                       <BookOpen size={40} />
                    </div>
                    <div className="space-y-2">
-                      <h3 className="text-xl font-black text-slate-900 uppercase">No Quizzes Yet</h3>
-                      <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Start creating your first learning module</p>
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase">No Quizzes Yet</h3>
+                      <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">Start creating your first learning module</p>
                    </div>
                 </div>
             )}
@@ -188,10 +188,10 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className="group relative bg-white rounded-xl overflow-hidden border border-slate-100 hover:border-blue-100 transition-all duration-500 cursor-pointer hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)]"
+            className="group relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-500 cursor-pointer hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)] transition-colors duration-300"
         >
             {/* Action Menu - Positioned at top level of card to avoid clipping */}
-            <div className="absolute top-6 right-6 z-50">
+            <div className="absolute top-6 right-6 z-55">
                 <button 
                     onClick={(e) => {
                         e.stopPropagation();
@@ -200,7 +200,7 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
                     className={`w-12 h-12 rounded-xl backdrop-blur-xl flex items-center justify-center transition-all duration-500 shadow-2xl ${
                         showMenu 
                         ? 'bg-blue-600 text-white rotate-90 scale-110' 
-                        : 'bg-white/80 text-slate-900 hover:bg-white border border-white/40'
+                        : 'bg-white/80 dark:bg-slate-800/80 text-slate-900 dark:text-white hover:bg-white dark:hover:bg-slate-800 border border-white/40 dark:border-slate-700'
                     }`}
                 >
                     <MoreVertical size={24} strokeWidth={2.5} />
@@ -209,47 +209,47 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
                 {showMenu && (
                     <div 
                         onClick={(e) => e.stopPropagation()}
-                        className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-2xl rounded-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-white/50 p-3 animate-in fade-in zoom-in slide-in-from-top-4 duration-300 overflow-hidden"
+                        className="absolute right-0 mt-4 w-64 bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl rounded-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-white/50 dark:border-slate-700 p-3 animate-in fade-in zoom-in slide-in-from-top-4 duration-300 overflow-hidden"
                     >
                         <div className="px-5 py-3 mb-2">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Management</p>
+                            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">Management</p>
                         </div>
                         
                         <MenuBtn 
                             icon={<Eye size={18} />} 
                             label="Preview Quiz" 
-                            color="text-slate-400"
+                            color="text-slate-400 dark:text-slate-500"
                             hoverColor="group-hover/btn:text-blue-600"
                             onClick={onClick} 
                         />
                         <MenuBtn 
                             icon={<BarChart2 size={18} />} 
                             label="Analytics & Attempts" 
-                            color="text-slate-400"
+                            color="text-slate-400 dark:text-slate-500"
                             hoverColor="group-hover/btn:text-indigo-600"
                             onClick={() => navigate(`/quizzes/${quiz.id}/attempts`)} 
                         />
                         <MenuBtn 
                             icon={<HelpCircle size={18} />} 
                             label="Edit Questions" 
-                            color="text-slate-400"
+                            color="text-slate-400 dark:text-slate-500"
                             hoverColor="group-hover/btn:text-amber-600"
                             onClick={onManage} 
                         />
                         <MenuBtn 
                             icon={<Edit3 size={18} />} 
                             label="Quiz Settings" 
-                            color="text-slate-400"
+                            color="text-slate-400 dark:text-slate-500"
                             hoverColor="group-hover/btn:text-indigo-600"
                             onClick={(e) => onEdit(e, quiz)} 
                         />
                         
-                        <div className="mx-4 my-2 h-px bg-slate-100" />
+                        <div className="mx-4 my-2 h-px bg-slate-100 dark:bg-slate-700" />
                         
                         <MenuBtn 
                             icon={<Trash2 size={18} />} 
                             label="Delete Forever" 
-                            color="text-slate-400"
+                            color="text-slate-400 dark:text-slate-500"
                             hoverColor="group-hover/btn:text-rose-600"
                             isDestructive
                             onClick={(e) => onDelete(e, quiz.id)} 
@@ -258,7 +258,7 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
                 )}
             </div>
 
-            <div className="relative h-48 w-full overflow-hidden shadow-inner bg-slate-50">
+            <div className="relative h-48 w-full overflow-hidden shadow-inner bg-slate-50 dark:bg-slate-800">
                 {/* Visual Polish Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
@@ -269,20 +269,20 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
                         alt={quiz.title} 
                     />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500/5 to-indigo-500/5 flex items-center justify-center">
-                        <Sparkles size={64} className="text-blue-200 animate-pulse" />
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500/5 to-indigo-500/5 dark:from-blue-950/20 dark:to-indigo-950/20 flex items-center justify-center">
+                        <Sparkles size={64} className="text-blue-200 dark:text-blue-900 animate-pulse" />
                     </div>
                 )}
 
                 {/* Glassmorphism Badges */}
                 <div className="absolute top-5 left-5 z-20 flex flex-col gap-2">
-                    <div className="px-4 py-2 rounded-xl bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl shadow-slate-900/5">
-                        <p className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{quiz.category?.name || "General"}</p>
+                    <div className="px-4 py-2 rounded-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-slate-750 shadow-xl shadow-slate-900/5">
+                        <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tighter">{quiz.category?.name || "General"}</p>
                     </div>
                     <div className={`px-4 py-2 rounded-xl backdrop-blur-xl border shadow-xl shadow-slate-900/5 ${
                         quiz.status === 'draft' 
-                        ? 'bg-amber-500/20 text-amber-700 border-amber-200/50' 
-                        : 'bg-emerald-500/20 text-emerald-700 border-emerald-200/50'
+                        ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/40' 
+                        : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-450 border-emerald-200/50 dark:border-emerald-900/40'
                     }`}>
                         <p className="text-[10px] font-black uppercase tracking-tighter">{quiz.status || 'published'}</p>
                     </div>
@@ -292,27 +292,27 @@ function QuizCard({ quiz, userId, onEdit, onDelete, onManage, onClick }) {
             {/* Content Section */}
             <div className="px-4 pt-8 pb-4">
                 <div className="mb-8">
-                    <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors duration-300 leading-tight mb-3">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 leading-tight mb-3">
                         {quiz.title}
                     </h3>
-                    <p className="text-slate-500 text-sm font-medium line-clamp-2 leading-relaxed h-[3rem]">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium line-clamp-2 leading-relaxed h-[3rem]">
                         {quiz.description || "No description provided."}
                     </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-8 border-t border-slate-50">
+                <div className="flex items-center justify-between pt-8 border-t border-slate-50 dark:border-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className="px-4 py-2.5 bg-slate-50 rounded-xl flex items-center gap-2.5 border border-slate-100 group-hover:bg-blue-50/50 group-hover:border-blue-100 transition-colors">
+                        <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center gap-2.5 border border-slate-100 dark:border-slate-750 group-hover:bg-blue-50/50 dark:group-hover:bg-blue-950/20 group-hover:border-blue-100 dark:group-hover:border-blue-900 transition-colors text-slate-900 dark:text-slate-200">
                              <Clock size={16} className="text-blue-500" />
-                             <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{quiz.time_limit || 30}M</span>
+                             <span className="text-[10px] font-black uppercase tracking-tighter">{quiz.time_limit || 30}M</span>
                         </div>
-                        <div className="px-4 py-2.5 bg-slate-50 rounded-xl flex items-center gap-2.5 border border-slate-100 group-hover:bg-emerald-50/50 group-hover:border-emerald-100 transition-colors">
+                        <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center gap-2.5 border border-slate-100 dark:border-slate-750 group-hover:bg-emerald-50/50 dark:group-hover:bg-emerald-950/20 group-hover:border-emerald-100 dark:group-hover:border-emerald-900 transition-colors text-slate-900 dark:text-slate-200">
                              <Users size={16} className="text-emerald-500" />
-                             <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{quiz.attempts_count || 0} ATTEMPTS</span>
+                             <span className="text-[10px] font-black uppercase tracking-tighter">{quiz.attempts_count || 0} ATTEMPTS</span>
                         </div>
                     </div>
                     
-                    <div className="w-14 h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/20 group-hover:shadow-blue-600/40 active:scale-90 group-hover:translate-x-1">
+                    <div className="w-14 h-14 bg-slate-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-all duration-500 shadow-2xl shadow-slate-900/20 dark:shadow-none group-hover:shadow-blue-600/40 active:scale-90 group-hover:translate-x-1">
                         <ChevronRight size={28} />
                     </div>
                 </div>
@@ -325,12 +325,12 @@ function MenuBtn({ icon, label, onClick, color, hoverColor, isDestructive }) {
     return (
         <button 
             onClick={(e) => { e.stopPropagation(); onClick(e); }}
-            className={`w-full px-5 py-3.5 flex items-center gap-4 rounded-xl transition-all duration-300 group/btn text-left ${isDestructive ? 'hover:bg-rose-50' : 'hover:bg-slate-50'}`}
+            className={`w-full px-5 py-3.5 flex items-center gap-4 rounded-xl transition-all duration-300 group/btn text-left ${isDestructive ? 'hover:bg-rose-50 dark:hover:bg-rose-950/40' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
         >
             <div className={`${color} ${hoverColor} transition-all duration-300 group-hover/btn:scale-110`}>
                 {icon}
             </div>
-            <span className={`text-sm font-bold transition-colors ${isDestructive ? 'text-rose-500 group-hover/btn:text-rose-600' : 'text-slate-600 group-hover/btn:text-slate-900'}`}>
+            <span className={`text-sm font-bold transition-colors ${isDestructive ? 'text-rose-500 group-hover/btn:text-rose-600' : 'text-slate-600 dark:text-slate-300 group-hover/btn:text-slate-900 dark:group-hover/btn:text-white'}`}>
                 {label}
             </span>
         </button>

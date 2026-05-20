@@ -162,6 +162,11 @@ export default function QuizDetail() {
                 description={quiz.description || `Take the ${quiz.title} quiz on QuizSphere. Challenge yourself with community-driven learning!`}
                 image={quiz.cover_image ? `${STORAGE_URL}/${quiz.cover_image}` : null}
                 url={`/quizzes/${quizId}`}
+                type="quiz"
+                data={{
+                    creatorName: quiz.creator?.name,
+                    categoryName: quiz.category?.name
+                }}
             />
             {/* Breadcrumb & Action */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
